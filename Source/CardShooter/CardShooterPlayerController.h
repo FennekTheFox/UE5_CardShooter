@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerController.h"
+#include "ProjectPlayerController.h"
+
 #include "CardShooterPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -15,7 +16,7 @@ class UUserWidget;
  *  Overrides the Player Camera Manager class.
  */
 UCLASS(abstract, config="Game")
-class CARDSHOOTER_API ACardShooterPlayerController : public APlayerController
+class CARDSHOOTER_API ACardShooterPlayerController : public AProjectPlayerController
 {
 	GENERATED_BODY()
 	

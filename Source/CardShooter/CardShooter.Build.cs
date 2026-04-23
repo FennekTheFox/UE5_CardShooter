@@ -18,7 +18,10 @@ public class CardShooter : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+			"GameplayTags",
+			"GameplayAbilities",
+			"ProjectAbilitySystem_Plugin"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
