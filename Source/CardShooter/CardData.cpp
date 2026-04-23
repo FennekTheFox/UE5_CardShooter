@@ -9,3 +9,8 @@ FText UCardEffectFragment_Root::GetFragmentDescription()
 {
 	return FText::FromString("Unassigned Description");
 }
+
+void UCardEffectFragment_Execution::Execute_Implementation()
+{
+
+}

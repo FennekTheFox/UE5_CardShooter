@@ -32,6 +32,16 @@ public:
 };
 
 
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class UCardEffectFragment_Execution : public UCardEffectFragment_Root
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintNativeEvent)
+	void Execute();
+};
+
 
 UCLASS(BlueprintType, Blueprintable)
 class UCardData : public UPrimaryDataAsset
@@ -55,5 +65,11 @@ public:
 	TObjectPtr<UTexture2D> CardTexture;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Instanced))
-	TArray<TObjectPtr<UCardEffectFragment_Root>> CardEffects;
+	TArray<TObjectPtr<UCardEffectFragment_Root>> CardAttributes;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Instanced))
+	TObjectPtr<UCardEffectFragment_Execution> PrimaryExecution;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Instanced))
+	TObjectPtr<UCardEffectFragment_Execution> SecondaryExecution;
 };
