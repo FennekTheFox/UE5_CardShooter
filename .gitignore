@@ -44,6 +44,8 @@
 *.VC.opendb
 .vsconfig
 
+UpgradeLog.html
+
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga
