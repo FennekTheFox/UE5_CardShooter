@@ -2,6 +2,7 @@
 
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "GameplayAbilitySpec.h"
 
 #include "CardData.generated.h"
 
@@ -38,8 +39,21 @@ class UCardEffectFragment_Execution : public UCardEffectFragment_Root
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void Execute();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Execute(APawn* ExecutingPawn);
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class UCardEffectFragment_Execution_GameplayAbility : public UCardEffectFragment_Execution
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayAbilitySpecDef AbilityToExecute;
+
+	void Execute_Implementation(APawn* ExecutingPawn) override;
+
 };
 
 
@@ -64,12 +78,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> CardTexture;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Instanced))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TArray<TObjectPtr<UCardEffectFragment_Root>> CardAttributes;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Instanced))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TObjectPtr<UCardEffectFragment_Execution> PrimaryExecution;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Instanced))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TObjectPtr<UCardEffectFragment_Execution> SecondaryExecution;
 };
