@@ -10,6 +10,9 @@ struct FCardDeck
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString DeckName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<TObjectPtr<UCardData>> CardList;
 };
 
