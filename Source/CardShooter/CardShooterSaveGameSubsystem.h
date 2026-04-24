@@ -8,17 +8,33 @@
 class UCardShooterSaveData;
 
 UCLASS(BlueprintType)
-class UCardShooterSaveGameSubsystem : public UGameInstanceSubsystem
+class UCardShooterSaveGameSubsystem : public ULocalPlayerSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintPure)
 	void GetLocalSaveGameList(TArray<UCardShooterSaveData*>& OutSaveGames);
 
-	UFUNCTION()
-	bool SaveGame(UCardShooterSaveData* Data);
+	UFUNCTION(BlueprintPure)
+	void GetLocalPlayerSaveGameName(TArray<FString>& OutSaveGames);
+
+	UFUNCTION(BlueprintCallable)
+	bool SaveGame();
 
 	UFUNCTION(BlueprintPure)
 	FString GetPlayerSaveGameDir();
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerLoadedSaveData(UCardShooterSaveData* Data);
+
+	UFUNCTION(BlueprintPure)
+	UCardShooterSaveData* GetLocalPlayerSaveData();
+
+	UFUNCTION(BlueprintCallable)
+	bool GetLastEditedSave(FString& OutProfileName);
+
+private:
+	UPROPERTY()
+	TObjectPtr<UCardShooterSaveData> LocalPlayerSaveData;
 };

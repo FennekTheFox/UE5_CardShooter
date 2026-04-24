@@ -22,8 +22,8 @@ class UCardShooterSaveData : public USaveGame
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(SaveGame, BlueprintReadWrite)
-	FString SaveGameName;
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (ExposeOnSpawn))
+	FString ProfileName;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	FDateTime DateTimeLastSaved;
