@@ -5,7 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
-#include "CardShooterCameraManager.h"
+#include "Actors/CardShooterCameraManager.h"
 #include "HorrorCharacter.h"
 #include "HorrorUI.h"
 #include "CardShooter.h"

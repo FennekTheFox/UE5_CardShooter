@@ -584,6 +584,11 @@ void UProjectAbilitySystemComponent::TryActivateAbilitiesOnSpawn()
 
 void UProjectAbilitySystemComponent::AddDefaults(AActor* InOwnerActor, AActor* InAvatarActor)
 {
+	if (!GetOwner() || !GetOwner()->HasAuthority())
+	{
+		return;
+	}
+
 	for (auto&& KVPair : DefaultAbilitySets)
 	{
 		if (!ensure(KVPair.Value))
