@@ -29,7 +29,7 @@ public:
 
 
 
-UCLASS(BlueprintType, EditInlineNew)
+UCLASS(BlueprintType, EditInlineNew, Abstract)
 class UCardEffectFragment_Base : public UObject
 {
 	GENERATED_BODY()
@@ -43,7 +43,7 @@ public:
 
 //The base class for all root level fragments
 //Supports returning a description
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Abstract)
 class UCardEffectFragment_Root : public UCardEffectFragment_Base
 {
 	GENERATED_BODY()
@@ -65,7 +65,7 @@ public:
 	void Server_ExecuteCardEffect(APawn* ExecutingPawn);
 };
 
-UCLASS(BlueprintType, Blueprintable)
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
 class UCardEffectFragment_Execution_GameplayAbility : public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
@@ -78,7 +78,7 @@ public:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Debug Print"))
 class UCardEffectFragment_Execution_DebugPrint : public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
@@ -94,6 +94,41 @@ public:
 	float DisplayDuration = 2.f;
 
 	void Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn) override;
+
+};
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
+{
+	GENERATED_BODY()
+
+public:
+
+};
+
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class UCardEffectFragment_ShuffleAttribute : public UCardEffectFragment_Attribute
+{
+	GENERATED_BODY()
+
+public:
+
+};
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Shuffle: Finisher"))
+class UCardEffectFragment_Finisher : public UCardEffectFragment_ShuffleAttribute
+{
+	GENERATED_BODY()
+
+public:
+
+};
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Shuffle: Opener"))
+class UCardEffectFragment_Opener : public UCardEffectFragment_ShuffleAttribute
+{
+	GENERATED_BODY()
+
+public:
 
 };
 
@@ -120,7 +155,7 @@ public:
 	TObjectPtr<UTexture2D> CardTexture;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
-	TArray<TObjectPtr<UCardEffectFragment_Root>> CardAttributes;
+	TArray<TObjectPtr<UCardEffectFragment_Attribute>> CardAttributes;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TObjectPtr<UCardEffectFragment_Execution> PrimaryExecution;
