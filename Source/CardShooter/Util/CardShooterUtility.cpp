@@ -59,9 +59,14 @@ bool UCardShooterUtilityLibrary::CanAddCardToDeck(const FCardDeck& Deck, UCardDa
 		PostChangeDeck.Add(GetCardDataFromIdentity(Identity));
 	}
 
+	return VerifyDeck(PostChangeDeck, FailureReasons);
+}
+
+bool UCardShooterUtilityLibrary::VerifyDeck(const TArray<UCardData*> Deck, TArray<class UDeckLimitationViolation*>& FailureReasons)
+{
 	bool bSuccess = true;
 
-	for (UCardData* Card : PostChangeDeck)
+	for (UCardData* Card : Deck)
 	{
 		if (!Card)
 		{
@@ -72,7 +77,7 @@ bool UCardShooterUtilityLibrary::CanAddCardToDeck(const FCardDeck& Deck, UCardDa
 		{
 			if (UCardEffectFragment_DeckLimitation* AsDeckLimitation = Cast<UCardEffectFragment_DeckLimitation>(DeckLimitation))
 			{
-				bSuccess &= AsDeckLimitation->Verify(PostChangeDeck, FailureReasons);
+				bSuccess &= AsDeckLimitation->Verify(Deck, FailureReasons);
 			}
 		}
 	}

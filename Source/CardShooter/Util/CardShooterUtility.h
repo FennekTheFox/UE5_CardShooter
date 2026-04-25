@@ -16,4 +16,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static bool CanAddCardToDeck(UPARAM()const FCardDeck& Deck, UCardData* CardToAdd, TArray<class UDeckLimitationViolation*>& FailureReasons);
+
+	UFUNCTION(BlueprintCallable)
+	static bool VerifyDeck(const TArray<UCardData*> Deck, TArray<class UDeckLimitationViolation*>& FailureReasons);
 };

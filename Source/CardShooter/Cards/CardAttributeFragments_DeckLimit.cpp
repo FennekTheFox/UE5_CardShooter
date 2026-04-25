@@ -96,3 +96,73 @@ bool UCardEffectFragment_Archetype::Verify(TArray<UCardData*> Deck, TArray<UDeck
 
 	return true;
 }
+
+FText UDeckLimitationViolation_Gregarious::GetFailureReasonText()
+{
+	FText TextToFormat = FText::FromString("Not enough cards in deck for {CardName}.");
+
+	FFormatOrderedArguments FormatArgs;
+	if (auto* OwningAttribute = GetOuter())
+	{
+		if (UCardData* OwningCard = Cast<UCardData>(OwningAttribute->GetOuter()))
+		{
+			FormatArgs.Add(FFormatArgumentValue(OwningCard->CardName));
+		}
+		else
+		{
+			ensure(false);
+		}
+	}
+	else
+	{
+		ensure(false);
+	}
+
+	return FText::Format(TextToFormat, FormatArgs);
+}
+
+bool UCardEffectFragment_Gregarious::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+{
+	bool bSuccess = Deck.Num() >= MinimumDeckSize;
+
+	if (!bSuccess)
+	{
+		FailureReasons.Add(NewObject<UDeckLimitationViolation_Gregarious>(this));
+	}
+	return bSuccess;
+}
+
+FText UDeckLimitationViolation_Reclusive::GetFailureReasonText()
+{
+	FText TextToFormat = FText::FromString("Too many cards in deck for {CardName}.");
+
+	FFormatOrderedArguments FormatArgs;
+	if (auto* OwningAttribute = GetOuter())
+	{
+		if (UCardData* OwningCard = Cast<UCardData>(OwningAttribute->GetOuter()))
+		{
+			FormatArgs.Add(FFormatArgumentValue(OwningCard->CardName));
+		}
+		else
+		{
+			ensure(false);
+		}
+	}
+	else
+	{
+		ensure(false);
+	}
+
+	return FText::Format(TextToFormat, FormatArgs);
+}
+
+bool UCardEffectFragment_Reclusive::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+{
+	bool bSuccess = Deck.Num() <= MaximumDeckSize;
+
+	if (!bSuccess)
+	{
+		FailureReasons.Add(NewObject<UDeckLimitationViolation_Reclusive>(this));
+	}
+	return bSuccess;
+}

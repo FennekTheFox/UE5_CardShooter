@@ -78,6 +78,15 @@ public:
 	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 };
 
+UCLASS(BlueprintType)
+class UDeckLimitationViolation_Gregarious : public UDeckLimitationViolation
+{
+	GENERATED_BODY()
+
+public:
+	FText GetFailureReasonText() override;
+};
+
 //obscure cards can only be added to decks of a minimum certain size
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Deck Limit: Gregarious"))
 class UCardEffectFragment_Gregarious : public UCardEffectFragment_DeckLimitation
@@ -87,7 +96,19 @@ class UCardEffectFragment_Gregarious : public UCardEffectFragment_DeckLimitation
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 MinimumDeckSize = 10;
+
+	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 };
+
+UCLASS(BlueprintType)
+class UDeckLimitationViolation_Reclusive : public UDeckLimitationViolation
+{
+	GENERATED_BODY()
+
+public:
+	FText GetFailureReasonText() override;
+};
+
 
 //prominent cards can only be added to decks of a minimum certain size
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Deck Limit: Reclusive"))
@@ -98,4 +119,6 @@ class UCardEffectFragment_Reclusive : public UCardEffectFragment_DeckLimitation
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 MaximumDeckSize = 10;
+
+	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 };
