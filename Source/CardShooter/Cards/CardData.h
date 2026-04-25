@@ -78,6 +78,24 @@ public:
 
 };
 
+UCLASS(BlueprintType, Blueprintable)
+class UCardEffectFragment_Execution_DebugPrint : public UCardEffectFragment_Execution
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FString Message;
+
+	UPROPERTY(EditDefaultsOnly)
+	FColor DisplayColor = FColor::Green;
+
+	UPROPERTY(EditDefaultsOnly)
+	float DisplayDuration = 2.f;
+
+	void Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn) override;
+
+};
 
 UCLASS(BlueprintType, Blueprintable)
 class UCardData : public UPrimaryDataAsset

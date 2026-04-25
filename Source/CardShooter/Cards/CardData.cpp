@@ -91,3 +91,8 @@ void UCardEffectFragment_Execution_GameplayAbility::Server_ExecuteCardEffect_Imp
 	Identity.AssetTag = AssetTag;
 	Identity.CardDataPath = FSoftObjectPath(this);
 }
+
+ void UCardEffectFragment_Execution_DebugPrint::Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn)
+ {
+	 GEngine->AddOnScreenDebugMessage(-1, DisplayDuration, DisplayColor, Message);
+ }
