@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cards/CardData.h"
+#include "Cards/Deck.h"
 
 #include "CardShooterUtility.generated.h"
 
@@ -12,4 +13,7 @@ class UCardShooterUtilityLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable)
 	static UCardData* GetCardDataFromIdentity(UPARAM()const FCardIdentity& Identity);
+
+	UFUNCTION(BlueprintCallable)
+	static bool CanAddCardToDeck(UPARAM()const FCardDeck& Deck, UCardData* CardToAdd, TArray<class UDeckLimitationViolation*>& FailureReasons);
 };

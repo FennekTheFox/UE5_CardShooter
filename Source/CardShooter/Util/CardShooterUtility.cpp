@@ -1,5 +1,6 @@
 #include "CardShooterUtility.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "../Cards/CardAttributeFragments_DeckLimit.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -39,5 +40,43 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 	}
 
 	return nullptr;
+}
+
+bool UCardShooterUtilityLibrary::CanAddCardToDeck(const FCardDeck& Deck, UCardData* CardToAdd, TArray<UDeckLimitationViolation*>& FailureReasons)
+{
+	FailureReasons.Empty();
+
+	if (!CardToAdd)
+	{
+		return false;
+	}
+
+	TArray<UCardData*> PostChangeDeck;
+	PostChangeDeck.Add(CardToAdd);
+
+	for (const FCardIdentity& Identity : Deck.CardList)
+	{
+		PostChangeDeck.Add(GetCardDataFromIdentity(Identity));
+	}
+
+	bool bSuccess = true;
+
+	for (UCardData* Card : PostChangeDeck)
+	{
+		if (!Card)
+		{
+			return false;
+		}
+
+		for (UCardEffectFragment_Attribute* DeckLimitation : Card->CardAttributes)
+		{
+			if (UCardEffectFragment_DeckLimitation* AsDeckLimitation = Cast<UCardEffectFragment_DeckLimitation>(DeckLimitation))
+			{
+				bSuccess &= AsDeckLimitation->Verify(PostChangeDeck, FailureReasons);
+			}
+		}
+	}
+
+	return bSuccess;
 }
 

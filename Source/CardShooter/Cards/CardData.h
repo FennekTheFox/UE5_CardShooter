@@ -2,7 +2,6 @@
 
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "GameplayAbilitySpec.h"
 
 #include "CardData.generated.h"
 
@@ -27,110 +26,8 @@ public:
 	//TODO here come more properties that more closely describe the actual card identity, like foil and what other customization we offer
 };
 
-
-
-UCLASS(BlueprintType, EditInlineNew, Abstract)
-class UCardEffectFragment_Base : public UObject
-{
-	GENERATED_BODY()
-
-public:
-	//Returns the "label" of the fragment
-	UFUNCTION(BlueprintPure)
-	FText GetFragmentLabel();
-};
-
-
-//The base class for all root level fragments
-//Supports returning a description
-UCLASS(BlueprintType, Abstract)
-class UCardEffectFragment_Root : public UCardEffectFragment_Base
-{
-	GENERATED_BODY()
-
-public:
-	UFUNCTION(BlueprintPure)
-	FText GetFragmentDescription();
-};
-
-
-UCLASS(BlueprintType, Blueprintable, Abstract)
-class UCardEffectFragment_Execution : public UCardEffectFragment_Root
-{
-	GENERATED_BODY()
-
-public:
-	//Execution of cards always needs to happen on server side, and be replicated to the client
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_ExecuteCardEffect(APawn* ExecutingPawn);
-};
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
-class UCardEffectFragment_Execution_GameplayAbility : public UCardEffectFragment_Execution
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayAbilitySpecDef AbilityToExecute;
-
-	void Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn) override;
-
-};
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Debug Print"))
-class UCardEffectFragment_Execution_DebugPrint : public UCardEffectFragment_Execution
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	FString Message;
-
-	UPROPERTY(EditDefaultsOnly)
-	FColor DisplayColor = FColor::Green;
-
-	UPROPERTY(EditDefaultsOnly)
-	float DisplayDuration = 2.f;
-
-	void Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn) override;
-
-};
-UCLASS(BlueprintType, Blueprintable, Abstract)
-class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
-{
-	GENERATED_BODY()
-
-public:
-
-};
-
-UCLASS(BlueprintType, Blueprintable, Abstract)
-class UCardEffectFragment_ShuffleAttribute : public UCardEffectFragment_Attribute
-{
-	GENERATED_BODY()
-
-public:
-
-};
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Shuffle: Finisher"))
-class UCardEffectFragment_Finisher : public UCardEffectFragment_ShuffleAttribute
-{
-	GENERATED_BODY()
-
-public:
-
-};
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Shuffle: Opener"))
-class UCardEffectFragment_Opener : public UCardEffectFragment_ShuffleAttribute
-{
-	GENERATED_BODY()
-
-public:
-
-};
+class UCardEffectFragment_Attribute;
+class UCardEffectFragment_Execution;
 
 UCLASS(BlueprintType, Blueprintable)
 class UCardData : public UPrimaryDataAsset
@@ -163,7 +60,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TObjectPtr<UCardEffectFragment_Execution> SecondaryExecution;
 
-
 	UFUNCTION(BlueprintPure)
 	void GetIdentity(FCardIdentity& Identity);
+
+	UFUNCTION(BlueprintPure)
+	TArray<UCardEffectFragment_Attribute*> GetAttributesOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
 };
