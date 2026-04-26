@@ -5,6 +5,16 @@
 
 #include "CardAttributeFragments_Execution.generated.h"
 
+USTRUCT(BlueprintType)
+struct FCardExecution_AdditionalData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	int32 IterationCount = 0;
+};
+
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UCardEffectFragment_Execution : public UCardEffectFragment_Root
 {
@@ -13,7 +23,13 @@ class UCardEffectFragment_Execution : public UCardEffectFragment_Root
 public:
 	//Execution of cards always needs to happen on server side, and be replicated to the client
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_ExecuteCardEffect(APawn* ExecutingPawn);
+	void Server_ExecuteCardEffect(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData = FCardExecution_AdditionalData());
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_ExecuteCardEffect_Delayed(APawn* ExecutingPawn, float Delay = 1.f, int32 IterationCount = 1);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void ExecuteCardEffect(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData = FCardExecution_AdditionalData());
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
@@ -25,7 +41,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayAbilitySpecDef AbilityToExecute;
 
-	void Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn) override;
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
 
 };
 
@@ -44,5 +60,5 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DisplayDuration = 2.f;
 
-	void Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn) override;
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
 };

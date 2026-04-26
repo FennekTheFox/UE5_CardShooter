@@ -35,3 +35,27 @@ class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
 public:
 
 };
+
+
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Ethereal"))
+class UCardEffectFragment_Ethereal : public UCardEffectFragment_Attribute
+{
+	GENERATED_BODY()
+
+public:
+
+};
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Echo"))
+class UCardEffectFragment_Echo : public UCardEffectFragment_Attribute
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 EchoCount;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float EchoDelay;
+};

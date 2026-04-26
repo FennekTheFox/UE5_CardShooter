@@ -19,4 +19,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static bool VerifyDeck(const TArray<UCardData*> Deck, TArray<class UDeckLimitationViolation*>& FailureReasons);
+
+	UFUNCTION(BlueprintPure)
+	static bool StringLexComparison(const FString& A, const FString& B);
 };

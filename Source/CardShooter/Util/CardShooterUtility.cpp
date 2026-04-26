@@ -85,3 +85,8 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const TArray<UCardData*> Deck, TArra
 	return bSuccess;
 }
 
+bool UCardShooterUtilityLibrary::StringLexComparison(const FString& A, const FString& B)
+{
+	return A < B; // lexicographic
+}
+

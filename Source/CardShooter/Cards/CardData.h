@@ -39,6 +39,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Gameplay.Cards.IDs"))
 	FGameplayTag AssetTag;
 
+	//This tag needs to be set in order for the utility functions to be able to load the card from the tag alone
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTagContainer CardTags;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText CardName;
 
