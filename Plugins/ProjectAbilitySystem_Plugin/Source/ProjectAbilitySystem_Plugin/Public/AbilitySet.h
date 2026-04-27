@@ -20,7 +20,7 @@ struct PROJECTABILITYSYSTEM_PLUGIN_API FAbilitySet
 	TArray<TSubclassOf<UAttributeSet>> Attributes;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FGameplayEffectSpec> Effects;
+	TArray<TSubclassOf<UGameplayEffect>> Effects;
 };
 
 

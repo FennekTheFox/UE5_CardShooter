@@ -47,6 +47,12 @@ public:
 
 };
 
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Persistent"))
+class UCardEffectFragment_Persistent : public UCardEffectFragment_Attribute
+{
+	GENERATED_BODY()
+};
+
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Echo"))
 class UCardEffectFragment_Echo : public UCardEffectFragment_Attribute
 {

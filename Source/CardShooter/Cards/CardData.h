@@ -7,8 +7,6 @@
 
 class UTexture2D;
 
-
-
 USTRUCT(BlueprintType)
 struct FCardIdentity
 {
@@ -24,6 +22,16 @@ public:
 	FSoftObjectPath CardDataPath;
 
 	//TODO here come more properties that more closely describe the actual card identity, like foil and what other customization we offer
+};
+
+USTRUCT(BlueprintType)
+struct FCardIdentityList
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FCardIdentity> Cards;
 };
 
 class UCardEffectFragment_Attribute;
@@ -68,5 +76,8 @@ public:
 	void GetIdentity(FCardIdentity& Identity);
 
 	UFUNCTION(BlueprintPure)
-	TArray<UCardEffectFragment_Attribute*> GetAttributesOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
+	TArray<UCardEffectFragment_Attribute*> GetAllAttributesOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
+
+	UFUNCTION(BlueprintPure)
+	UCardEffectFragment_Attribute* GetAttributeOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
 };

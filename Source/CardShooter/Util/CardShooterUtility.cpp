@@ -1,6 +1,7 @@
 #include "CardShooterUtility.h"
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "../Cards/CardAttributeFragments_DeckLimit.h"
+#include "Cards/CardAttributeFragments_DeckLimit.h"
+#include "AbilitySystemComponent.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -88,5 +89,20 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const TArray<UCardData*> Deck, TArra
 bool UCardShooterUtilityLibrary::StringLexComparison(const FString& A, const FString& B)
 {
 	return A < B; // lexicographic
+}
+
+void UCardShooterUtilityLibrary::BindEventToTagCountChanged(class UAbilitySystemComponent* ASC, FGameplayTag Tag, FOnGameplayTagChangedBP Callback)
+{
+	if (!ensure(ASC))
+	{
+		return;
+	}
+
+	ASC->RegisterGameplayTagEvent(Tag, EGameplayTagEventType::AnyCountChange).AddLambda([Tag, Callback](FGameplayTag ChangedTag, int32 NewCount) {
+		if (ChangedTag == Tag)
+		{
+			Callback.ExecuteIfBound(ChangedTag, NewCount);
+		}
+		});
 }
 

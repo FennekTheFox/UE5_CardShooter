@@ -90,3 +90,46 @@ void UCardEffectFragment_Execution_DebugPrint::ExecuteCardEffect_Implementation(
 {
 	GEngine->AddOnScreenDebugMessage(-1, DisplayDuration, DisplayColor, Message);
 }
+
+void UCardEffectFragment_Execution_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData)
+{
+	if (!ensure(ExecutingPawn && GameplayEffect))
+	{
+		return;
+	}
+
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ExecutingPawn);
+
+	if (!ensure(ASC))
+	{
+		return;
+	}
+
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GameplayEffect, GameplayEffectLevel, ASC->MakeEffectContext());
+
+	FActiveGameplayEffectHandle EffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+
+	//TWeakObjectPtr<UCardEffectFragment_Execution_ApplyEffectToOwner> WeakThis = this;
+
+	//ASC->AddLooseGameplayTag(TrackingTag);
+	//ASC->OnGameplayEffectRemoved_InfoDelegate(EffectHandle)->AddLambda([ASC, WeakThis](const FGameplayEffectRemovalInfo&) {
+	//	if(WeakThis.IsValid())
+	//	{
+	//		ASC->RemoveLooseGameplayTag(WeakThis->TrackingTag);
+	//	};
+}
+
+void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassOf<UCardEffectFragment_Execution> Class, TArray<UCardEffectFragment_Execution*>& OutArray)
+{
+	for (UCardEffectFragment_Execution* SubExec : Executions)
+	{
+		if (UCardEffectFragment_Execution_Compound* AsCompound = Cast<UCardEffectFragment_Execution_Compound>(SubExec))
+		{
+			AsCompound->FindSubExecutionsOfClass(Class, OutArray);
+		}
+		else if (SubExec->IsA(Class))
+		{
+			OutArray.Add(SubExec);
+		}
+	}
+}

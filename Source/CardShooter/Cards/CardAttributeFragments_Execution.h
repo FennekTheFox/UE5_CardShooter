@@ -2,6 +2,8 @@
 
 #include "CardAttributeFragment_Base.h"
 #include "GameplayAbilitySpec.h"
+#include "GameplayEffect.h"
+#include "GameplayCueInterface.h"
 
 #include "CardAttributeFragments_Execution.generated.h"
 
@@ -42,7 +44,19 @@ public:
 	FGameplayAbilitySpecDef AbilityToExecute;
 
 	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
+};
 
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
+class UCardEffectFragment_Execution_Compound : public UCardEffectFragment_Execution
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, Instanced)
+	TArray<TObjectPtr<UCardEffectFragment_Execution>> Executions;
+
+	UFUNCTION(BlueprintPure)
+	void FindSubExecutionsOfClass(TSubclassOf<UCardEffectFragment_Execution> Class, TArray<UCardEffectFragment_Execution*>& OutArray);
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Debug Print"))
@@ -59,6 +73,25 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float DisplayDuration = 2.f;
+
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
+};
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Apply Effect To Self"))
+class UCardEffectFragment_Execution_ApplyEffectToOwner : public UCardEffectFragment_Execution
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> GameplayEffect;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float GameplayEffectLevel = 1.f;
+
+	//The tag applied by the gameplay effect to track when the persistent effect gets removed
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FGameplayTag TrackingTag;
 
 	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
 };

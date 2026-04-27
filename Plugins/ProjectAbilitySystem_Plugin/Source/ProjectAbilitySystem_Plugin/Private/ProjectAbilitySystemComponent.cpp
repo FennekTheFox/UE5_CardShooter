@@ -38,9 +38,11 @@ void UProjectAbilitySystemComponent::AddAbilitySet(const FAbilitySet& AbilitySet
 	}
 
 	// Apply the effects
-	for (const FGameplayEffectSpec Spec : AbilitySet.Effects)
+	for (const TSubclassOf<UGameplayEffect> GameplayEffect : AbilitySet.Effects)
 	{
-		NewData.AppliedEffects.Add(ApplyGameplayEffectSpecToSelf(Spec));
+		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(GameplayEffect, 1.f, MakeEffectContext());
+		
+		NewData.AppliedEffects.Add(ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get()));
 	}
 }
 

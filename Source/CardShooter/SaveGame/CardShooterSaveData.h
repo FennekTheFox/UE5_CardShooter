@@ -48,4 +48,8 @@ public:
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	TArray<FCardDeck> DeckList;
+
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	int32 LastSelectedDeckIndex = -1;
 };
