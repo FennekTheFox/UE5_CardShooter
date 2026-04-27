@@ -1,16 +1,14 @@
 #pragma once
 
+#include "Gameplay/ICardExecutionInfo.h"
+
 #include "CardAttributeFragment_Base.generated.h"
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
 class UCardEffectFragment_Base : public UObject
+	, public ICardExecutionInfo
 {
 	GENERATED_BODY()
-
-public:
-	//Returns the "label" of the fragment
-	UFUNCTION(BlueprintPure)
-	FText GetFragmentLabel();
 };
 
 
@@ -22,8 +20,6 @@ class UCardEffectFragment_Root : public UCardEffectFragment_Base
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure)
-	FText GetFragmentDescription();
 };
 
 
@@ -44,34 +40,4 @@ class UCardEffectFragment_ExecutionAttribute : public UCardEffectFragment_Attrib
 
 public:
 
-};
-
-
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Ethereal"))
-class UCardEffectFragment_Ethereal : public UCardEffectFragment_ExecutionAttribute
-{
-	GENERATED_BODY()
-
-public:
-
-};
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Persistent"))
-class UCardEffectFragment_Persistent : public UCardEffectFragment_ExecutionAttribute
-{
-	GENERATED_BODY()
-};
-
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Echo"))
-class UCardEffectFragment_Echo : public UCardEffectFragment_ExecutionAttribute
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	int32 EchoCount;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float EchoDelay;
 };

@@ -1,6 +1,6 @@
 #include "CardShooterUtility.h"
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "Cards/CardAttributeFragments_DeckLimit.h"
+#include "Cards/CardAttributeFragment_DeckLimit.h"
 #include "AbilitySystemComponent.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)

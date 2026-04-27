@@ -1,0 +1,31 @@
+#pragma once
+
+#include "CardAttributeFragment_DeckLimit.h"
+#include "CardEffectFragment_Keystone.generated.h"
+
+
+UCLASS(BlueprintType)
+class UDeckLimitationViolation_KeystoneLimit : public UDeckLimitationViolation
+{
+	GENERATED_BODY()
+
+public:
+	FText GetFailureReasonText() override;
+};
+
+//Keystone attributes limit the number of Keystone Attribute cards per deck, lowest number dominates
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Deck Limit: Keystone"))
+class UCardEffectFragment_Keystone : public UCardEffectFragment_DeckLimitation
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int32 KeystoneLimit = 3;
+
+	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
+
+	//BEGIN UCardExecutionInfo
+	FText GetName_Implementation() override;
+	//BEGIN UCardExecutionInfo
+};

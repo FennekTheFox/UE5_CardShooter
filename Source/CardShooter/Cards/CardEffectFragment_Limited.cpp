@@ -1,0 +1,50 @@
+#include "CardEffectFragment_Limited.h"
+
+#include "CardData.h"
+
+
+#define LOCTEXT_NAMESPACE "CardEffects"
+
+
+FText UDeckLimitationViolation_Limit::GetFailureReasonText()
+{
+	FText TextToFormat = FText::FromString("Too many of {CardName} in deck.");
+
+	FAILURE_REASON_FORMAT_CARD_NAME();
+
+	return FText::Format(TextToFormat, FormatArgs);
+}
+
+bool UCardEffectFragment_Limited::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+{
+	int32 Count = 0;
+
+	if (auto* OwningAttribute = GetOuter())
+	{
+		if (UCardData* OwningCard = Cast<UCardData>(OwningAttribute->GetOuter()))
+		{
+			for (UCardData* Card : Deck)
+			{
+				if (Card->GetClass() == OwningCard->GetClass())
+				{
+					Count += 1;
+
+					if (Count > Limit)
+					{
+						FailureReasons.Add(NewObject<UDeckLimitationViolation_Limit>(this));
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+FText UCardEffectFragment_Limited::GetName_Implementation()
+{
+	return FText::Format(LOCTEXT("LimitedAttrName", "Limited({0})"), FText::AsNumber(Limit));
+}
+
+#undef LOCTEXT_NAMESPACE

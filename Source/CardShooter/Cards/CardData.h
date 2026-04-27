@@ -2,6 +2,7 @@
 
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "../Gameplay/ICardExecutionInfo.h"
 
 #include "CardData.generated.h"
 
@@ -39,6 +40,7 @@ class UCardEffectFragment_Execution;
 
 UCLASS(BlueprintType, Blueprintable)
 class UCardData : public UPrimaryDataAsset
+	, public ICardExecutionInfo
 {
 	GENERATED_BODY()
 
@@ -53,9 +55,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText CardName;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText CardDescription;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> CardIcon;
@@ -80,4 +79,11 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UCardEffectFragment_Attribute* GetAttributeOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
+
+	//BEGIN UCardExecutionInfo
+	FText GetName_Implementation() override;
+	FText GetDescription_Implementation() override;
+	UTexture2D* GetIcon_Implementation() override;
+	//BEGIN UCardExecutionInfo
+
 };
