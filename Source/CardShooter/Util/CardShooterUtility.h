@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void BindEventToTagCountChanged(class UAbilitySystemComponent* ASC, FGameplayTag Tag, FOnGameplayTagChangedBP Callback);
+
+	UFUNCTION(BlueprintPure)
+	static class UCardEffectFragment_Attribute* GetAttributeOfClassFromArray(TArray<UCardEffectFragment_Attribute*> Array, TSubclassOf<UCardEffectFragment_Attribute> Class);
 };

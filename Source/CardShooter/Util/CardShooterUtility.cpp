@@ -106,3 +106,15 @@ void UCardShooterUtilityLibrary::BindEventToTagCountChanged(class UAbilitySystem
 		});
 }
 
+class UCardEffectFragment_Attribute* UCardShooterUtilityLibrary::GetAttributeOfClassFromArray(TArray<UCardEffectFragment_Attribute*> Array, TSubclassOf<UCardEffectFragment_Attribute> Class)
+{
+	for (UCardEffectFragment_Attribute* Attribute : Array)
+	{
+		if (Attribute->IsA(Class))
+		{
+			return Attribute;
+		}
+	}
+	return nullptr;
+}
+

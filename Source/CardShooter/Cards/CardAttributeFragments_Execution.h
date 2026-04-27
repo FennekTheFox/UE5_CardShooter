@@ -25,13 +25,13 @@ class UCardEffectFragment_Execution : public UCardEffectFragment_Root
 public:
 	//Execution of cards always needs to happen on server side, and be replicated to the client
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_ExecuteCardEffect(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData = FCardExecution_AdditionalData());
+	void Server_ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData AdditionalData = FCardExecution_AdditionalData());
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ExecuteCardEffect_Delayed(APawn* ExecutingPawn, float Delay = 1.f, int32 IterationCount = 1);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void ExecuteCardEffect(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData = FCardExecution_AdditionalData());
+	void ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData);
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
@@ -43,10 +43,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayAbilitySpecDef AbilityToExecute;
 
-	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 };
 
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
+UCLASS(BlueprintType, Blueprintable, Abstract, meta = (DisplayName = "Activate Gameplay Ability"))
 class UCardEffectFragment_Execution_Compound : public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
@@ -57,6 +57,18 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	void FindSubExecutionsOfClass(TSubclassOf<UCardEffectFragment_Execution> Class, TArray<UCardEffectFragment_Execution*>& OutArray);
+};
+
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "AllAtOnce"))
+class UCardEffectFragment_Execution_AllAtOnce : public UCardEffectFragment_Execution_Compound
+{
+	GENERATED_BODY()
+
+public:
+
+	void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Debug Print"))
@@ -74,7 +86,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DisplayDuration = 2.f;
 
-	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
+	void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Apply Effect To Self"))
@@ -93,5 +105,36 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag TrackingTag;
 
-	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData) override;
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+};
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Add Attribute To Next"))
+class UCardEffectFragment_Execution_AddAttributeToNextCards : public UCardEffectFragment_Execution
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
+	TObjectPtr<UCardEffectFragment_ExecutionAttribute> Attribute;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 Count = 1;
+
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+};
+
+
+UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Remove Attribute From Next"))
+class UCardEffectFragment_Execution_RemoveAttributeFromNextCards : public UCardEffectFragment_Execution
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UCardEffectFragment_ExecutionAttribute> AttributeClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 Count = 1;
+
+	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 };

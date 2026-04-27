@@ -36,10 +36,20 @@ public:
 
 };
 
+//Parent class for attributes that can be applied to an execution
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class UCardEffectFragment_ExecutionAttribute : public UCardEffectFragment_Attribute
+{
+	GENERATED_BODY()
+
+public:
+
+};
+
 
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Ethereal"))
-class UCardEffectFragment_Ethereal : public UCardEffectFragment_Attribute
+class UCardEffectFragment_Ethereal : public UCardEffectFragment_ExecutionAttribute
 {
 	GENERATED_BODY()
 
@@ -48,13 +58,13 @@ public:
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Persistent"))
-class UCardEffectFragment_Persistent : public UCardEffectFragment_Attribute
+class UCardEffectFragment_Persistent : public UCardEffectFragment_ExecutionAttribute
 {
 	GENERATED_BODY()
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Echo"))
-class UCardEffectFragment_Echo : public UCardEffectFragment_Attribute
+class UCardEffectFragment_Echo : public UCardEffectFragment_ExecutionAttribute
 {
 	GENERATED_BODY()
 

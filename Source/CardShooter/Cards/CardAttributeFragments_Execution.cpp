@@ -2,8 +2,9 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "../Actors/CardShooterCharacter.h"
 
-void UCardEffectFragment_Execution::Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardEffectFragment_Execution::Server_ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData AdditionalData /*= FCardExecution_AdditionalData()*/)
 {
 	ExecuteCardEffect(ExecutingPawn, AdditionalData);
 }
@@ -29,12 +30,12 @@ void UCardEffectFragment_Execution::Server_ExecuteCardEffect_Delayed_Implementat
 		Delay, false);
 }
 
-void UCardEffectFragment_Execution::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardEffectFragment_Execution::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
 {
 
 }
 
-void UCardEffectFragment_Execution_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardEffectFragment_Execution_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
 {
 	Super::ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
 
@@ -86,12 +87,12 @@ void UCardEffectFragment_Execution_GameplayAbility::ExecuteCardEffect_Implementa
 	);
 }
 
-void UCardEffectFragment_Execution_DebugPrint::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardEffectFragment_Execution_DebugPrint::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
 {
 	GEngine->AddOnScreenDebugMessage(-1, DisplayDuration, DisplayColor, Message);
 }
 
-void UCardEffectFragment_Execution_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, FCardExecution_AdditionalData AdditionalData)
+void UCardEffectFragment_Execution_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
 {
 	if (!ensure(ExecutingPawn && GameplayEffect))
 	{
@@ -131,5 +132,33 @@ void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassO
 		{
 			OutArray.Add(SubExec);
 		}
+	}
+}
+
+void UCardEffectFragment_Execution_AddAttributeToNextCards::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	//TODO This may not be player exclusive, but probably will. If not this needs to change
+	if (auto* AsCSPCharacter = Cast<ACardShooterCharacter>(ExecutingPawn))
+	{
+		int32& ExistingCount = AsCSPCharacter->AttributesToAddToExecutions.FindOrAdd(Attribute);
+		ExistingCount += Count;
+	}
+}
+
+void UCardEffectFragment_Execution_RemoveAttributeFromNextCards::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	//TODO This may not be player exclusive, but probably will. If not this needs to change
+	if (auto* AsCSPCharacter = Cast<ACardShooterCharacter>(ExecutingPawn))
+	{
+		int32& ExistingCount = AsCSPCharacter->AttributesToRemoveFromExecutions.FindOrAdd(AttributeClass);
+		ExistingCount += Count;
+	}
+}
+
+void UCardEffectFragment_Execution_AllAtOnce::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
+{
+	for (UCardEffectFragment_Execution* Exec : Executions)
+	{
+		Exec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
 	}
 }
