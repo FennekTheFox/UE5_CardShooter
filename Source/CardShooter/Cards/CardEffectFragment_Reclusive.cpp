@@ -11,7 +11,7 @@ FText UDeckLimitationViolation_Reclusive::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
-FText UCardEffectFragment_Reclusive::GetName_Implementation()
+FText UCardEffectFragment_Reclusive::GetLocalizableName_Implementation()
 {
 	return FText::Format(LOCTEXT("ReclusiveAttrName", "Reclusive({0})"), FText::AsNumber(MaximumDeckSize));
 }
@@ -25,6 +25,11 @@ bool UCardEffectFragment_Reclusive::Verify(TArray<UCardData*> Deck, TArray<UDeck
 		FailureReasons.Add(NewObject<UDeckLimitationViolation_Reclusive>(this));
 	}
 	return bSuccess;
+}
+
+FText UCardEffectFragment_Reclusive::GetLocalizableDescription_Implementation()
+{
+	return FText::Format(LOCTEXT("ReclusiveAttrDesc", "This card can only be part of decks with no more than {0} cards."), FText::AsNumber(MaximumDeckSize));
 }
 
 #undef LOCTEXT_NAMESPACE

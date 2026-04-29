@@ -7,9 +7,24 @@
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UGameplayAbility_CardExecution : public UProjectGameplayAbility
-	, public ICardExecutionInfo
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FText AbilityName;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FText AbilityDesc;
+
+	FText GetName() 
+	{
+		return AbilityName;
+	}
+
+
+	FText GetDescription() 
+	{
+		return AbilityDesc;
+	}
 };

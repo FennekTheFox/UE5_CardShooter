@@ -1,11 +1,38 @@
 #pragma once
 
 #include "CardAttributeFragment_Execution.h"
+#include "Internationalization/Text.h"
 
 #include "CardEffectFragment_EffectToSelf.generated.h"
 
+UENUM(BlueprintType)
+enum class ESetByCallerMagnitudeDisplayType : uint8
+{
+	Flat = 0,
+	Percent = 1, 
+	PercentOneMinus = 2
+};
+
+USTRUCT(BlueprintType)
+struct FSetByCallerMetaData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Magnitude = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	ESetByCallerMagnitudeDisplayType DisplayType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText ParameterName;
+
+	FText GetDisplayText() const;
+};
+
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Apply Effect To Self"))
-class UCardEffectFragment_Execution_ApplyEffectToOwner : public UCardEffectFragment_Execution
+class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
 
@@ -16,13 +43,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float GameplayEffectLevel = 1.f;
 
-	//The tag applied by the gameplay effect to track when the persistent effect gets removed
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag TrackingTag;
+	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
 
 	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
-	//BEGIN UCardExecutionInfo
-	FText GetName_Implementation() override;
-	//BEGIN UCardExecutionInfo
+	 //~UCardEffectFragment
+	FText GetLocalizableDescription_Implementation() override;
+	 //~UCardEffectFragment
+
+	void GetSetByCallerFormattingArgs(FFormatNamedArguments& Args);
 };

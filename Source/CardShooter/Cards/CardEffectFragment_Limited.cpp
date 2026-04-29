@@ -42,7 +42,16 @@ bool UCardEffectFragment_Limited::Verify(TArray<UCardData*> Deck, TArray<UDeckLi
 	return true;
 }
 
-FText UCardEffectFragment_Limited::GetName_Implementation()
+FText UCardEffectFragment_Limited::GetLocalizableDescription_Implementation()
+{
+	if (UCardData* OwningCard = Cast<UCardData>(GetOuter()))
+	{
+		return FText::Format(LOCTEXT("LimitedAttrDesc", "A deck may contain only {0} or less copies of {1}."), FText::AsNumber(Limit), OwningCard->CardName);
+	}
+	return FText::GetEmpty();
+}
+
+FText UCardEffectFragment_Limited::GetLocalizableName_Implementation()
 {
 	return FText::Format(LOCTEXT("LimitedAttrName", "Limited({0})"), FText::AsNumber(Limit));
 }

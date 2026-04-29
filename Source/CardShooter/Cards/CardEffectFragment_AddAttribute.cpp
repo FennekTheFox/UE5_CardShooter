@@ -13,14 +13,17 @@ void UCardEffectFragment_Execution_AddAttributeToNextCards::ExecuteCardEffect_Im
 	}
 }
 
-FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetName_Implementation()
+FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescription_Implementation()
 {
 	if (!ensure(Attribute))
 	{
 		return FText::GetEmpty();
 	}
 
-	return FText::Format(LOCTEXT("AddAttributesToNextName", "Adds {0} to the next {1} cards."), Attribute->GetDescription(), Count);
+	return FText::Format(LOCTEXT("AddAttributesToNextDesc", "Adds <hover id=\"{0}\">{1}</> to the next {2} cards."),
+		FText::FromString(Attribute->GetPathName()),
+		Attribute->GetLocalizableName(),
+		Count);
 }
 
 #undef LOCTEXT_NAMESPACE

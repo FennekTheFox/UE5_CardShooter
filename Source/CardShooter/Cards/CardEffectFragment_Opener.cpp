@@ -2,9 +2,14 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Opener::GetName_Implementation()
+FText UCardEffectFragment_Opener::GetLocalizableName_Implementation()
 {
 	return LOCTEXT("OpenerAttrName", "Opener");
+}
+
+FText UCardEffectFragment_Opener::GetLocalizableDescription_Implementation()
+{
+	return LOCTEXT("OpenerAttrDesc", "This card will always be shuffled to the front of the deck.");
 }
 
 #undef LOCTEXT_NAMESPACE

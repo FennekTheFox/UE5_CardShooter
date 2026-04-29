@@ -14,14 +14,17 @@ void UCardEffectFragment_Execution_RemoveAttributeFromNextCards::ExecuteCardEffe
 	}
 }
 
-FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetName_Implementation()
+FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetLocalizableDescription_Implementation()
 {
 	if (!ensure(AttributeClass))
 	{
 		return FText::GetEmpty();
 	}
 
-	return FText::Format(LOCTEXT("RemoveAttributesToNextName", "Removes {0} from the next {1} cards."), Cast<UCardEffectFragment_ExecutionAttribute>(AttributeClass->GetDefaultObject())->GetDescription(), Count);
+	return FText::Format(LOCTEXT("RemoveAttributesToNextDesc", "Removes <hover id=\"{0}\">{1}</> from the next {2} cards."),
+		FText::FromString(AttributeClass->GetDefaultObject()->GetPathName()),
+		Cast<UCardEffectFragment_Attribute>(AttributeClass->GetDefaultObject())->GetLocalizableName(),
+		Count);
 }
 
 #undef LOCTEXT_NAMESPACE

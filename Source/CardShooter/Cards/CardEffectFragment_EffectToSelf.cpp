@@ -7,7 +7,7 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-void UCardEffectFragment_Execution_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+void UCardEffectFragment_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
 {
 	if (!ensure(ExecutingPawn && GameplayEffect))
 	{
@@ -23,23 +23,85 @@ void UCardEffectFragment_Execution_ApplyEffectToOwner::ExecuteCardEffect_Impleme
 
 	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GameplayEffect, GameplayEffectLevel, ASC->MakeEffectContext());
 
+	for (auto&& KVPair : SetByCallerMagnitudes)
+	{
+		SpecHandle.Data->SetSetByCallerMagnitude(KVPair.Key, KVPair.Value.Magnitude);
+	}
+
 	FActiveGameplayEffectHandle EffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
 
-FText UCardEffectFragment_Execution_ApplyEffectToOwner::GetName_Implementation()
+FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation()
 {
 	if (!ensure(GameplayEffect))
 	{
 		return FText::GetEmpty();
 	}
 
-	if (UGameplayEffect_CardExecution* AsGA_CE = Cast<UGameplayEffect_CardExecution>(GameplayEffect->GetDefaultObject()))
+	if (UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(GameplayEffect->GetDefaultObject()))
 	{
-		return AsGA_CE->GetDescription();
+		FFormatNamedArguments Args;
+		GetSetByCallerFormattingArgs(Args);
+
+		return FText::Format(LOCTEXT("EffectToSelfDesc", "Grants <hover id=\"{0}\" relatedEffectExec=\"{1}\">{2}</>."),
+			FText::FromString(AsGE_CE->GetPathName()),
+			FText::FromString(this->GetPathName()),
+			FText::Format(AsGE_CE->GetDetailedLocalizableName(), Args));
 	}
 
 	ensure(false);
 	return FText::GetEmpty();
 }
 
+void UCardEffectFragment_ApplyEffectToOwner::GetSetByCallerFormattingArgs(FFormatNamedArguments& Args)
+{
+	for (auto&& KVPair : SetByCallerMagnitudes)
+	{
+		const FSetByCallerMetaData& MetaData = KVPair.Value;
+
+		FString TagString = KVPair.Key.ToString();
+
+		FString Left;
+		FString Right;
+
+		FString LastPart = TagString;
+
+		if (TagString.Split(
+			TEXT("."),
+			&Left,
+			&Right,
+			ESearchCase::IgnoreCase,
+			ESearchDir::FromEnd))
+		{
+			LastPart = Right;
+		}
+
+		Args.Add(
+			LastPart + "Magnitude",
+			MetaData.GetDisplayText()
+		);
+
+		Args.Add(
+			LastPart + "Parameter",
+			MetaData.ParameterName
+		);
+	}
+}
+
 #undef LOCTEXT_NAMESPACE
+
+FText FSetByCallerMetaData::GetDisplayText() const 
+{
+	switch (DisplayType)
+	{
+	case ESetByCallerMagnitudeDisplayType::Flat: 
+		return FText::AsNumber(Magnitude);
+	case ESetByCallerMagnitudeDisplayType::Percent: 
+		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * Magnitude));
+	case ESetByCallerMagnitudeDisplayType::PercentOneMinus: 
+		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * (1.f - Magnitude)));
+	}
+
+	ensure(false);
+	return FText::GetEmpty();
+}

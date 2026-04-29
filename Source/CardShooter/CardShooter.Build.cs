@@ -13,15 +13,19 @@ public class CardShooter : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"InputCore",
-			"EnhancedInput",
+			"SlateCore",
+            "CommonUI",
+            "CommonInput",
+            "EnhancedInput",
 			"AIModule",
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
+			"SlateCore",
 			"GameplayTags",
 			"GameplayAbilities",
-			"ProjectAbilitySystem_Plugin"
+			"ProjectAbilitySystem_Plugin",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

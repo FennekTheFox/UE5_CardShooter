@@ -32,6 +32,12 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData);
+
+	FText GetLocalizableName_Implementation() override
+	{
+		return GetLocalizableName_Implementation();	
+	}
+
 };
 
 UCLASS(BlueprintType, Blueprintable, Abstract, meta = (DisplayName = "Activate Gameplay Ability"))

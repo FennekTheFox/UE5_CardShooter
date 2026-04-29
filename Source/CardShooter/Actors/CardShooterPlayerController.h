@@ -10,6 +10,8 @@
 class UInputMappingContext;
 class UUserWidget;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FInputDeviceTypeChanged, bool)
+
 /**
  *  Simple first person Player Controller
  *  Manages the input mapping context.
@@ -23,7 +25,11 @@ class CARDSHOOTER_API ACardShooterPlayerController : public AProjectPlayerContro
 public:
 
 	/** Constructor */
+
 	ACardShooterPlayerController();
+	bool InputKey(const FInputKeyEventArgs& Params) override;
+	bool bLastInputWasGamepad = false;
+	FInputDeviceTypeChanged OnDeviceTypeChanged;
 
 protected:
 

@@ -6,9 +6,15 @@
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
 class UCardEffectFragment_Base : public UObject
-	, public ICardExecutionInfo
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	FText GetLocalizableName();	
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	FText GetLocalizableDescription();
 };
 
 

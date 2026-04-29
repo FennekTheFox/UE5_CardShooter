@@ -8,7 +8,7 @@
 #define LOCTEXT_NAMESPACE "CardEffects"
 
 
-void UCardEffectFragment_Execution_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
 {
 	Super::ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
 
@@ -60,7 +60,7 @@ void UCardEffectFragment_Execution_GameplayAbility::ExecuteCardEffect_Implementa
 	);
 }
 
-FText UCardEffectFragment_Execution_GameplayAbility::GetName_Implementation()
+FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation()
 {
 	if (!ensure(AbilityToExecute.Ability))
 	{

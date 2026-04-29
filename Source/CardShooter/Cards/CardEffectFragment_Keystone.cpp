@@ -13,9 +13,14 @@ FText UDeckLimitationViolation_KeystoneLimit::GetFailureReasonText()
 		return FText::Format(TextToFormat, FormatArgs);
 }
 
-FText UCardEffectFragment_Keystone::GetName_Implementation()
+FText UCardEffectFragment_Keystone::GetLocalizableName_Implementation()
 {
-	return FText::Format(LOCTEXT("KeystoneName", "Keystone({0})"), FText::AsNumber(KeystoneLimit));
+	return FText::Format(LOCTEXT("KeystoneAttrName", "Keystone({0})"), FText::AsNumber(KeystoneLimit));
+}
+
+FText UCardEffectFragment_Keystone::GetLocalizableDescription_Implementation()
+{
+	return FText::Format(LOCTEXT("KeystoneAttrDesc", "A deck with this card can only contain {0} cards with the Keystone attribute."), FText::AsNumber(KeystoneLimit));
 }
 
 bool UCardEffectFragment_Keystone::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)

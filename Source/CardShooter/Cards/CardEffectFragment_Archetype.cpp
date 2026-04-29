@@ -33,7 +33,12 @@ bool UCardEffectFragment_Archetype::Verify(TArray<UCardData*> Deck, TArray<UDeck
 	return true;
 }
 
-FText UCardEffectFragment_Archetype::GetName_Implementation()
+FText UCardEffectFragment_Archetype::GetLocalizableDescription_Implementation()
+{
+	return LOCTEXT("ArchetypeAttrDesc", "Your deck can only contain cards of one archetype.");
+}
+
+FText UCardEffectFragment_Archetype::GetLocalizableName_Implementation()
 {
 	if (!ensure(Archetype))
 	{

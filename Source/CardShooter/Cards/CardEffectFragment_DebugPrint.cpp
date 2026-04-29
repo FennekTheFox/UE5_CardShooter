@@ -9,7 +9,7 @@ void UCardEffectFragment_Execution_DebugPrint::ExecuteCardEffect_Implementation(
 	GEngine->AddOnScreenDebugMessage(-1, DisplayDuration, DisplayColor, Message);
 }
 
-FText UCardEffectFragment_Execution_DebugPrint::GetName_Implementation()
+FText UCardEffectFragment_Execution_DebugPrint::GetLocalizableDescription_Implementation()
 {
 	return FText::Format(
 		LOCTEXT("DebugPrintName", "Prints Debug Message: {0}"),

@@ -25,7 +25,8 @@ public:
 
 	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 
-	//BEGIN UCardExecutionInfo
-	FText GetName_Implementation() override;
-	//BEGIN UCardExecutionInfo
+	 //~UCardEffectFragment
+	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableDescription_Implementation() override;
+	 //~UCardEffectFragment
 };

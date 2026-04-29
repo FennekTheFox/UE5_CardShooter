@@ -16,6 +16,17 @@ ACardShooterPlayerController::ACardShooterPlayerController()
 	PlayerCameraManagerClass = ACardShooterCameraManager::StaticClass();
 }
 
+bool ACardShooterPlayerController::InputKey(const FInputKeyEventArgs& Params)
+{
+	if (Params.Key.IsGamepadKey() != bLastInputWasGamepad)
+	{
+		bLastInputWasGamepad = Params.Key.IsGamepadKey();
+		OnDeviceTypeChanged.Broadcast(bLastInputWasGamepad);
+	}
+
+	return Super::InputKey(Params);
+}
+
 void ACardShooterPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

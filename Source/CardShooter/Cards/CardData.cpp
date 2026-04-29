@@ -38,13 +38,13 @@ UCardEffectFragment_Attribute* UCardData::GetAttributeOfClass(TSubclassOf<UCardE
 	return nullptr;
 }
 
-UTexture2D* UCardData::GetIcon_Implementation()
+FText UCardData::GetDescription()
 {
-	return CardIcon;
-}
-
-FText UCardData::GetDescription_Implementation()
-{
+	// Ensure primary execution exists
+	if (!ensure(PrimaryExecution))
+	{
+		return FText::GetEmpty();
+	}
 
 	// Gather Attribute Descriptions
 	TArray<FText> AttributeDescs;
@@ -53,17 +53,17 @@ FText UCardData::GetDescription_Implementation()
 	{
 		if (IsValid(Attr))
 		{
-			AttributeDescs.Add(Attr->GetDescription());
+			FText AttrName = Attr->GetLocalizableName();
+			FText Wrapped = FText::Format(
+				FText::FromString(TEXT("<hover id=\"{0}\">{1}</>")),
+				FText::FromString(Attr->GetPathName()),
+				AttrName
+			);
+			AttributeDescs.Add(Wrapped);
 		}
 	}
 
 	FText AttributesDesc = FText::Join(FText::FromString(", "), AttributeDescs);
-
-	// Ensure primary execution exists
-	if (!ensure(PrimaryExecution))
-	{
-		return FText::GetEmpty();
-	}
 
 	TArray<FText> Sections;
 
@@ -73,36 +73,42 @@ FText UCardData::GetDescription_Implementation()
 		Sections.Add(AttributesDesc);
 	}
 
+	FText PrimaryInput = LOCTEXT("PrimaryInput", "<input id=\"/Game/Blueprint/Input/CardExecution/IA_ExecuteCardPrimary\"/>");
+	FText SecondaryInput = LOCTEXT("SecondaryInput", "<input id=\"/Game/Blueprint/Input/CardExecution/IA_ExecuteCardSecondary\"/>");
+
 	// Primary execution
-	if (SecondaryExecution)
+	if (!SecondaryExecution)
 	{
-		TArray<FText> PrimaryParts;
-		PrimaryParts.Add(LOCTEXT("PrimarySpecifier", "Primary:"));
-		PrimaryParts.Add(PrimaryExecution->GetDescription());
-		Sections.Add(FText::Join(FText::FromString(" "), PrimaryParts));
+		Sections.Add(
+			FText::Format(
+				LOCTEXT("NoSecondaryLayout", "{0}|{1}: {2}"),
+				PrimaryInput,
+				SecondaryInput,
+				PrimaryExecution->GetLocalizableDescription()
+			)
+		);
 	}
 	else
 	{
-		Sections.Add(PrimaryExecution->GetDescription());
+		TArray<FText> PrimaryParts;
+		PrimaryParts.Add(PrimaryInput);
+		PrimaryParts.Add(PrimaryExecution->GetLocalizableDescription());
+		Sections.Add(FText::Join(FText::FromString(": "), PrimaryParts));
 	}
 
 
 	// Secondary execution (optional)
 	if (SecondaryExecution)
 	{
+
 		TArray<FText> SecondaryParts;
-		SecondaryParts.Add(LOCTEXT("SecondarySpecifier", "Secondary:"));
-		SecondaryParts.Add(PrimaryExecution->GetDescription());
-		Sections.Add(FText::Join(FText::FromString(" "), SecondaryParts));
+		SecondaryParts.Add(SecondaryInput);
+		SecondaryParts.Add(SecondaryExecution->GetLocalizableDescription());
+		Sections.Add(FText::Join(FText::FromString(": "), SecondaryParts));
 	}
 
 	// Final join with spacing
 	return FText::Join(FText::FromString("\n\n"), Sections);
-}
-
-FText UCardData::GetName_Implementation()
-{
-	return CardName;
 }
 
 #undef LOCTEXT_NAMESPACE

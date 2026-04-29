@@ -13,7 +13,7 @@ void UCardEffectFragment_Execution_AllAtOnce::ExecuteCardEffect_Implementation(A
 	}
 }
 
-FText UCardEffectFragment_Execution_AllAtOnce::GetName_Implementation()
+FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Implementation()
 {
 	TArray<FText> ExecDescs;
 
@@ -21,7 +21,7 @@ FText UCardEffectFragment_Execution_AllAtOnce::GetName_Implementation()
 	{
 		if (IsValid(Exec))
 		{
-			ExecDescs.Add(Exec->GetDescription());
+			ExecDescs.Add(Exec->GetLocalizableDescription());
 		}
 	}
 

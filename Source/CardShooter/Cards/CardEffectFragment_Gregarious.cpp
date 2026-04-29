@@ -22,7 +22,12 @@ bool UCardEffectFragment_Gregarious::Verify(TArray<UCardData*> Deck, TArray<UDec
 	return bSuccess;
 }
 
-FText UCardEffectFragment_Gregarious::GetName_Implementation()
+FText UCardEffectFragment_Gregarious::GetLocalizableDescription_Implementation()
+{
+	return FText::Format(LOCTEXT("GregariousAttrDesc", "This card can only be part of decks with at least {0} cards."), FText::AsNumber(MinimumDeckSize));
+}
+
+FText UCardEffectFragment_Gregarious::GetLocalizableName_Implementation()
 {
 	return FText::Format(LOCTEXT("GregariousAttrName", "Gregarious({0})"), FText::AsNumber(MinimumDeckSize));
 }

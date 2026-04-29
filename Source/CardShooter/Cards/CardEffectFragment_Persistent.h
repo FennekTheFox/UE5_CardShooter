@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CardAttributeFragment_Base.h"
+#include "GameplayTagContainer.h"
 
 #include "CardEffectFragment_Persistent.generated.h"
 
@@ -10,7 +11,14 @@ class UCardEffectFragment_Persistent : public UCardEffectFragment_ExecutionAttri
 	GENERATED_BODY()
 
 public:
-	//BEGIN UCardExecutionInfo
-	FText GetName_Implementation() override;
-	//BEGIN UCardExecutionInfo
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FGameplayTag TrackingTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<class UGameplayEffect_CardExecution> TrackedEffect;
+
+	 //~UCardEffectFragment
+	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableDescription_Implementation() override;
+	 //~UCardEffectFragment
 };

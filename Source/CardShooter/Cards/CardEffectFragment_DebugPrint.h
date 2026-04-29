@@ -21,7 +21,7 @@ public:
 
 	void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
-	//BEGIN UCardExecutionInfo
-	FText GetName_Implementation() override;
-	//BEGIN UCardExecutionInfo
+	 //~UCardEffectFragment
+	FText GetLocalizableDescription_Implementation() override;
+	 //~UCardEffectFragment
 };

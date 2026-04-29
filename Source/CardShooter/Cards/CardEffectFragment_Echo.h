@@ -10,9 +10,10 @@ class UCardEffectFragment_Echo : public UCardEffectFragment_ExecutionAttribute
 	GENERATED_BODY()
 
 public:
-	//BEGIN UCardExecutionInfo
-	FText GetName_Implementation() override;
-	//BEGIN UCardExecutionInfo
+	 //~UCardEffectFragment
+	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableDescription_Implementation() override;
+	 //~UCardEffectFragment
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

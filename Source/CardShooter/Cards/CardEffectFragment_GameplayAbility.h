@@ -5,7 +5,8 @@
 #include "CardEffectFragment_GameplayAbility.generated.h"
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
-class UCardEffectFragment_Execution_GameplayAbility : public UCardEffectFragment_Execution
+class UCardEffectFragment_GameplayAbility 
+	: public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
 
@@ -16,7 +17,7 @@ public:
 	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
 
-	//BEGIN UCardExecutionInfo
-	FText GetName_Implementation() override;
-	//BEGIN UCardExecutionInfo
+	 //~UCardEffectFragment
+	FText GetLocalizableDescription_Implementation() override;
+	 //~UCardEffectFragment
 };
