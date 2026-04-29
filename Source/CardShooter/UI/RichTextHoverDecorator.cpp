@@ -6,9 +6,9 @@
 #include "UObject/UObjectGlobals.h"
 #include "UObject/Package.h"
 #include "Kismet/GameplayStatics.h"
-#include "Cards/CardAttributeFragment_Base.h"
+#include "Cards/Fragments/CardAttributeFragment_Base.h"
 #include "Gameplay/CardExecutionEffect.h"
-#include "Cards/CardEffectFragment_EffectToSelf.h"
+#include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
 #include "Widgets/Layout/SBox.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RichTextHoverDecorator)

@@ -1,0 +1,39 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.1",
+	"FriendlyName": "Warwolf Mission System",
+	"Description": "State Tree-based mission system.",
+	"Category": "Mission",
+	"CreatedBy": "Michael Greenard",
+	"CreatedByURL": "http://imake.games/",
+	"DocsURL": "https://drive.google.com/file/d/15mNJySRAT_XJ88POisBHDrQ9tIPT3rd5/view?usp=sharing",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EngineVersion": "5.7.0",
+	"CanContainContent": true,
+	"Installed": true,
+	"Sealed": true,
+	"Modules": [
+		{
+			"Name": "WarwolfMissionSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64",
+				"Linux",
+				"Android"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "GameplayStateTree",
+			"Enabled": true
+		},
+		{
+			"Name": "StateTree",
+			"Enabled": true
+		}
+	]
+}

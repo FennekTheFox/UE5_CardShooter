@@ -3,8 +3,8 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "ProjectAbilitySystemComponent.h"
 #include "Templates/SharedPointer.h"
-#include "CardAttributeFragment_Base.h"
-#include "CardAttributeFragment_Execution.h"
+#include "Fragments/CardAttributeFragment_Base.h"
+#include "Fragments/CardAttributeFragment_Execution.h"
 
 #define LOCTEXT_NAMESPACE "CardData"
 

@@ -2,6 +2,7 @@
 
 #include "Cards/CardData.h"
 #include "Cards/Deck.h"
+#include "Cards/Fragments/CardAttributeFragment_Execution.h"
 
 #include "CardShooterUtility.generated.h"
 

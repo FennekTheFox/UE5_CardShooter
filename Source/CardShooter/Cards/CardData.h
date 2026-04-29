@@ -22,7 +22,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
 	FSoftObjectPath CardDataPath;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	int32 UniqueID;
+
 	//TODO here come more properties that more closely describe the actual card identity, like foil and what other customization we offer
+
+	bool operator== (const FCardIdentity& Other)
+	{
+		return AssetTag == Other.AssetTag && UniqueID == Other.UniqueID;
+	}
 };
 
 USTRUCT(BlueprintType)

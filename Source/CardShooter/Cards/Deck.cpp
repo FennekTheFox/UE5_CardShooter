@@ -8,9 +8,12 @@ void UPrebuiltDeck::GetDeck(FCardDeck& OutDeck)
 
 	for(UCardData* CardData : CardList)
 	{
-		FCardIdentity Identity;
-		CardData->GetIdentity(Identity);
-		OutDeck.CardList.Add(Identity);
+		if (CardData)
+		{
+			FCardIdentity Identity;
+			CardData->GetIdentity(Identity);
+			OutDeck.CardList.Add(Identity);
+		}
 	}
 }
 
