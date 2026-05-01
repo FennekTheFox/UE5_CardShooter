@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Gameplay/ICardExecutionInfo.h"
-
 #include "CardAttributeFragment_Base.generated.h"
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
@@ -10,11 +8,17 @@ class UCardEffectFragment_Base : public UObject
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
+	bool GetShouldShowInDescription();
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	FText GetLocalizableName();	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	FText GetLocalizableDescription();
+
+protected:
+	bool bShowInDescription = true;
 };
 
 

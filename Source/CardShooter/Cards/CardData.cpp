@@ -51,7 +51,7 @@ FText UCardData::GetDescription()
 
 	for (UCardEffectFragment_Attribute* Attr : CardAttributes)
 	{
-		if (IsValid(Attr))
+		if (IsValid(Attr) && Attr->GetShouldShowInDescription())
 		{
 			FText AttrName = Attr->GetLocalizableName();
 			FText Wrapped = FText::Format(

@@ -2,7 +2,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "Gameplay/CardExecutionAbility.h"
+#include "Gameplay/GameplayAbility_CardExecution.h"
 
 
 #define LOCTEXT_NAMESPACE "CardEffects"

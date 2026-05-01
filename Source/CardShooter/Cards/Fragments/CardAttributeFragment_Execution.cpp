@@ -3,8 +3,8 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Actors/CardShooterCharacter.h"
-#include "Gameplay/CardExecutionAbility.h"
-#include "Gameplay/CardExecutionEffect.h"
+#include "Gameplay/GameplayAbility_CardExecution.h"
+#include "Gameplay/GameplayEffect_CardExecution.h"
 
 #define LOCTEXT_NAMESPACE "CardEffectFragment"
 

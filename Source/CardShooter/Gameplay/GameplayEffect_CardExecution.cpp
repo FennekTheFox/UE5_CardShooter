@@ -1,4 +1,4 @@
-#include "CardExecutionEffect.h"
+#include "GameplayEffect_CardExecution.h"
 #include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
 
 FText UGameplayEffect_CardExecution::GetDescription(UCardEffectFragment_ApplyEffectToOwner* OwningCEF_AETO)

@@ -2,7 +2,6 @@
 
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
-#include "Gameplay/ICardExecutionInfo.h"
 
 #include "CardData.generated.h"
 

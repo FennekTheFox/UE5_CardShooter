@@ -2,7 +2,7 @@
 
 #include "Cards/CardData.h"
 #include "CardEffectFragment_EffectToSelf.h"
-#include "Gameplay/CardExecutionEffect.h"
+#include "Gameplay/GameplayEffect_CardExecution.h"
 
 
 #define LOCTEXT_NAMESPACE "CardEffects"

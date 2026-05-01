@@ -1,9 +1,8 @@
 #pragma once
 
-#include "ICardExecutionInfo.h"
 #include "GameplayEffect.h"
 
-#include "CardExecutionEffect.generated.h"
+#include "GameplayEffect_CardExecution.generated.h"
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UGameplayEffect_CardExecution : public UGameplayEffect

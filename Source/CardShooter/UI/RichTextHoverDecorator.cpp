@@ -7,7 +7,7 @@
 #include "UObject/Package.h"
 #include "Kismet/GameplayStatics.h"
 #include "Cards/Fragments/CardAttributeFragment_Base.h"
-#include "Gameplay/CardExecutionEffect.h"
+#include "Gameplay/GameplayEffect_CardExecution.h"
 #include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
 #include "Widgets/Layout/SBox.h"
 

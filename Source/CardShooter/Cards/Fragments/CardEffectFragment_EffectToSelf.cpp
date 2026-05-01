@@ -1,6 +1,6 @@
 #include "CardEffectFragment_EffectToSelf.h"
 
-#include "Gameplay/CardExecutionEffect.h"
+#include "Gameplay/GameplayEffect_CardExecution.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 
@@ -40,10 +40,19 @@ FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implemen
 
 	if (UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(GameplayEffect->GetDefaultObject()))
 	{
+		FText Base = FText::GetEmpty();
+
+		switch (EffectInclination)
+		{
+		case EEffectInclination::Benefitial: Base = LOCTEXT("EffectToSelfDescBaseBenefitial", "Grants"); break;
+		case EEffectInclination::Detrimental: Base = LOCTEXT("EffectToSelfDescBaseDetrimental", "Inflicts"); break;
+		}
+
 		FFormatNamedArguments Args;
 		GetSetByCallerFormattingArgs(Args);
 
-		return FText::Format(LOCTEXT("EffectToSelfDesc", "Grants <hover id=\"{0}\" relatedEffectExec=\"{1}\">{2}</>."),
+		return FText::Format(LOCTEXT("EffectToSelfDesc", "{0} <hover id=\"{1}\" relatedEffectExec=\"{2}\">{3}</>."),
+			Base,
 			FText::FromString(AsGE_CE->GetPathName()),
 			FText::FromString(this->GetPathName()),
 			FText::Format(AsGE_CE->GetDetailedLocalizableName(), Args));

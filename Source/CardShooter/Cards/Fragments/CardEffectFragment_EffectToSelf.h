@@ -13,6 +13,14 @@ enum class ESetByCallerMagnitudeDisplayType : uint8
 	PercentOneMinus = 2
 };
 
+//Only used for text generation
+UENUM(BlueprintType)
+enum class EEffectInclination : uint8
+{
+	Benefitial = 0,
+	Detrimental = 1,
+};
+
 USTRUCT(BlueprintType)
 struct FSetByCallerMetaData
 {
@@ -39,6 +47,9 @@ class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_Execut
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> GameplayEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EEffectInclination EffectInclination = EEffectInclination::Benefitial;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float GameplayEffectLevel = 1.f;

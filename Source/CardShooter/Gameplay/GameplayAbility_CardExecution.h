@@ -1,14 +1,15 @@
 #pragma once
 
 #include "ProjectGameplayAbility.h"
-#include "ICardExecutionInfo.h"
 
-#include "CardExecutionAbility.generated.h"
+#include "GameplayAbility_CardExecution.generated.h"
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UGameplayAbility_CardExecution : public UProjectGameplayAbility
 {
 	GENERATED_BODY()
+
+	UGameplayAbility_CardExecution();
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

@@ -1,12 +1,13 @@
-#include "AbilityTemplates.h"
+#include "GameplayAbility_CardExecution.h"
+
+#include "AbilityTriggers.h"
 
 #define TC_ONGRANTED UAbilityActivationTrigger_OnAbilityGranted
 
-UCardExecutionAbility_Base::UCardExecutionAbility_Base()
+UGameplayAbility_CardExecution::UGameplayAbility_CardExecution()
 {
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnly;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 
 	ActivationTriggers.Add(Cast<TC_ONGRANTED>(TC_ONGRANTED::StaticClass()->GetDefaultObject(false)));
 }
-
