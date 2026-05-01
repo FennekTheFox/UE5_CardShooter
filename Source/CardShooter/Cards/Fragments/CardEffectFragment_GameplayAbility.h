@@ -14,6 +14,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayAbilitySpecDef AbilityToExecute;
 
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag TargetDataID;
+
 	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
 

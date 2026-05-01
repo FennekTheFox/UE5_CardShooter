@@ -2,8 +2,9 @@
 
 #include "CardAttributeFragment_Base.h"
 #include "Abilities/GameplayAbilityTargetTypes.h"
+#include "CardAttributeFragment_Execution.h"
 
-#include "CardEffectFragment_ShowTargetIndicator.generated.h"
+#include "CardEffectFragment_Targeting.generated.h"
 
 UENUM(BlueprintType)
 enum class ETargetIndicatorType : uint8
@@ -22,7 +23,7 @@ public:
 	TObjectPtr<class UCardEffectFragment_Targeting> TargetingAttr;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void Update(UPARAM()const FGameplayAbilityTargetDataHandle& TargetData);
+	void Update(UPARAM()const FReplicatedTargetData& TargetData);
 };
 
 UCLASS(BlueprintType, meta = (DisplayName = "Targeting"))
@@ -34,6 +35,9 @@ class UCardEffectFragment_Targeting : public UCardEffectFragment_Attribute
 
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag TargetingID;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftClassPtr<ATargetVisualizer> TargetVisualizerActorClass;
 

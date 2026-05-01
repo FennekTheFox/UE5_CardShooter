@@ -4,8 +4,21 @@
 #include "GameplayAbilitySpec.h"
 #include "GameplayEffect.h"
 #include "GameplayCueInterface.h"
+#include "Abilities/GameplayAbilityTargetTypes.h"
 
 #include "CardAttributeFragment_Execution.generated.h"
+
+USTRUCT(BlueprintType)
+struct FReplicatedTargetData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTag TargetDataID;
+
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayAbilityTargetDataHandle TargetData;
+};
 
 USTRUCT(BlueprintType)
 struct FCardExecution_AdditionalData
@@ -18,6 +31,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 ComboIndex = 0;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FReplicatedTargetData> TargetData;
 };
 
 UCLASS(BlueprintType, Blueprintable, Abstract)

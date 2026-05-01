@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ProjectGameplayAbility.h"
+#include "Cards/Fragments/CardAttributeFragment_Execution.h"
 
 #include "GameplayAbility_CardExecution.generated.h"
 
@@ -18,6 +19,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText AbilityDesc;
 
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FCardExecution_AdditionalData AdditionalData;
+
 	FText GetName() 
 	{
 		return AbilityName;
@@ -28,4 +33,7 @@ public:
 	{
 		return AbilityDesc;
 	}
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PostAdditionalDataSet();
 };

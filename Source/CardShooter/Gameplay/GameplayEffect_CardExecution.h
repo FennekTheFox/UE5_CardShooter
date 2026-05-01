@@ -9,6 +9,8 @@ class UGameplayEffect_CardExecution : public UGameplayEffect
 {
 	GENERATED_BODY()
 
+	UGameplayEffect_CardExecution();
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText SimpleEffectName;

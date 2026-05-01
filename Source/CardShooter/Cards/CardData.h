@@ -7,6 +7,13 @@
 
 class UTexture2D;
 
+UENUM()
+enum class ECardRarity : uint8 
+{
+	Common, 
+	Rare
+};
+
 USTRUCT(BlueprintType)
 struct FCardIdentity
 {
@@ -21,14 +28,19 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
 	FSoftObjectPath CardDataPath;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
-	int32 UniqueID;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, SaveGame)
+	int32 UniqueID = 0;	
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, SaveGame)
+	ECardRarity CardRarity = ECardRarity::Common;
 
 	//TODO here come more properties that more closely describe the actual card identity, like foil and what other customization we offer
 
-	bool operator== (const FCardIdentity& Other)
+	bool operator== (const FCardIdentity& Other) const
 	{
-		return AssetTag == Other.AssetTag && UniqueID == Other.UniqueID;
+		return AssetTag == Other.AssetTag 
+			&& UniqueID == Other.UniqueID
+			&& CardRarity == Other.CardRarity;
 	}
 };
 

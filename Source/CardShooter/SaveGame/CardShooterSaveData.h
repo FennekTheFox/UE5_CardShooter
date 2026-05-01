@@ -13,7 +13,7 @@ struct FCardCollection
 	GENERATED_BODY()
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	FGameplayTagContainer CardContainer;
+	TArray<FCardIdentity> Cards;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -52,4 +52,15 @@ public:
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 LastSelectedDeckIndex = -1;
+
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void MakeUniqueCollectionIdentity(UPARAM()FCardIdentity& CardIdentity);
+
+	UFUNCTION(BlueprintCallable)
+	void AddCardToCollection(const FCardIdentity& CardIdentity);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveCardFromCollection(const FCardIdentity& CardIdentity);
 };

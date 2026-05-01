@@ -20,15 +20,15 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 	}
 
 	FGameplayAbilitySpec AbilitySpec(AbilityToExecute.Ability);
-	FGameplayAbilitySpecHandle Handle = ASC->GiveAbility(AbilitySpec);
+	FGameplayAbilitySpecHandle SpecHandle = ASC->GiveAbility(AbilitySpec);
 
 	//This relies on the ability 100% getting executed, else it wont get removed properly
 	TSharedPtr<FDelegateHandle> OnEndedHandle = MakeShared<FDelegateHandle>();
 	TSharedPtr<FDelegateHandle> OnFailedHandle = MakeShared<FDelegateHandle>();
-	*OnEndedHandle = ASC->OnAbilityEnded.AddLambda([ASC, Handle, AbilitySpec, OnEndedHandle, OnFailedHandle](const FAbilityEndedData& Data) {
+	*OnEndedHandle = ASC->OnAbilityEnded.AddLambda([ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const FAbilityEndedData& Data) {
 		if (Data.AbilityThatEnded == AbilitySpec.Ability)
 		{
-			ASC->ClearAbility(Handle);
+			ASC->ClearAbility(SpecHandle);
 
 			if (OnEndedHandle->IsValid())
 			{
@@ -42,10 +42,10 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 		}
 	);
 
-	*OnFailedHandle = ASC->AbilityFailedCallbacks.AddLambda([ASC, Handle, AbilitySpec, OnEndedHandle, OnFailedHandle](const UGameplayAbility* Ability, const FGameplayTagContainer&) {
+	*OnFailedHandle = ASC->AbilityFailedCallbacks.AddLambda([ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const UGameplayAbility* Ability, const FGameplayTagContainer&) {
 		if (Ability == AbilitySpec.Ability)
 		{
-			ASC->ClearAbility(Handle);
+			ASC->ClearAbility(SpecHandle);
 
 			if (OnEndedHandle->IsValid())
 			{
@@ -58,6 +58,25 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 		}
 		}
 	);
+
+	ExecutingPawn->GetWorld()->GetTimerManager()
+		.SetTimerForNextTick(FTimerDelegate::CreateLambda(
+			[ASC, SpecHandle, AdditionalData]
+			()
+			{
+
+				FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromHandle(SpecHandle);
+				if (Spec)
+				{
+					UGameplayAbility_CardExecution* GA_CE = Cast<UGameplayAbility_CardExecution>(Spec->GetAbilityInstances().Last());
+					if (GA_CE)
+					{
+						GA_CE->AdditionalData = AdditionalData;
+						GA_CE->PostAdditionalDataSet();
+					}
+				}
+			}));
+
 }
 
 FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation()

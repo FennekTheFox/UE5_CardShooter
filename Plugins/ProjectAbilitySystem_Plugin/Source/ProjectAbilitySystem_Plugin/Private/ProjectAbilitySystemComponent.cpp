@@ -602,6 +602,11 @@ void UProjectAbilitySystemComponent::AddDefaults(AActor* InOwnerActor, AActor* I
 	}
 }
 
+UProjectAbilitySystemComponent::UProjectAbilitySystemComponent()
+{
+	//SetReplicationMode(EGameplayEffectReplicationMode::Full);
+}
+
 void UProjectAbilitySystemComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
 													  FActorComponentTickFunction* ThisTickFunction)
 {

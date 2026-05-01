@@ -23,8 +23,10 @@ void UCardEffectFragment_Execution::Server_ExecuteCardEffect_Delayed_Implementat
 		Handle,
 		FTimerDelegate::CreateLambda([WeakThis, WeakPawn, Data]()
 			{
+				UE_LOG(LogTemp, Log, TEXT("Foo1"))
 				if (WeakPawn.IsValid() || WeakThis.IsValid())
 				{
+					UE_LOG(LogTemp, Log, TEXT("Foo2"))
 					WeakThis->ExecuteCardEffect(WeakPawn.Get(), Data);
 				}
 			}),

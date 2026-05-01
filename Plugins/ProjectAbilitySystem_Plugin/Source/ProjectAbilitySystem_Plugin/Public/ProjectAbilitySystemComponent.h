@@ -44,6 +44,8 @@ class PROJECTABILITYSYSTEM_PLUGIN_API UProjectAbilitySystemComponent : public UA
 	GENERATED_BODY()
 
 public:
+	UProjectAbilitySystemComponent();
+
 	//BEGIN UActorComponent
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	//END UActorComponent
