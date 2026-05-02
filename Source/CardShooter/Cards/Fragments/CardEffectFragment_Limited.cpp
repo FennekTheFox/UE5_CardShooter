@@ -19,21 +19,18 @@ bool UCardEffectFragment_Limited::Verify(TArray<UCardData*> Deck, TArray<UDeckLi
 {
 	int32 Count = 0;
 
-	if (auto* OwningAttribute = GetOuter())
+	if (UCardData* OwningCard = Cast<UCardData>(GetOuter()))
 	{
-		if (UCardData* OwningCard = Cast<UCardData>(OwningAttribute->GetOuter()))
+		for (UCardData* Card : Deck)
 		{
-			for (UCardData* Card : Deck)
+			if (Card == OwningCard)
 			{
-				if (Card->GetClass() == OwningCard->GetClass())
-				{
-					Count += 1;
+				Count += 1;
 
-					if (Count > Limit)
-					{
-						FailureReasons.Add(NewObject<UDeckLimitationViolation_Limit>(this));
-						return false;
-					}
+				if (Count > Limit)
+				{
+					FailureReasons.Add(NewObject<UDeckLimitationViolation_Limit>(this));
+					return false;
 				}
 			}
 		}

@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION(BlueprintPure, meta = (DeterminesOutputType = "Class"))
 	static class UCardEffectFragment_Attribute* GetAttributeOfClassFromArray(TArray<UCardEffectFragment_Attribute*> Array, TSubclassOf<UCardEffectFragment_Attribute> Class);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (Card Identity)", CompactNodeTitle = "==", Keywords = "== equal"), Category = "Card")
+	static bool Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B);
 };

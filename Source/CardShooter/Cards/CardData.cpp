@@ -46,6 +46,26 @@ FText UCardData::GetDescription()
 		return FText::GetEmpty();
 	}
 
+	TArray<FText> Sections;
+
+	// Attributes
+
+	// Gather Attribute Descriptions
+	FText AttributesDesc = GetAttributesDescription();
+
+	if (!AttributesDesc.IsEmpty())
+	{
+		Sections.Add(AttributesDesc);
+	}
+
+	Sections.Add(GetExecutionsDescription());
+
+	// Final join with spacing
+	return FText::Join(FText::FromString("\n\n"), Sections);
+}
+
+FText UCardData::GetAttributesDescription()
+{
 	// Gather Attribute Descriptions
 	TArray<FText> AttributeDescs;
 
@@ -65,13 +85,12 @@ FText UCardData::GetDescription()
 
 	FText AttributesDesc = FText::Join(FText::FromString(", "), AttributeDescs);
 
-	TArray<FText> Sections;
+	return AttributesDesc;
+}
 
-	// Attributes
-	if (!AttributesDesc.IsEmpty())
-	{
-		Sections.Add(AttributesDesc);
-	}
+FText UCardData::GetExecutionsDescription()
+{
+	TArray<FText> Sections;
 
 	FText PrimaryInput = LOCTEXT("PrimaryInput", "<input id=\"/Game/Blueprint/Input/CardExecution/IA_ExecuteCardPrimary\"/>");
 	FText SecondaryInput = LOCTEXT("SecondaryInput", "<input id=\"/Game/Blueprint/Input/CardExecution/IA_ExecuteCardSecondary\"/>");

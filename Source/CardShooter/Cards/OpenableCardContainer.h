@@ -5,10 +5,16 @@
 
 #include "OpenableCardContainer.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCardPack, Log, Log)
+
 UCLASS(BlueprintType)
 class UOpenableCardContainerInstance : public UObject
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FCardIdentity> Cards;
 };
 
 USTRUCT(BlueprintType)
@@ -26,33 +32,12 @@ struct FDrawableCardData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Draw")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Weight = 1.f;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CardData")
-	TObjectPtr<UCardData> Card;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "CardData")
-	ECardRarity CardRarity = ECardRarity::Common;
-
-	//TODO here come more properties that more closely describe the actual card identity, like foil and what other customization we offer
-
-	bool operator== (const FDrawableCardData& Other) const
-	{
-		return Card == Other.Card
-			&& CardRarity == Other.CardRarity;
-	}
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FCardIdentity Card;
 };
-
-FORCEINLINE uint32 GetTypeHash(const FDrawableCardData& Data)
-{
-	uint32 Hash = 0;
-
-	Hash = HashCombine(Hash, GetTypeHash(Data.Card));
-	Hash = HashCombine(Hash, GetTypeHash(Data.CardRarity));
-
-	return Hash;
-}
 
 UCLASS(BlueprintType)
 class UOpenableCardContainerDefinition : public UPrimaryDataAsset
@@ -62,6 +47,9 @@ class UOpenableCardContainerDefinition : public UPrimaryDataAsset
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText ContainerName;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 PackOrderIndex = 999;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	class UTexture2D* ContainerTexture;
@@ -78,4 +66,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, meta = (RowType = "/Script/CardShooter.FDrawableCardData"))
 	TArray<TObjectPtr<UDataTable>> CardDrawPools;
+
+	UFUNCTION(BlueprintCallable)
+	UOpenableCardContainerInstance* GenerateInstance(UObject* Outer);
 };
