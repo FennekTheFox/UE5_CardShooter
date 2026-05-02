@@ -49,7 +49,8 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	TArray<FCardDeck> DeckList;
 
-	//TODO Currencies
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	TMap<FGameplayTag, int32> Currencies;
 
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
@@ -68,4 +69,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards);
+
+
+	UFUNCTION(BlueprintCallable)
+	void AddCurrency(FGameplayTag CurrencyTag, int32 Amount);
+	UFUNCTION(BlueprintCallable)
+	bool DeductCurrency(FGameplayTag CurrencyTag, int32 Amount);
+	UFUNCTION(BlueprintCallable)
+	int32 GetCurrencyAmount(FGameplayTag CurrencyTag);
 };
