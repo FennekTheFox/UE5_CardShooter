@@ -68,11 +68,14 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 				FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromHandle(SpecHandle);
 				if (Spec)
 				{
-					UGameplayAbility_CardExecution* GA_CE = Cast<UGameplayAbility_CardExecution>(Spec->GetAbilityInstances().Last());
-					if (GA_CE)
+					if (!ensure(Spec->GetAbilityInstances().IsEmpty()))
 					{
-						GA_CE->AdditionalData = AdditionalData;
-						GA_CE->PostAdditionalDataSet();
+						UGameplayAbility_CardExecution* GA_CE = Cast<UGameplayAbility_CardExecution>(Spec->GetAbilityInstances().Last());
+						if (GA_CE)
+						{
+							GA_CE->AdditionalData = AdditionalData;
+							GA_CE->PostAdditionalDataSet();
+						}
 					}
 				}
 			}));

@@ -15,6 +15,11 @@ struct FCardDeck
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
 	TArray<FCardIdentity> CardList;
+
+	//If true, the deck does not get checked for card availability in collection
+	//TODO
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	bool bDebugDeck = false;
 };
 
 UCLASS(BlueprintType)
