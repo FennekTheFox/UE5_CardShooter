@@ -13,7 +13,7 @@ struct FCardCollection
 	GENERATED_BODY()
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	TArray<FCardIdentity> Cards;
+	TMap<FCardIdentity, int32> Cards;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -49,6 +49,9 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	TArray<FCardDeck> DeckList;
 
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	TMap<FGameplayTag, int32> Currencies;
+
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 LastSelectedDeckIndex = -1;
@@ -56,11 +59,22 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void MakeUniqueCollectionIdentity(UPARAM()FCardIdentity& CardIdentity);
+	void ValidateAndFix(FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintCallable)
 	void AddCardToCollection(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveCardFromCollection(const FCardIdentity& CardIdentity);
+	bool RemoveCardFromCollection(const FCardIdentity& CardIdentity);
+
+	UFUNCTION(BlueprintCallable)
+	void GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards);
+
+
+	UFUNCTION(BlueprintCallable)
+	void AddCurrency(FGameplayTag CurrencyTag, int32 Amount);
+	UFUNCTION(BlueprintCallable)
+	bool DeductCurrency(FGameplayTag CurrencyTag, int32 Amount);
+	UFUNCTION(BlueprintCallable)
+	int32 GetCurrencyAmount(FGameplayTag CurrencyTag);
 };

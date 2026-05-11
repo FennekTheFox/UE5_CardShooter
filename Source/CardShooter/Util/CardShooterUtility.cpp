@@ -16,7 +16,7 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 		//We found a valid card data
 		if (UCardData* LoadedCard = Cast<UCardData>(AssetData.GetAsset()))
 		{
-			if (LoadedCard->AssetTag == Identity.AssetTag)
+			if (!Identity.AssetTag.IsValid() ||LoadedCard->AssetTag == Identity.AssetTag)
 			{
 				return LoadedCard;
 			}
@@ -110,10 +110,20 @@ class UCardEffectFragment_Attribute* UCardShooterUtilityLibrary::GetAttributeOfC
 {
 	for (UCardEffectFragment_Attribute* Attribute : Array)
 	{
+		if (!ensure(Attribute))
+		{
+			continue;
+		}
+
 		if (Attribute->IsA(Class))
 		{
 			return Attribute;
 		}
 	}
 	return nullptr;
+}
+
+bool UCardShooterUtilityLibrary::Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B)
+{
+	return A == B;
 }

@@ -123,7 +123,8 @@ protected:
 
 		const FSlateBrush* Brush = Decorator->FindInputActionBrush(CurrentPlatformName, InputAction, bWarnIfMissing, Owner.Get());
 
-		if (ensure(Brush))
+		//No ensure here, else it triggers in UI
+		if (/*ensure*/(Brush))
 		{
 			TOptional<int32> Width;
 			if (const FString* WidthString = RunInfo.MetaData.Find(TEXT("width")))
@@ -194,6 +195,12 @@ const FSlateBrush* URichTextBlockInputActionDecorator::FindInputActionBrush(FNam
 	if (Row)
 	{
 		ACardShooterPlayerController* PC = Cast<ACardShooterPlayerController>(InOwner->GetOwningPlayer());
+
+		if (!PC)
+		{
+			return nullptr;
+		}
+
 		const FControllerInputIcons* ControllerData = Row->ControllerData.Find(PC->bLastInputWasGamepad ? EInputDeviceType::Gamepad : EInputDeviceType::KBM);
 
 		if (ControllerData)
