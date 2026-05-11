@@ -26,7 +26,7 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 	TSharedPtr<FDelegateHandle> OnEndedHandle = MakeShared<FDelegateHandle>();
 	TSharedPtr<FDelegateHandle> OnFailedHandle = MakeShared<FDelegateHandle>();
 	*OnEndedHandle = ASC->OnAbilityEnded.AddLambda([ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const FAbilityEndedData& Data) {
-		if (Data.AbilityThatEnded == AbilitySpec.Ability)
+		if (Data.AbilitySpecHandle == SpecHandle)
 		{
 			ASC->ClearAbility(SpecHandle);
 
@@ -68,6 +68,8 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 				FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromHandle(SpecHandle);
 				if (Spec)
 				{
+					//TODO: this triggers on certain abilities, which execute on server and client
+					//not fatal, only annoying and not intended
 					if (!ensure(Spec->GetAbilityInstances().IsEmpty()))
 					{
 						UGameplayAbility_CardExecution* GA_CE = Cast<UGameplayAbility_CardExecution>(Spec->GetAbilityInstances().Last());
