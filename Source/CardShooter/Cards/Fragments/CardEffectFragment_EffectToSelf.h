@@ -10,7 +10,9 @@ enum class ESetByCallerMagnitudeDisplayType : uint8
 {
 	Flat = 0,
 	Percent = 1, 
-	PercentOneMinus = 2
+	PercentOneMinus = 2,
+	Absolute,
+	AbsolutePercent
 };
 
 //Only used for text generation
