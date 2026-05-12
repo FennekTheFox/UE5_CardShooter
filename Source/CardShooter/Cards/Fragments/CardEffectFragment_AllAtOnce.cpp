@@ -9,7 +9,10 @@ void UCardEffectFragment_Execution_AllAtOnce::ExecuteCardEffect_Implementation(A
 {
 	for (UCardEffectFragment_Execution* Exec : Executions)
 	{
-		Exec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+		if (ensure(Exec))
+		{
+			Exec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+		}
 	}
 }
 

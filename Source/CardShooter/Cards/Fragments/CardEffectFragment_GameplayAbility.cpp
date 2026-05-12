@@ -70,7 +70,7 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 				{
 					//TODO: this triggers on certain abilities, which execute on server and client
 					//not fatal, only annoying and not intended
-					if (!ensure(Spec->GetAbilityInstances().IsEmpty()))
+					if (!/*ensure*/(Spec->GetAbilityInstances().IsEmpty()))
 					{
 						UGameplayAbility_CardExecution* GA_CE = Cast<UGameplayAbility_CardExecution>(Spec->GetAbilityInstances().Last());
 						if (GA_CE)
