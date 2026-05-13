@@ -5,16 +5,6 @@
 
 #include "CardEffectFragment_EffectToSelf.generated.h"
 
-UENUM(BlueprintType)
-enum class ESetByCallerMagnitudeDisplayType : uint8
-{
-	Flat = 0,
-	Percent = 1, 
-	PercentOneMinus = 2,
-	Absolute,
-	AbsolutePercent
-};
-
 //Only used for text generation
 UENUM(BlueprintType)
 enum class EEffectInclination : uint8
@@ -23,26 +13,17 @@ enum class EEffectInclination : uint8
 	Detrimental = 1,
 };
 
-USTRUCT(BlueprintType)
-struct FSetByCallerMetaData
+UCLASS()
+class UCardExecutionInstance_ApplyEffectToOwner : public UCardExecutionInstance
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float Magnitude = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ESetByCallerMagnitudeDisplayType DisplayType;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText ParameterName;
-
-	FText GetDisplayText() const;
+	void ProcessExecutionInstance() override;
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Apply Effect To Self"))
-class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_Execution
+class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_ExecutionWithParameters
 {
 	GENERATED_BODY()
 
@@ -57,13 +38,11 @@ public:
 	float GameplayEffectLevel = 1.f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
+	bool bResolveImmediately = false;
 
-	virtual void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
 	 //~UCardEffectFragment
 	FText GetLocalizableDescription_Implementation() override;
 	 //~UCardEffectFragment
-
-	void GetSetByCallerFormattingArgs(FFormatNamedArguments& Args);
 };

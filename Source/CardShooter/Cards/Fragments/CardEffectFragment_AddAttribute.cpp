@@ -3,14 +3,31 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-void UCardEffectFragment_Execution_AddAttributeToNextCards::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+void UCardExecutionInstance_AddAttributeToNextCards::ProcessExecutionInstance()
 {
+	UCardEffectFragment_Execution_AddAttributeToNextCards* AsAddAttribute = Cast<UCardEffectFragment_Execution_AddAttributeToNextCards>(Exec);
+
+	if (!ensure(AsAddAttribute))
+	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+		return;
+	}
+
 	//TODO This may not be player exclusive, but probably will. If not this needs to change
 	if (ACardShooterCharacter* AsCSPCharacter = Cast<ACardShooterCharacter>(ExecutingPawn))
 	{
-		int32& ExistingCount = AsCSPCharacter->AttributesToAddToExecutions.FindOrAdd(Attribute);
-		ExistingCount += Count;
+		int32& ExistingCount = AsCSPCharacter->AttributesToAddToExecutions.FindOrAdd(AsAddAttribute->Attribute);
+		ExistingCount += AsAddAttribute->Count;
 	}
+
+	OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+}
+
+UCardExecutionInstance* UCardEffectFragment_Execution_AddAttributeToNextCards::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_AddAttributeToNextCards>(this);
+	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
+	return NewInstance;
 }
 
 FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescription_Implementation()
@@ -27,3 +44,4 @@ FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescr
 }
 
 #undef LOCTEXT_NAMESPACE
+

@@ -34,4 +34,10 @@ public:
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (Card Identity)", CompactNodeTitle = "==", Keywords = "== equal"), Category = "Card")
 	static bool Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B);
+
+	UFUNCTION(BlueprintPure)
+	static AActor* GetInstigatorFromEffectHandle(const FActiveGameplayEffectHandle& Handle);
+
+	UFUNCTION(BlueprintCallable)
+	static void ResetDurationOnEffect(const FActiveGameplayEffectHandle& Handle);
 };

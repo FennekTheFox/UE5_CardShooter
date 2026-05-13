@@ -13,7 +13,7 @@ class UDamageModifierAttributeSet : public UProjectAttributeSet
 public:
 	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, DamageMultiplier);
 	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, PhysicalDamageMultiplier);
-	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, ElectricDamageMultiplier);
+	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, LightningDamageMultiplier);
 	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, ColdDamageMultiplier);
 	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, PoisonDamageMultiplier);
 	ATTRIBUTE_ACCESSORS(UDamageModifierAttributeSet, SanctusDamageMultiplier);
@@ -27,7 +27,7 @@ private:
 	FGameplayAttributeData PhysicalDamageMultiplier;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData ElectricDamageMultiplier;
+	FGameplayAttributeData LightningDamageMultiplier;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData ColdDamageMultiplier;

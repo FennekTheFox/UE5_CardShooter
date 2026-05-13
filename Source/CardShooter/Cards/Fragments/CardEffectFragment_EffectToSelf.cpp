@@ -7,10 +7,20 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-void UCardEffectFragment_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+
+void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 {
-	if (!ensure(ExecutingPawn && GameplayEffect))
+	UCardEffectFragment_ApplyEffectToOwner* AsEffectToOwner = Cast<UCardEffectFragment_ApplyEffectToOwner>(Exec);
+
+	if (!ensure(AsEffectToOwner))
 	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+		return;
+	}
+
+	if (!ensure(ExecutingPawn && AsEffectToOwner->GameplayEffect))
+	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 		return;
 	}
 
@@ -18,17 +28,44 @@ void UCardEffectFragment_ApplyEffectToOwner::ExecuteCardEffect_Implementation(AP
 
 	if (!ensure(ASC))
 	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 		return;
 	}
 
-	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GameplayEffect, GameplayEffectLevel, ASC->MakeEffectContext());
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AsEffectToOwner->GameplayEffect, AsEffectToOwner->GameplayEffectLevel, ASC->MakeEffectContext());
 
-	for (auto&& KVPair : SetByCallerMagnitudes)
+	for (auto&& KVPair : AsEffectToOwner->SetByCallerMagnitudes)
 	{
 		SpecHandle.Data->SetSetByCallerMagnitude(KVPair.Key, KVPair.Value.Magnitude);
 	}
 
 	FActiveGameplayEffectHandle EffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	
+
+	if (AsEffectToOwner->bResolveImmediately)
+	{
+		//If the execution is to resolve immediately
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+	}
+	else
+	{
+		//If not, then we wait for the effect to expire
+		if (EffectHandle.IsValid())
+		{
+			ASC->OnGameplayEffectRemoved_InfoDelegate(EffectHandle)
+				->AddLambda([this](const FGameplayEffectRemovalInfo& RemovalInfo)
+					{
+						OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+					});
+		}
+	}
+}
+
+UCardExecutionInstance* UCardEffectFragment_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_ApplyEffectToOwner>(this);
+	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
+	return NewInstance;
 }
 
 FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation()
@@ -61,60 +98,4 @@ FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implemen
 	ensure(false);
 	return FText::GetEmpty();
 }
-
-void UCardEffectFragment_ApplyEffectToOwner::GetSetByCallerFormattingArgs(FFormatNamedArguments& Args)
-{
-	for (auto&& KVPair : SetByCallerMagnitudes)
-	{
-		const FSetByCallerMetaData& MetaData = KVPair.Value;
-
-		FString TagString = KVPair.Key.ToString();
-
-		FString Left;
-		FString Right;
-
-		FString LastPart = TagString;
-
-		if (TagString.Split(
-			TEXT("."),
-			&Left,
-			&Right,
-			ESearchCase::IgnoreCase,
-			ESearchDir::FromEnd))
-		{
-			LastPart = Right;
-		}
-
-		Args.Add(
-			LastPart + "Magnitude",
-			MetaData.GetDisplayText()
-		);
-
-		Args.Add(
-			LastPart + "Parameter",
-			MetaData.ParameterName
-		);
-	}
-}
-
 #undef LOCTEXT_NAMESPACE
-
-FText FSetByCallerMetaData::GetDisplayText() const 
-{
-	switch (DisplayType)
-	{
-	case ESetByCallerMagnitudeDisplayType::Flat: 
-		return FText::AsNumber(Magnitude);
-	case ESetByCallerMagnitudeDisplayType::Percent: 
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * Magnitude));
-	case ESetByCallerMagnitudeDisplayType::PercentOneMinus:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * (1.f - Magnitude)));
-	case ESetByCallerMagnitudeDisplayType::Absolute:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(FMath::Abs(Magnitude)));
-	case ESetByCallerMagnitudeDisplayType::AbsolutePercent:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(FMath::Abs(100.f * Magnitude)));
-	}
-
-	ensure(false);
-	return FText::GetEmpty();
-}

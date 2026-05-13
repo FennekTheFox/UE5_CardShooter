@@ -127,3 +127,40 @@ bool UCardShooterUtilityLibrary::Equal_CardIdentity(const FCardIdentity& A, cons
 {
 	return A == B;
 }
+
+AActor* UCardShooterUtilityLibrary::GetInstigatorFromEffectHandle(const FActiveGameplayEffectHandle& Handle)
+{
+	if (!Handle.IsValid())
+	{
+		return nullptr;
+	}
+
+	FGameplayEffectContextHandle Context = Handle.GetOwningAbilitySystemComponent()->GetEffectContextFromActiveGEHandle(Handle);
+
+	return Context.GetOriginalInstigator();
+}
+
+void UCardShooterUtilityLibrary::ResetDurationOnEffect(const FActiveGameplayEffectHandle& Handle)
+{
+	UAbilitySystemComponent* ASC = Handle.GetOwningAbilitySystemComponent();
+
+	if (!ASC || !Handle.IsValid())
+	{
+		return;
+	}
+
+	const FActiveGameplayEffect* ActiveEffect =
+		ASC->GetActiveGameplayEffect(Handle);
+
+	if (!ActiveEffect)
+	{
+		return;
+	}
+
+	// Copy spec before removing
+	FGameplayEffectSpec SpecCopy = ActiveEffect->Spec;
+
+	ASC->RemoveActiveGameplayEffect(Handle);
+
+	ASC->ApplyGameplayEffectSpecToSelf(SpecCopy);
+}

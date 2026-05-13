@@ -4,6 +4,15 @@
 
 #include "CardEffectFragment_DebugPrint.generated.h"
 
+UCLASS()
+class UCardExecutionInstance_DebugPrint : public UCardExecutionInstance
+{
+	GENERATED_BODY()
+
+public:
+	void ProcessExecutionInstance() override;
+};
+
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Debug Print"))
 class UCardEffectFragment_Execution_DebugPrint : public UCardEffectFragment_Execution
 {
@@ -19,7 +28,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DisplayDuration = 2.f;
 
-	void ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
 	 //~UCardEffectFragment
 	FText GetLocalizableDescription_Implementation() override;

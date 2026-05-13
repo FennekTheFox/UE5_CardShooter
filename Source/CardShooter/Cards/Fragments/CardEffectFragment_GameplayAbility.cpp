@@ -7,28 +7,40 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-
-void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
+namespace CardGameplayTags
 {
-	Super::ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+	UE_DEFINE_GAMEPLAY_TAG(Event_InitializeCardAbility, "Gameplay.Event.InitializeCardAbility");
+}
+
+void UCardExecutionInstance_GameplayAbility::ProcessExecutionInstance()
+{
+	UCardEffectFragment_GameplayAbility* AsGA = Cast<UCardEffectFragment_GameplayAbility>(Exec);
+
+	if (!ensure(AsGA))
+	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+		return;
+	}
 
 	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ExecutingPawn);
 
 	if (!ensure(ASC))
 	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 		return;
 	}
 
-	FGameplayAbilitySpec AbilitySpec(AbilityToExecute.Ability);
+	FGameplayAbilitySpec AbilitySpec(AsGA->AbilityToExecute.Ability);
 	FGameplayAbilitySpecHandle SpecHandle = ASC->GiveAbility(AbilitySpec);
 
 	//This relies on the ability 100% getting executed, else it wont get removed properly
 	TSharedPtr<FDelegateHandle> OnEndedHandle = MakeShared<FDelegateHandle>();
 	TSharedPtr<FDelegateHandle> OnFailedHandle = MakeShared<FDelegateHandle>();
-	*OnEndedHandle = ASC->OnAbilityEnded.AddLambda([ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const FAbilityEndedData& Data) {
+	*OnEndedHandle = ASC->OnAbilityEnded.AddLambda([this, ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const FAbilityEndedData& Data) {
 		if (Data.AbilitySpecHandle == SpecHandle)
 		{
 			ASC->ClearAbility(SpecHandle);
+			OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 
 			if (OnEndedHandle->IsValid())
 			{
@@ -42,10 +54,11 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 		}
 	);
 
-	*OnFailedHandle = ASC->AbilityFailedCallbacks.AddLambda([ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const UGameplayAbility* Ability, const FGameplayTagContainer&) {
+	*OnFailedHandle = ASC->AbilityFailedCallbacks.AddLambda([this, ASC, SpecHandle, AbilitySpec, OnEndedHandle, OnFailedHandle](const UGameplayAbility* Ability, const FGameplayTagContainer&) {
 		if (Ability == AbilitySpec.Ability)
 		{
 			ASC->ClearAbility(SpecHandle);
+			OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 
 			if (OnEndedHandle->IsValid())
 			{
@@ -61,7 +74,7 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 
 	ExecutingPawn->GetWorld()->GetTimerManager()
 		.SetTimerForNextTick(FTimerDelegate::CreateLambda(
-			[ASC, SpecHandle, AdditionalData]
+			[this, ASC, SpecHandle]
 			()
 			{
 
@@ -81,7 +94,19 @@ void UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn
 					}
 				}
 			}));
+}
 
+UCardExecutionInstance* UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_GameplayAbility>(this);
+	FCardExecution_AdditionalData AppendedData = AdditionalData;
+	for (auto&& KVPair : SetByCallerMagnitudes)
+	{
+		AppendedData.SetByCallerMetaDataTags.Add(KVPair.Key);
+		AppendedData.SetByCallerMetaDataValues.Add(KVPair.Value);
+	}
+	NewInstance->StartExecutionInstance(ExecutingPawn, AppendedData, this);
+	return NewInstance;
 }
 
 FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation()
@@ -93,11 +118,17 @@ FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementat
 
 	if (UGameplayAbility_CardExecution* AsGA_CE = Cast<UGameplayAbility_CardExecution>(AbilityToExecute.Ability->GetDefaultObject()))
 	{
-		return FText::Format(FText::FromString("{0}: {1}"), AsGA_CE->GetName(), AsGA_CE->GetDescription());
+		FFormatNamedArguments Args;
+		GetSetByCallerFormattingArgs(Args);
+
+		return FText::Format(FText::FromString("{0}: {1}"), 
+			AsGA_CE->GetName(), 
+			FText::Format(AsGA_CE->GetDescription(), Args));
 	}
 
 	ensure(false);
 	return FText::GetEmpty();
 }
+
 
 #undef LOCTEXT_NAMESPACE

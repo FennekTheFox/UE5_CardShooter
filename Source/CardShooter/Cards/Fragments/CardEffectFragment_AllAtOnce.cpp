@@ -4,16 +4,47 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-
-void UCardEffectFragment_Execution_AllAtOnce::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardExecutionInstance_AllAtOnce::ProcessExecutionInstance()
 {
-	for (UCardEffectFragment_Execution* Exec : Executions)
+	UCardEffectFragment_Execution_AllAtOnce* AsAllAtOnce = Cast<UCardEffectFragment_Execution_AllAtOnce>(Exec);
+
+	if (!ensure(AsAllAtOnce))
 	{
-		if (ensure(Exec))
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+		return;
+	}
+
+	bool bValidExecutionFound = false;
+
+	for (UCardEffectFragment_Execution* ExecIt : AsAllAtOnce->Executions)
+	{
+		if (ensure(ExecIt))
 		{
-			Exec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+			bValidExecutionFound = true;
+
+			UCardExecutionInstance* NewInstance = ExecIt->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+			NewInstance->OnExecutionCompleted.AddLambda([this, NewInstance](APawn* P, const FCardExecution_AdditionalData& A, UCardEffectFragment_Execution* E) {
+				RunningSubInstances.Remove(NewInstance);
+				if (RunningSubInstances.IsEmpty())
+				{
+					OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+				}
+				});
+			RunningSubInstances.Add(NewInstance);
 		}
 	}
+
+	if (!bValidExecutionFound)
+	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+	}
+}
+
+UCardExecutionInstance* UCardEffectFragment_Execution_AllAtOnce::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_AllAtOnce>(this);
+	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
+	return NewInstance;
 }
 
 FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Implementation()

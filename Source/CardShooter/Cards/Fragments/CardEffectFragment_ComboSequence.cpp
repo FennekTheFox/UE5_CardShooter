@@ -5,27 +5,44 @@
 #define LOCTEXT_NAMESPACE "CardEffects"
 
 
-void UCardEffectFragment_Execution_ComboSequence::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData /*= FCardExecution_AdditionalData()*/)
+void UCardExecutionInstance_ComboSequence::ProcessExecutionInstance()
 {
-	if (Executions.Num() == 1)
+	UCardEffectFragment_Execution_ComboSequence* AsComboSeq = Cast<UCardEffectFragment_Execution_ComboSequence>(Exec);
+
+	if (!ensure(AsComboSeq))
 	{
-		if (UCardEffectFragment_Execution* Exec = Executions[0])
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
+		return;
+	}
+
+	if (AsComboSeq->Executions.Num() == 1)
+	{
+		if (UCardEffectFragment_Execution* ComboExec = AsComboSeq->Executions[0])
 		{
-			Exec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+			RunningSubInstances.Add(ComboExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData));
 		}
 
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 		return;
 	}
 
-	if (!ensure(AdditionalData.ComboIndex >= 0 && AdditionalData.ComboIndex < Executions.Num()))
+	if (!ensure(AdditionalData.ComboIndex >= 0 && AdditionalData.ComboIndex < AsComboSeq->Executions.Num()))
 	{
+		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 		return;
 	}
 
-	if (UCardEffectFragment_Execution* Exec = Executions[AdditionalData.ComboIndex])
+	if (UCardEffectFragment_Execution* ComboExec = AsComboSeq->Executions[AdditionalData.ComboIndex])
 	{
-		Exec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+		RunningSubInstances.Add(ComboExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData));
 	}
+}
+
+UCardExecutionInstance* UCardEffectFragment_Execution_ComboSequence::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+{
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_ComboSequence>(this);
+	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
+	return NewInstance;
 }
 
 FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Implementation()
