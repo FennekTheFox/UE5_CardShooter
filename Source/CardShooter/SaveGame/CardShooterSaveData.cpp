@@ -154,3 +154,15 @@ int32 UCardShooterSaveData::GetCurrencyAmount(FGameplayTag CurrencyTag)
 	return HaveAmount;
 }
 
+bool UCardShooterSaveData::HasSufficientCurrency(const FGameplayTag CurrencyTag, int32 RequiredAmount) const
+{
+	const int32* HaveAmout = Currencies.Find(CurrencyTag);
+
+	if (HaveAmout)
+	{
+		return *HaveAmout >= RequiredAmount;
+	}
+
+	return false;
+}
+

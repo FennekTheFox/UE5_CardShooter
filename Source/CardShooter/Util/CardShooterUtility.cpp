@@ -1,8 +1,12 @@
 #include "CardShooterUtility.h"
-#include "AssetRegistry/AssetRegistryModule.h"
 #include "Cards/Fragments/CardAttributeFragment_DeckLimit.h"
+#include "Currency.h"
+
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
+#include "UObject/UnrealType.h"
+#include "UObject/Stack.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -171,4 +175,44 @@ void UCardShooterUtilityLibrary::ResetDurationOnEffect(const FActiveGameplayEffe
 void UCardShooterUtilityLibrary::AddSourceToContext(FGameplayEffectContextHandle Handle, UObject* Source)
 {
 	Handle.AddSourceObject(Source);
+}
+
+class UCurrencyDef* UCardShooterUtilityLibrary::FindCurrencyDef(FGameplayTag CurrencyTag)
+{
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
+
+	//We couldnt retrieve a valid card by soft path, so lets check if we can find it at all
+	TArray<FAssetData> CurrencyAssets;
+	AssetRegistry.GetAssetsByClass(UCurrencyDef::StaticClass()->GetClassPathName(), CurrencyAssets, true);
+	{
+		for (FAssetData& AssetDataIt : CurrencyAssets)
+		{
+			//We found a valid card data
+			if (UCurrencyDef* LoadedCurrency = Cast<UCurrencyDef>(AssetDataIt.GetAsset()))
+			{
+				if (LoadedCurrency->CurrencyTag == CurrencyTag)
+				{
+					return LoadedCurrency;
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void UCardShooterUtilityLibrary::SortCardIdentityArray(TArray<FCardIdentity>& Array, FCardIdentitySortPredicate Predicate)
+{
+	Array.Sort(
+		[&Predicate](const FCardIdentity& A, const FCardIdentity& B)
+		{
+			if (Predicate.IsBound())
+			{
+				return Predicate.Execute(A, B);
+			}
+
+			return false;
+		});
 }

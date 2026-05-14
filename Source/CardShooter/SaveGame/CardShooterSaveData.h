@@ -77,4 +77,7 @@ public:
 	bool DeductCurrency(FGameplayTag CurrencyTag, int32 Amount);
 	UFUNCTION(BlueprintCallable)
 	int32 GetCurrencyAmount(FGameplayTag CurrencyTag);
+
+	UFUNCTION(BlueprintPure)
+	bool HasSufficientCurrency(const FGameplayTag CurrencyTag, int32 RequiredAmount) const;
 };

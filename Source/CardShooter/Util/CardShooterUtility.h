@@ -8,6 +8,13 @@
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGameplayTagChangedBP, FGameplayTag, Tag, int32, Count);
 
+DECLARE_DYNAMIC_DELEGATE_RetVal_TwoParams(
+	bool,
+	FCardIdentitySortPredicate,
+	const FCardIdentity&, A,
+	const FCardIdentity&, B
+);
+
 UCLASS()
 class UCardShooterUtilityLibrary : public UBlueprintFunctionLibrary
 {
@@ -43,4 +50,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void AddSourceToContext(FGameplayEffectContextHandle Handle, UObject* Source);
+
+	UFUNCTION(BlueprintPure)
+	static class UCurrencyDef* FindCurrencyDef(FGameplayTag CurrencyTag);
+
+
+	UFUNCTION(BlueprintCallable, Category = "CardShooter|Sorting")
+	static void SortCardIdentityArray(UPARAM(ref) TArray<FCardIdentity>& Array,	FCardIdentitySortPredicate Predicate);
 };

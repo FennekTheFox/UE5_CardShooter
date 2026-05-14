@@ -39,6 +39,19 @@ public:
 	FCardIdentity Card;
 };
 
+USTRUCT(BlueprintType)
+struct FCardDrawPool
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float TableWeightMultiplier = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UDataTable> PoolTable;
+};
+
 UCLASS(BlueprintType)
 class UOpenableCardContainerDefinition : public UPrimaryDataAsset
 {
@@ -60,13 +73,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTagQuery SaveDataVisibilityCondition;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<TObjectPtr<class UCurrencyDef>, int32> BaseCurrencyCost;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<FCardDrawProperties> CardDraws;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, meta = (RowType = "/Script/CardShooter.FDrawableCardData"))
-	TArray<TObjectPtr<UDataTable>> CardDrawPools;
+	TArray<FCardDrawPool> CardDrawPools;
 
 	UFUNCTION(BlueprintCallable)
 	UOpenableCardContainerInstance* GenerateInstance(UObject* Outer);
+
+	UFUNCTION(BlueprintPure)
+	float GetSummedUpDrawWeightsForDraw(const FCardDrawProperties& DrawProperties) const;
 };

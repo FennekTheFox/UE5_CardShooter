@@ -23,29 +23,7 @@ UOpenableCardContainerInstance* UOpenableCardContainerDefinition::GenerateInstan
 
 		UE_LOG(LogCardPack, Log, TEXT(" ==== > Summing up weights..."));
 		//Sum up the weights
-		float SumWeights = 0.f;
-		for (int32 PoolIndex : Draw.CardPools)
-		{
-			if (!ensure(CardDrawPools.IsValidIndex(PoolIndex)) && CardDrawPools[PoolIndex])
-			{
-				continue;
-			}
-
-			const TMap<FName, uint8*>& RowMap = CardDrawPools[PoolIndex]->GetRowMap();
-			//Iterate through to sum up weights
-			for (const TPair<FName, uint8*>& Pair : RowMap)
-			{
-				FName RowName = Pair.Key;
-
-				FDrawableCardData* Row = (FDrawableCardData*)Pair.Value;
-
-				if (Row)
-				{
-					SumWeights += Row->Weight;
-					UE_LOG(LogCardPack, Log, TEXT(" ===== > Sum of weights increased to: %f"), SumWeights);
-				}
-			}
-		}
+		float SumWeights = GetSummedUpDrawWeightsForDraw(Draw);
 		//done summing up!
 		UE_LOG(LogCardPack, Log, TEXT(" ====== > Sum of weights value got: %f"), SumWeights);
 
@@ -56,12 +34,13 @@ UOpenableCardContainerInstance* UOpenableCardContainerDefinition::GenerateInstan
 		UE_LOG(LogCardPack, Log, TEXT(" ======== > Counting down target value..."));
 		for (int32 PoolIndex : Draw.CardPools)
 		{
-			if (!ensure(CardDrawPools.IsValidIndex(PoolIndex)) && CardDrawPools[PoolIndex])
+			if (!ensure(CardDrawPools.IsValidIndex(PoolIndex)) && CardDrawPools[PoolIndex].PoolTable)
 			{
 				continue;
 			}
 
-			const TMap<FName, uint8*>& RowMap = CardDrawPools[PoolIndex]->GetRowMap();
+			const FCardDrawPool& DrawPool = CardDrawPools[PoolIndex];
+			const TMap<FName, uint8*>& RowMap = DrawPool.PoolTable->GetRowMap();
 
 			//Iterate through to sum up weights
 			for (const TPair<FName, uint8*>& Pair : RowMap)
@@ -75,7 +54,7 @@ UOpenableCardContainerInstance* UOpenableCardContainerDefinition::GenerateInstan
 
 				if (Row)
 				{
-					TargetValue -= Row->Weight;
+					TargetValue -= DrawPool.TableWeightMultiplier * Row->Weight;
 					UE_LOG(LogCardPack, Log, TEXT(" ========= > Target value decreased to: %f"), TargetValue);
 
 					if (TargetValue <= 0.f)
@@ -91,3 +70,34 @@ UOpenableCardContainerInstance* UOpenableCardContainerDefinition::GenerateInstan
 	return NewInst;
 }
 
+float UOpenableCardContainerDefinition::GetSummedUpDrawWeightsForDraw(const FCardDrawProperties& DrawProperties) const
+{
+	float SumWeights = 0.f;
+
+	for (int32 PoolIndex : DrawProperties.CardPools)
+	{
+		if (!ensure(CardDrawPools.IsValidIndex(PoolIndex)) && CardDrawPools[PoolIndex].PoolTable)
+		{
+			continue;
+		}
+
+		const FCardDrawPool& DrawPool = CardDrawPools[PoolIndex];
+		const TMap<FName, uint8*>& RowMap = DrawPool.PoolTable->GetRowMap();
+
+		//Iterate through to sum up weights
+		for (const TPair<FName, uint8*>& Pair : RowMap)
+		{
+			FName RowName = Pair.Key;
+
+			FDrawableCardData* Row = (FDrawableCardData*)Pair.Value;
+
+			if (Row)
+			{
+				SumWeights += DrawPool.TableWeightMultiplier * Row->Weight;
+				UE_LOG(LogCardPack, Log, TEXT(" ===== > Sum of weights increased to: %f"), SumWeights);
+			}
+		}
+	}
+
+	return SumWeights;
+}

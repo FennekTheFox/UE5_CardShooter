@@ -13,6 +13,10 @@ struct FCardDeck
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
 	FString DeckName;
 
+	//Set utility cards that need not be drawn and can be played at any time
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	TArray<FCardIdentity> UtilityCards;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
 	TArray<FCardIdentity> CardList;
 
