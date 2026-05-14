@@ -117,6 +117,8 @@ FText FSetByCallerMetaData::GetDisplayText() const
 		return FText::Format(FText::FromString("{0}"), FText::AsNumber(FMath::Abs(Magnitude)));
 	case ESetByCallerMagnitudeDisplayType::AbsolutePercent:
 		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(FMath::Abs(100.f * Magnitude)));
+	case ESetByCallerMagnitudeDisplayType::AbsolutePercentOneOver:
+		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(1.f / FMath::Abs(100.f * Magnitude)));
 	}
 
 	ensure(false);

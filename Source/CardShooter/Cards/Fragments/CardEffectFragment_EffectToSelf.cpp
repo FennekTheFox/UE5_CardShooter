@@ -32,7 +32,9 @@ void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 		return;
 	}
 
-	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AsEffectToOwner->GameplayEffect, AsEffectToOwner->GameplayEffectLevel, ASC->MakeEffectContext());
+	FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+	Context.AddSourceObject(this);
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AsEffectToOwner->GameplayEffect, AsEffectToOwner->GameplayEffectLevel, Context);
 
 	for (auto&& KVPair : AsEffectToOwner->SetByCallerMagnitudes)
 	{

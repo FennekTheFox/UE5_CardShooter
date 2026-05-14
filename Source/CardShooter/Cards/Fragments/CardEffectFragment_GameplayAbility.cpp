@@ -30,7 +30,7 @@ void UCardExecutionInstance_GameplayAbility::ProcessExecutionInstance()
 		return;
 	}
 
-	FGameplayAbilitySpec AbilitySpec(AsGA->AbilityToExecute.Ability);
+	FGameplayAbilitySpec AbilitySpec(AsGA->AbilityToExecute.Ability, 1, -1, this);
 	FGameplayAbilitySpecHandle SpecHandle = ASC->GiveAbility(AbilitySpec);
 
 	//This relies on the ability 100% getting executed, else it wont get removed properly

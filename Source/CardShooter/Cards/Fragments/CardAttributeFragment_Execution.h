@@ -16,7 +16,8 @@ enum class ESetByCallerMagnitudeDisplayType : uint8
 	Percent = 1,
 	PercentOneMinus = 2,
 	Absolute,
-	AbsolutePercent
+	AbsolutePercent,
+	AbsolutePercentOneOver,
 };
 
 USTRUCT(BlueprintType)
@@ -131,7 +132,7 @@ class UCardEffectFragment_ExecutionWithParameters : public UCardEffectFragment_E
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SetByCallerParameters")
 	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
 
 	void GetSetByCallerFormattingArgs(FFormatNamedArguments& Args);
@@ -154,7 +155,7 @@ class UCardEffectFragment_Execution_Compound : public UCardEffectFragment_Execut
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, Instanced)
+	UPROPERTY(EditDefaultsOnly, Instanced, Category="Compound")
 	TArray<TObjectPtr<UCardEffectFragment_Execution>> Executions;
 
 	UFUNCTION(BlueprintPure)

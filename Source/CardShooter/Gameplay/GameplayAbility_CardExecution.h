@@ -13,6 +13,9 @@ class UGameplayAbility_CardExecution : public UProjectGameplayAbility
 	UGameplayAbility_CardExecution();
 
 public:
+	UFUNCTION(BlueprintPure)
+	bool GetEffectContextSourceSetByCallerValue(FGameplayTag Tag, FSetByCallerMetaData& Out);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText AbilityName;
 

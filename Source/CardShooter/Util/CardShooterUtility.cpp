@@ -2,6 +2,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Cards/Fragments/CardAttributeFragment_DeckLimit.h"
 #include "AbilitySystemComponent.h"
+#include "GameplayEffectTypes.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -22,6 +23,8 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 			}
 		}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Warning: Unable to find card data with matching tag at path\"%s\""), *Identity.CardDataPath.ToString())
 
 	//We couldnt retrieve a valid card by soft path, so lets check if we can find it at all
 	TArray<FAssetData> CardAssets;
@@ -163,4 +166,9 @@ void UCardShooterUtilityLibrary::ResetDurationOnEffect(const FActiveGameplayEffe
 	ASC->RemoveActiveGameplayEffect(Handle);
 
 	ASC->ApplyGameplayEffectSpecToSelf(SpecCopy);
+}
+
+void UCardShooterUtilityLibrary::AddSourceToContext(FGameplayEffectContextHandle Handle, UObject* Source)
+{
+	Handle.AddSourceObject(Source);
 }

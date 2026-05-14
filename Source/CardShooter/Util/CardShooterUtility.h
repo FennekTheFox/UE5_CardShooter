@@ -40,4 +40,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void ResetDurationOnEffect(const FActiveGameplayEffectHandle& Handle);
+
+	UFUNCTION(BlueprintCallable)
+	static void AddSourceToContext(FGameplayEffectContextHandle Handle, UObject* Source);
 };
