@@ -11,9 +11,26 @@ FText UDeckLimitationViolation_Archetype::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
-bool UCardEffectFragment_Archetype::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Archetype::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
-	for (UCardData* Card : Deck)
+	for (UCardData* Card : Deck.UtilityCards)
+	{
+		TArray<UCardEffectFragment_Attribute*> Attributes = Card->GetAllAttributesOfClass(UCardEffectFragment_Archetype::StaticClass());
+
+		for (UCardEffectFragment_Attribute* Attribute : Attributes)
+		{
+			if (auto* AsArchetypeAttribute = Cast<UCardEffectFragment_Archetype>(Attribute))
+			{
+				if (AsArchetypeAttribute->Archetype != Archetype)
+				{
+					FailureReasons.Add(NewObject<UDeckLimitationViolation_Archetype>(this));
+					return false;
+				}
+			}
+		}
+	}
+
+	for (UCardData* Card : Deck.CardList)
 	{
 		TArray<UCardEffectFragment_Attribute*> Attributes = Card->GetAllAttributesOfClass(UCardEffectFragment_Archetype::StaticClass());
 

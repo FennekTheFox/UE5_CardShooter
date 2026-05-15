@@ -11,9 +11,9 @@ FText UDeckLimitationViolation_Gregarious::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
-bool UCardEffectFragment_Gregarious::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Gregarious::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
-	bool bSuccess = Deck.Num() >= MinimumDeckSize;
+	bool bSuccess = Deck.CardList.Num() >= MinimumDeckSize;
 
 	if (!bSuccess)
 	{

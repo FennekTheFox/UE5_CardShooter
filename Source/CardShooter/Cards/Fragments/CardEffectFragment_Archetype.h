@@ -34,7 +34,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	TObjectPtr<UCardArchetype> Archetype;
 
-	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
+	bool Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 
 	 //~UCardEffectFragment
 	FText GetLocalizableName_Implementation() override;

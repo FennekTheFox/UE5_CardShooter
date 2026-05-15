@@ -23,7 +23,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 KeystoneLimit = 3;
 
-	bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
+	bool Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 
 	 //~UCardEffectFragment
 	FText GetLocalizableName_Implementation() override;

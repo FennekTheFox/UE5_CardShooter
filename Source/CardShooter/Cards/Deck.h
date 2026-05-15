@@ -5,6 +5,26 @@
 
 class UCardData;
 
+//Used for verifying deck limits, so we dont have to look up all the data assets all the time
+USTRUCT(BlueprintType)
+struct FCardDeck_DataOnly
+{
+	GENERATED_BODY()
+
+	//Set utility cards that need not be drawn and can be played at any time
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	TArray<TObjectPtr<UCardData>> UtilityCards;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	TArray<TObjectPtr<UCardData>> CardList;
+
+	//If true, the deck does not get checked for card availability in collection
+	//TODO
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	bool bDebugDeck = false;
+};
+
+
 USTRUCT(BlueprintType)
 struct FCardDeck
 {

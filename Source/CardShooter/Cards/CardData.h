@@ -75,6 +75,9 @@ class UCardData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText CardName;
+
 	//This tag needs to be set in order for the utility functions to be able to load the card from the tag alone
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Gameplay.Cards.IDs"))
 	FGameplayTag AssetTag;
@@ -82,9 +85,6 @@ public:
 	//This tag needs to be set in order for the utility functions to be able to load the card from the tag alone
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTagContainer CardTags;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText CardName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> CardIcon;

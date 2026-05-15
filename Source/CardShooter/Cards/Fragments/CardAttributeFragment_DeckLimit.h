@@ -3,6 +3,7 @@
 #include "CardAttributeFragment_Base.h"
 
 #include "Cards/CardData.h"
+#include "Cards/Deck.h"
 
 #include "CardAttributeFragment_DeckLimit.generated.h"
 
@@ -43,5 +44,5 @@ class UCardEffectFragment_DeckLimitation : public UCardEffectFragment_Attribute
 	GENERATED_BODY()
 
 public:
-	virtual bool Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons) { return false; };
+	virtual bool Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons) { return false; };
 };

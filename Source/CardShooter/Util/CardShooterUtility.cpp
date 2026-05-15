@@ -50,31 +50,37 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 	return nullptr;
 }
 
-bool UCardShooterUtilityLibrary::CanAddCardToDeck(const FCardDeck& Deck, UCardData* CardToAdd, TArray<UDeckLimitationViolation*>& FailureReasons)
-{
-	FailureReasons.Empty();
+//bool UCardShooterUtilityLibrary::CanAddCardToDeck(const FCardDeck& Deck, FCardIdentity* CardToAdd, TArray<class UDeckLimitationViolation*>& FailureReasons)
+//{
+//	FailureReasons.Empty();
+//
+//	if (!CardToAdd)
+//	{
+//		return false;
+//	}
+//
+//	FCardDeck PostChangeDeck = Deck;
+//	PostChangeDeck.CardList.Add(CardToAdd);
+//
+//	return VerifyDeck(PostChangeDeck, FailureReasons);
+//}
 
-	if (!CardToAdd)
-	{
-		return false;
-	}
-
-	TArray<UCardData*> PostChangeDeck;
-	PostChangeDeck.Add(CardToAdd);
-
-	for (const FCardIdentity& Identity : Deck.CardList)
-	{
-		PostChangeDeck.Add(GetCardDataFromIdentity(Identity));
-	}
-
-	return VerifyDeck(PostChangeDeck, FailureReasons);
-}
-
-bool UCardShooterUtilityLibrary::VerifyDeck(const TArray<UCardData*> Deck, TArray<class UDeckLimitationViolation*>& FailureReasons)
+bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, TArray<class UDeckLimitationViolation*>& FailureReasons)
 {
 	bool bSuccess = true;
 
-	for (UCardData* Card : Deck)
+	FCardDeck_DataOnly DataOnlyDeck;
+
+	for (const FCardIdentity& Identity : Deck.UtilityCards)
+	{
+		DataOnlyDeck.UtilityCards.Add(GetCardDataFromIdentity(Identity));
+	}
+	for (const FCardIdentity& Identity : Deck.CardList)
+	{
+		DataOnlyDeck.CardList.Add(GetCardDataFromIdentity(Identity));
+	}
+
+	for (UCardData* Card : DataOnlyDeck.UtilityCards)
 	{
 		if (!Card)
 		{
@@ -85,7 +91,23 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const TArray<UCardData*> Deck, TArra
 		{
 			if (UCardEffectFragment_DeckLimitation* AsDeckLimitation = Cast<UCardEffectFragment_DeckLimitation>(DeckLimitation))
 			{
-				bSuccess &= AsDeckLimitation->Verify(Deck, FailureReasons);
+				bSuccess &= AsDeckLimitation->Verify(DataOnlyDeck, FailureReasons);
+			}
+		}
+	}	
+	
+	for (UCardData* Card : DataOnlyDeck.CardList)
+	{
+		if (!Card)
+		{
+			return false;
+		}
+
+		for (UCardEffectFragment_Attribute* DeckLimitation : Card->CardAttributes)
+		{
+			if (UCardEffectFragment_DeckLimitation* AsDeckLimitation = Cast<UCardEffectFragment_DeckLimitation>(DeckLimitation))
+			{
+				bSuccess &= AsDeckLimitation->Verify(DataOnlyDeck, FailureReasons);
 			}
 		}
 	}

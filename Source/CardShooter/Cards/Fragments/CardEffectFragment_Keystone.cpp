@@ -23,12 +23,20 @@ FText UCardEffectFragment_Keystone::GetLocalizableDescription_Implementation()
 	return FText::Format(LOCTEXT("KeystoneAttrDesc", "A deck with this card can only contain {0} cards with the Keystone attribute."), FText::AsNumber(KeystoneLimit));
 }
 
-bool UCardEffectFragment_Keystone::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Keystone::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	int32 KeystoneCount = 0;
 	bool bSuccess = true;
 
-	for (UCardData* Card : Deck)
+	for (UCardData* Card : Deck.UtilityCards)
+	{
+		if (!Card->GetAllAttributesOfClass(UCardEffectFragment_Keystone::StaticClass()).IsEmpty())
+		{
+			KeystoneCount += 1;
+		}
+	}
+
+	for (UCardData* Card : Deck.CardList)
 	{
 		if (!Card->GetAllAttributesOfClass(UCardEffectFragment_Keystone::StaticClass()).IsEmpty())
 		{

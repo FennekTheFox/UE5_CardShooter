@@ -15,13 +15,30 @@ FText UDeckLimitationViolation_Limit::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
-bool UCardEffectFragment_Limited::Verify(TArray<UCardData*> Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Limited::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	int32 Count = 0;
 
 	if (UCardData* OwningCard = Cast<UCardData>(GetOuter()))
 	{
-		for (UCardData* Card : Deck)
+		for (UCardData* Card : Deck.UtilityCards)
+		{
+			if (Card == OwningCard)
+			{
+				Count += 1;
+
+				if (Count > Limit)
+				{
+					FailureReasons.Add(NewObject<UDeckLimitationViolation_Limit>(this));
+					return false;
+				}
+			}
+		}
+	}
+
+	if (UCardData* OwningCard = Cast<UCardData>(GetOuter()))
+	{
+		for (UCardData* Card : Deck.CardList)
 		{
 			if (Card == OwningCard)
 			{
