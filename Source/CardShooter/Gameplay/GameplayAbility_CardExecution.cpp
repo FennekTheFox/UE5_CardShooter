@@ -18,42 +18,54 @@ UGameplayAbility_CardExecution::UGameplayAbility_CardExecution()
 
 bool UGameplayAbility_CardExecution::GetEffectContextSourceSetByCallerValue(FGameplayTag Tag, FSetByCallerMetaData& Out)
 {
+	//The source object could either be an instance, if the ability was granted by a GE which was applied via a card execution, or 
+	//an ability execution if applied via an effect that was applied via an ability (yes i know its confusing). Either way we need
+	//to retrieve the set by caller data from the _WithParameters fragment
+
+	TMap<FGameplayTag, FSetByCallerMetaData>* SetByCallerData = nullptr;
+	UCardEffectFragment_ExecutionWithParameters* WithParams = nullptr;
+
 	FGameplayEffectContextHandle Context = GetGrantedByEffectContext();
-
-	UObject* SourceObject = Context.GetSourceObject();
-
-	if (ensure(SourceObject))
+	UObject* ContextSourceObject = Context.GetSourceObject();
+	if ((ContextSourceObject))
 	{
-		//The source object could either be an instance, if the ability was granted by a GE which was applied via a card execution, or 
-		//an ability execution if applied via an effect that was applied via an ability (yes i know its confusing)
-		TMap<FGameplayTag, FSetByCallerMetaData>* SetByCallerData = nullptr;
-		
-		UCardEffectFragment_ExecutionWithParameters* WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(SourceObject);
+		WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(ContextSourceObject);
 
 		if (!WithParams)
 		{
-			UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(SourceObject);
+			UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(ContextSourceObject);
 
 			if (AsInstance)
 			{
 				WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(AsInstance->Exec);
 			}
 		}
+	}
 
-		if (WithParams)
+	//If added directly via the CEF_GA, it should be the Source Object
+	if (!WithParams)
+	{
+		UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(GetCurrentSourceObject());
+
+		if (AsInstance)
 		{
-			SetByCallerData = &WithParams->SetByCallerMagnitudes;
+			WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(AsInstance->Exec);
 		}
+	}		
+	
+	if (WithParams)
+	{
+		SetByCallerData = &(WithParams->SetByCallerMagnitudes);
+	}
 
-		if (ensure(SetByCallerData))
+	if (ensure(SetByCallerData))
+	{
+		FSetByCallerMetaData* Data = WithParams->SetByCallerMagnitudes.Find(Tag);
+
+		if (Data)
 		{
-			FSetByCallerMetaData* Data = WithParams->SetByCallerMagnitudes.Find(Tag);
-
-			if (Data)
-			{
-				Out = *Data;
-				return true;
-			}
+			Out = *Data;
+			return true;
 		}
 	}
 

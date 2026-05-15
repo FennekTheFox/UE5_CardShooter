@@ -18,6 +18,7 @@ enum class ESetByCallerMagnitudeDisplayType : uint8
 	Absolute,
 	AbsolutePercent,
 	AbsolutePercentOneOver,
+	XOver100,
 };
 
 USTRUCT(BlueprintType)
