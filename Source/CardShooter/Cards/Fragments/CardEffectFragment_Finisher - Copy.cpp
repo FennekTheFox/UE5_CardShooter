@@ -7,7 +7,7 @@ FText UCardEffectFragment_Stable::GetLocalizableName_Implementation()
 	return LOCTEXT("StableAttrName", "Stable");
 }
 
-FText UCardEffectFragment_Stable::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Stable::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("StableAttrDesc", "A stable card will not be discarded with the other cards. \
 		Holding on to a stable card will also not prevent shuffling an empty deck.");

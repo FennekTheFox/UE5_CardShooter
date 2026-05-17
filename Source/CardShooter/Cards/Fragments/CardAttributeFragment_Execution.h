@@ -5,74 +5,10 @@
 #include "GameplayEffect.h"
 #include "GameplayCueInterface.h"
 #include "Abilities/GameplayAbilityTargetTypes.h"
+#include "Cards/Augments/CardAugmentData.h"
+#include "CardExecution_AdditionalData.h"
 
 #include "CardAttributeFragment_Execution.generated.h"
-
-
-UENUM(BlueprintType)
-enum class ESetByCallerMagnitudeDisplayType : uint8
-{
-	Flat = 0,
-	Percent = 1,
-	PercentOneMinus = 2,
-	Absolute,
-	AbsolutePercent,
-	AbsolutePercentOneOver,
-	XOver100,
-};
-
-USTRUCT(BlueprintType)
-struct FSetByCallerMetaData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float Magnitude = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ESetByCallerMagnitudeDisplayType DisplayType;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText ParameterName;
-
-	FText GetDisplayText() const;
-};
-
-
-USTRUCT(BlueprintType)
-struct FReplicatedTargetData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	FGameplayTag TargetDataID;
-
-	UPROPERTY(BlueprintReadWrite)
-	FGameplayAbilityTargetDataHandle TargetData;
-};
-
-USTRUCT(BlueprintType)
-struct FCardExecution_AdditionalData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite)
-	int32 EchoIndex = 0;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 ComboIndex = 0;
-
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FReplicatedTargetData> TargetData;
-
-	UPROPERTY(BlueprintReadOnly)
-	TArray<FGameplayTag> SetByCallerMetaDataTags;
-
-	UPROPERTY(BlueprintReadOnly)
-	TArray<FSetByCallerMetaData> SetByCallerMetaDataValues;
-};
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FExecutionCompletedDelegate, APawn*, const FCardExecution_AdditionalData&, class UCardEffectFragment_Execution*);
 
@@ -120,6 +56,9 @@ public:
 		return GetLocalizableName_Implementation();
 	}
 
+protected:
+	TSubclassOf<UCardExecutionInstance> ExecInstanceClass = nullptr;
+
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UCardExecutionInstance>> RunningInstances;
@@ -136,7 +75,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SetByCallerParameters")
 	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
 
-	void GetSetByCallerFormattingArgs(FFormatNamedArguments& Args);
+	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+
+	void GetSetByCallerFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
 };
 
 UCLASS()

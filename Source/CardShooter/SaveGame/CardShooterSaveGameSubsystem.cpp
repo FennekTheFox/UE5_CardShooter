@@ -64,7 +64,7 @@ void UCardShooterSaveGameSubsystem::GetLocalPlayerSaveGameName(TArray<FString>& 
         });
 }
 
-bool UCardShooterSaveGameSubsystem::SaveGame()
+bool UCardShooterSaveGameSubsystem::SaveGame(bool bIsAutoSave)
 {
     if (!LocalPlayerSaveData)
     {

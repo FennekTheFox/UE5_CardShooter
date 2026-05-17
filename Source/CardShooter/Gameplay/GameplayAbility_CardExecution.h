@@ -14,7 +14,7 @@ class UGameplayAbility_CardExecution : public UProjectGameplayAbility
 
 public:
 	UFUNCTION(BlueprintPure)
-	bool GetEffectContextSourceSetByCallerValue(FGameplayTag Tag, FSetByCallerMetaData& Out);
+	float GetEffectContextSourceSetByCallerValue(FGameplayTag Tag);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText AbilityName;
@@ -28,7 +28,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FCardExecution_AdditionalData AdditionalData;
 
-	void GetFormatingArguments(FFormatNamedArguments& Args);
+	void GetFormatingArguments(const FCardIdentity& CardIdentity, FFormatNamedArguments& Args);
 
 	FText GetName() 
 	{
@@ -36,10 +36,10 @@ public:
 	}
 
 
-	FText GetDescription() 
+	FText GetDescription(const FCardIdentity& CardIdentity) 
 	{
 		FFormatNamedArguments Args;
-		GetFormatingArguments(Args);
+		GetFormatingArguments(CardIdentity,Args);
 
 		return FText::Format(AbilityDesc, Args);
 	}

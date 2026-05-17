@@ -38,14 +38,7 @@ void UCardExecutionInstance_ComboSequence::ProcessExecutionInstance()
 	}
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution_ComboSequence::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_ComboSequence>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (Executions.IsEmpty())
 	{
@@ -63,7 +56,7 @@ FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Imp
 			{
 				ExecDescs.Add(FText::Format(LOCTEXT("ComboSequencePartDesc", "{0}: {1}"),
 					FText::AsNumber(i+1),
-					Exec->GetLocalizableDescription()));
+					Exec->GetLocalizableDescription(CardIdentity)));
 			}
 		}
 
@@ -77,12 +70,17 @@ FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Imp
 		{
 			ExecDescs.Add(FText::Format(LOCTEXT("ComboSequencePartDesc", "{0}: {1}"),
 				FText::AsNumber(Count),
-				Exec->GetLocalizableDescription()));
+				Exec->GetLocalizableDescription(CardIdentity)));
 		}
 		Count++;
 	}
 
 	return FText::Join(FText::FromString("\n"), ExecDescs);
+}
+
+UCardEffectFragment_Execution_ComboSequence::UCardEffectFragment_Execution_ComboSequence()
+{
+	ExecInstanceClass = UCardEffectFragment_Execution_ComboSequence::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

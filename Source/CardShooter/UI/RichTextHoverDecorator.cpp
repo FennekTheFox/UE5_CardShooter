@@ -10,6 +10,7 @@
 #include "Gameplay/GameplayEffect_CardExecution.h"
 #include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
 #include "Widgets/Layout/SBox.h"
+#include "Cards/CardIdentity.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RichTextHoverDecorator)
 
@@ -23,6 +24,7 @@ public:
 		SLATE_ARGUMENT(TObjectPtr<UObject>, RelatedEffectExecFrag)
 		SLATE_ATTRIBUTE(FTextBlockStyle, TextStyle)
 		SLATE_ATTRIBUTE(FText, Text)
+		SLATE_ATTRIBUTE(FCardIdentity, CardIdentity)
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs)
@@ -31,6 +33,7 @@ public:
 		RelatedEffectExecFrag = InArgs._RelatedEffectExecFrag;
 		TextStyle = InArgs._TextStyle;
 		Text = InArgs._Text;
+		CardIdentity = InArgs._CardIdentity;
 
 		ChildSlot
 			[
@@ -52,6 +55,7 @@ private:
 	TObjectPtr<UObject> RelatedEffectExecFrag;
 	TAttribute<FTextBlockStyle> TextStyle;
 	TAttribute<FText> Text;
+	TAttribute<FCardIdentity> CardIdentity;
 
 	TSharedPtr<SWindow> TooltipWindow;
 	TSharedPtr<SWidget> TooltipContent;;
@@ -77,17 +81,17 @@ private:
 		{
 			if (UCardEffectFragment_Attribute* AsAttribute = Cast<UCardEffectFragment_Attribute>(HoverObject))
 			{
-				Content = AsAttribute->GetLocalizableDescription();
+				Content = AsAttribute->GetLocalizableDescription(CardIdentity.Get());
 			}else		
 			if (UGameplayEffect_CardExecution* AsEffect = Cast<UGameplayEffect_CardExecution>(HoverObject))
 			{
 				if (auto* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(RelatedEffectExecFrag))
 				{
-					Content = AsEffect->GetDescription(AsCEF_AETO);
+					Content = AsEffect->GetDescription(CardIdentity.Get(), AsCEF_AETO);
 				}
 				else
 				{
-					Content = AsEffect->GetDescription();
+					Content = AsEffect->GetDescription(CardIdentity.Get());
 				}
 			}
 		}
@@ -154,6 +158,7 @@ public:
 	{
 		const FString* HoveredObjectPath = RunInfo.MetaData.Find(TEXT("id"));
 		const FString* EffectObjectPath = RunInfo.MetaData.Find(TEXT("relatedEffectExec"));
+		const FString* CardIdentityHandleString = RunInfo.MetaData.Find(TEXT("cardidentityhandle"));
 
 		if (!HoveredObjectPath || HoveredObjectPath->IsEmpty())
 		{
@@ -177,12 +182,21 @@ public:
 			}
 		}
 
+		FCardIdentityHandle Handle;
+		FCardIdentity CardIdentity;
+		if (CardIdentityHandleString)
+		{
+			Handle.Index = FCString::Atoi(**CardIdentityHandleString);
+			//If this fails, an invalid card identity handle was passed into the tag!
+			ensure(UCardIdentityHandleLibrary::GetCachedCardIdentityFromIndex(Handle.Index, CardIdentity));
+		}
 
 		return SNew(SHoverObjectWidget)
 			.HoverObject(Obj)
 			.RelatedEffectExecFrag(Eff)
 			.TextStyle(DecoratorTextStyle)
-			.Text(RunInfo.Content);
+			.Text(RunInfo.Content)
+			.CardIdentity(CardIdentity);
 	}
 };
 

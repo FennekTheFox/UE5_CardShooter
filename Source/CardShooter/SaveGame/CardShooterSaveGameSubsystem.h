@@ -20,7 +20,7 @@ public:
 	void GetLocalPlayerSaveGameName(TArray<FString>& OutSaveGames);
 
 	UFUNCTION(BlueprintCallable)
-	bool SaveGame();
+	bool SaveGame(bool bIsAutoSave = true);
 
 	UFUNCTION(BlueprintPure)
 	FString GetPlayerSaveGameDir();

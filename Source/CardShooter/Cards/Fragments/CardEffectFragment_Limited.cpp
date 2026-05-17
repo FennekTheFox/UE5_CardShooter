@@ -56,7 +56,7 @@ bool UCardEffectFragment_Limited::Verify(const FCardDeck_DataOnly& Deck, TArray<
 	return true;
 }
 
-FText UCardEffectFragment_Limited::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Limited::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (UCardData* OwningCard = Cast<UCardData>(GetOuter()))
 	{

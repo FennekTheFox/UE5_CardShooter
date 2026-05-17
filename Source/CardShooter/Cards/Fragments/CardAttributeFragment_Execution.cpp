@@ -5,6 +5,7 @@
 #include "Actors/CardShooterCharacter.h"
 #include "Gameplay/GameplayAbility_CardExecution.h"
 #include "Gameplay/GameplayEffect_CardExecution.h"
+#include "Cards/Augments/CardAugment.h"
 
 #define LOCTEXT_NAMESPACE "CardEffectFragment"
 
@@ -15,7 +16,7 @@ void UCardExecutionInstance::StartExecutionInstance(APawn* InExecutingPawn, cons
 	Exec = InExec;
 
 	ExecutingPawn->GetWorld()->GetTimerManager().SetTimerForNextTick([this]() {
-			this->ProcessExecutionInstance();
+		this->ProcessExecutionInstance();
 		});
 }
 
@@ -50,7 +51,14 @@ void UCardEffectFragment_Execution::Server_ExecuteCardEffect_Delayed_Implementat
 
 UCardExecutionInstance* UCardEffectFragment_Execution::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
 {
-	return nullptr;
+	if (!ensure(ExecInstanceClass))
+	{
+		return nullptr;
+	};
+
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance>(this, ExecInstanceClass);
+	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
+	return NewInstance;
 }
 
 void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassOf<UCardEffectFragment_Execution> Class, TArray<UCardEffectFragment_Execution*>& OutArray)
@@ -68,13 +76,71 @@ void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassO
 	}
 }
 
-void UCardEffectFragment_ExecutionWithParameters::GetSetByCallerFormattingArgs(FFormatNamedArguments& Args)
+UCardExecutionInstance* UCardEffectFragment_ExecutionWithParameters::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
 {
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance>(this, ExecInstanceClass);
+
+	FCardExecution_AdditionalData PostModificationData = AdditionalData;
 	for (auto&& KVPair : SetByCallerMagnitudes)
 	{
-		const FSetByCallerMetaData& MetaData = KVPair.Value;
+		PostModificationData.SetByCallerMetaDataTags.Add(KVPair.Key);
+		PostModificationData.SetByCallerMetaDataValues.Add(KVPair.Value);
+	}
 
-		FString TagString = KVPair.Key.ToString();
+	for (FCardAugmentData AugmentData : AdditionalData.AugmentData)
+	{
+		UCardAugment* AugmentCDO = nullptr;
+
+		if (UClass* AugmentClass =
+			AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		{
+			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
+		}
+
+		if (AugmentCDO)
+		{
+			AugmentCDO->ApplyAugment(PostModificationData, AugmentData);
+		}
+	}
+
+	NewInstance->StartExecutionInstance(ExecutingPawn, PostModificationData, this);
+	return NewInstance;
+}
+
+void UCardEffectFragment_ExecutionWithParameters::GetSetByCallerFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
+{
+	//create temporary proxy exec data
+	FCardExecution_AdditionalData tempAddData;
+
+	for (auto&& KVPair : SetByCallerMagnitudes)
+	{
+		tempAddData.SetByCallerMetaDataTags.Add(KVPair.Key);
+		tempAddData.SetByCallerMetaDataValues.Add(KVPair.Value);
+	}
+
+	//apply the card augments
+	for (FCardAugmentData AugmentData : CardIdentity.Augments)
+	{
+		UCardAugment* AugmentCDO = nullptr;
+
+		if (UClass* AugmentClass =
+			AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		{
+			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
+		}
+
+		if (AugmentCDO)
+		{
+			AugmentCDO->ApplyAugment(tempAddData, AugmentData);
+		}
+	}
+
+	//Iterate over all SetByCaller magnitudes
+	for (int32 i = 0; i < tempAddData.SetByCallerMetaDataTags.Num(); i++)
+	{
+		const FSetByCallerMetaData& MetaData = tempAddData.SetByCallerMetaDataValues[i];
+
+		FString TagString = tempAddData.SetByCallerMetaDataTags[i].ToString();
 
 		FString Left;
 		FString Right;
@@ -101,30 +167,6 @@ void UCardEffectFragment_ExecutionWithParameters::GetSetByCallerFormattingArgs(F
 			MetaData.ParameterName
 		);
 	}
-}
-
-FText FSetByCallerMetaData::GetDisplayText() const
-{
-	switch (DisplayType)
-	{
-	case ESetByCallerMagnitudeDisplayType::Flat:
-		return FText::AsNumber(Magnitude);
-	case ESetByCallerMagnitudeDisplayType::Percent:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * Magnitude));
-	case ESetByCallerMagnitudeDisplayType::PercentOneMinus:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * (1.f - Magnitude)));
-	case ESetByCallerMagnitudeDisplayType::Absolute:
-		return FText::Format(FText::FromString("{0}"), FText::AsNumber(FMath::Abs(Magnitude)));
-	case ESetByCallerMagnitudeDisplayType::AbsolutePercent:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(FMath::Abs(100.f * Magnitude)));
-	case ESetByCallerMagnitudeDisplayType::AbsolutePercentOneOver:
-		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(1.f / FMath::Abs(100.f * Magnitude)));
-	case ESetByCallerMagnitudeDisplayType::XOver100:
-		return FText::Format(FText::FromString("{0}"), FText::AsNumber(Magnitude / 100.f));
-	}
-
-	ensure(false);
-	return FText::GetEmpty();
 }
 
 #undef LOCTEXT_NAMESPACE

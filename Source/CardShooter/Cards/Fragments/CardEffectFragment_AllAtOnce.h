@@ -18,10 +18,10 @@ class UCardEffectFragment_Execution_AllAtOnce : public UCardEffectFragment_Execu
 {
 	GENERATED_BODY()
 
-public:
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+	UCardEffectFragment_Execution_AllAtOnce();
 
+public:
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

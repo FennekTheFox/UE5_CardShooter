@@ -5,6 +5,7 @@
 #include "Templates/SharedPointer.h"
 #include "Fragments/CardAttributeFragment_Base.h"
 #include "Fragments/CardAttributeFragment_Execution.h"
+#include "CardIdentity.h"
 
 #define LOCTEXT_NAMESPACE "CardData"
 
@@ -38,7 +39,7 @@ UCardEffectFragment_Attribute* UCardData::GetAttributeOfClass(TSubclassOf<UCardE
 	return nullptr;
 }
 
-FText UCardData::GetDescription()
+FText UCardData::GetDescription(const FCardIdentity& CardIdentity)
 {
 	// Ensure primary execution exists
 	if (!ensure(PrimaryExecution))
@@ -51,20 +52,20 @@ FText UCardData::GetDescription()
 	// Attributes
 
 	// Gather Attribute Descriptions
-	FText AttributesDesc = GetAttributesDescription();
+	FText AttributesDesc = GetAttributesDescription(CardIdentity);
 
 	if (!AttributesDesc.IsEmpty())
 	{
 		Sections.Add(AttributesDesc);
 	}
 
-	Sections.Add(GetExecutionsDescription());
+	Sections.Add(GetExecutionsDescription(CardIdentity));
 
 	// Final join with spacing
 	return FText::Join(FText::FromString("\n\n"), Sections);
 }
 
-FText UCardData::GetAttributesDescription()
+FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 {
 	// Gather Attribute Descriptions
 	TArray<FText> AttributeDescs;
@@ -75,8 +76,9 @@ FText UCardData::GetAttributesDescription()
 		{
 			FText AttrName = Attr->GetLocalizableName();
 			FText Wrapped = FText::Format(
-				FText::FromString(TEXT("<hover id=\"{0}\">{1}</>")),
-				FText::FromString(Attr->GetPathName()),
+				FText::FromString(TEXT("<hover id=\"{0}\" cardidentityhandle=\"{1}\">{2}</>")),
+				FText::FromString(Attr->GetPathName()), 
+				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
 				AttrName
 			);
 			AttributeDescs.Add(Wrapped);
@@ -88,12 +90,12 @@ FText UCardData::GetAttributesDescription()
 	return AttributesDesc;
 }
 
-FText UCardData::GetExecutionsDescription()
+FText UCardData::GetExecutionsDescription(const FCardIdentity& CardIdentity)
 {
 	TArray<FText> Sections;
 
-	FText PrimaryInput = LOCTEXT("PrimaryInput", "<input id=\"/Game/Blueprint/Input/CardExecution/IA_ExecuteCardPrimary\"/>");
-	FText SecondaryInput = LOCTEXT("SecondaryInput", "<input id=\"/Game/Blueprint/Input/CardExecution/IA_ExecuteCardSecondary\"/>");
+	FText PrimaryInput = LOCTEXT("PrimaryInput", "<input id=\"/Game/Blueprint/Input/TacticalMode/CardExecution/IA_ExecuteCardPrimary\"/>");
+	FText SecondaryInput = LOCTEXT("SecondaryInput", "<input id=\"/Game/Blueprint/Input/TacticalMode/CardExecution/IA_ExecuteCardSecondary\"/>");
 
 	// Primary execution
 	if (!SecondaryExecution)
@@ -103,7 +105,7 @@ FText UCardData::GetExecutionsDescription()
 				LOCTEXT("NoSecondaryLayout", "{0}|{1}: {2}"),
 				PrimaryInput,
 				SecondaryInput,
-				PrimaryExecution->GetLocalizableDescription()
+				PrimaryExecution->GetLocalizableDescription(CardIdentity)
 			)
 		);
 	}
@@ -111,7 +113,7 @@ FText UCardData::GetExecutionsDescription()
 	{
 		TArray<FText> PrimaryParts;
 		PrimaryParts.Add(PrimaryInput);
-		PrimaryParts.Add(PrimaryExecution->GetLocalizableDescription());
+		PrimaryParts.Add(PrimaryExecution->GetLocalizableDescription(CardIdentity));
 		Sections.Add(FText::Join(FText::FromString(": "), PrimaryParts));
 	}
 
@@ -122,7 +124,7 @@ FText UCardData::GetExecutionsDescription()
 
 		TArray<FText> SecondaryParts;
 		SecondaryParts.Add(SecondaryInput);
-		SecondaryParts.Add(SecondaryExecution->GetLocalizableDescription());
+		SecondaryParts.Add(SecondaryExecution->GetLocalizableDescription(CardIdentity));
 		Sections.Add(FText::Join(FText::FromString(": "), SecondaryParts));
 	}
 

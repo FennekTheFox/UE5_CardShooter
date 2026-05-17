@@ -7,6 +7,9 @@
 #include "GameplayEffectTypes.h"
 #include "UObject/UnrealType.h"
 #include "UObject/Stack.h"
+#include "GameplayTagsManager.h"
+#include "SaveGame/CardShooterSaveGameSubsystem.h"
+#include "SaveGame/CardShooterSaveData.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -21,7 +24,7 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 		//We found a valid card data
 		if (UCardData* LoadedCard = Cast<UCardData>(AssetData.GetAsset()))
 		{
-			if (!Identity.AssetTag.IsValid() ||LoadedCard->AssetTag == Identity.AssetTag)
+			if (!Identity.AssetTag.IsValid() || LoadedCard->AssetTag == Identity.AssetTag)
 			{
 				return LoadedCard;
 			}
@@ -30,8 +33,8 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 
 	UE_LOG(LogTemp, Warning, TEXT("Warning: Unable to find card data with matching tag at path\"%s\""), *Identity.CardDataPath.ToString())
 
-	//We couldnt retrieve a valid card by soft path, so lets check if we can find it at all
-	TArray<FAssetData> CardAssets;
+		//We couldnt retrieve a valid card by soft path, so lets check if we can find it at all
+		TArray<FAssetData> CardAssets;
 	AssetRegistry.GetAssetsByClass(UCardData::StaticClass()->GetClassPathName(), CardAssets, true);
 	{
 		for (FAssetData& AssetDataIt : CardAssets)
@@ -65,18 +68,48 @@ UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdenti
 //	return VerifyDeck(PostChangeDeck, FailureReasons);
 //}
 
-bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, TArray<class UDeckLimitationViolation*>& FailureReasons)
+bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, APlayerController* PlayerController, TArray<class UDeckLimitationViolation*>& FailureReasons)
 {
+	if (!ensure(PlayerController))
+	{
+		return false;
+	}
+
+	UCardShooterSaveGameSubsystem* SGSS = PlayerController->GetLocalPlayer()->GetSubsystem<UCardShooterSaveGameSubsystem>();
+
+	if (!ensure(SGSS))
+	{
+		return false;
+	}
+
+	UCardShooterSaveData* SaveData = SGSS->GetLocalPlayerSaveData();
+
+	if (!ensure(SaveData))
+	{
+		return false;
+	}
+
 	bool bSuccess = true;
 
 	FCardDeck_DataOnly DataOnlyDeck;
 
-	for (const FCardIdentity& Identity : Deck.UtilityCards)
+	for (const FCardIdentityHandle& CardHandle : Deck.UtilityCards)
 	{
+		FCardIdentity Identity;
+		if (!ensure(SaveData->GetCardFromCollection(CardHandle, Identity)))
+		{
+			return false;
+		}
 		DataOnlyDeck.UtilityCards.Add(GetCardDataFromIdentity(Identity));
 	}
-	for (const FCardIdentity& Identity : Deck.CardList)
+
+	for (const FCardIdentityHandle& CardHandle : Deck.CardHandles)
 	{
+		FCardIdentity Identity;
+		if (!ensure(SaveData->GetCardFromCollection(CardHandle, Identity)))
+		{
+			return false;
+		}
 		DataOnlyDeck.CardList.Add(GetCardDataFromIdentity(Identity));
 	}
 
@@ -94,8 +127,8 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, TArray<class 
 				bSuccess &= AsDeckLimitation->Verify(DataOnlyDeck, FailureReasons);
 			}
 		}
-	}	
-	
+	}
+
 	for (UCardData* Card : DataOnlyDeck.CardList)
 	{
 		if (!Card)
@@ -194,6 +227,11 @@ void UCardShooterUtilityLibrary::ResetDurationOnEffect(const FActiveGameplayEffe
 	ASC->ApplyGameplayEffectSpecToSelf(SpecCopy);
 }
 
+bool UCardShooterUtilityLibrary::Equal_CardIdentityHandle(const FCardIdentityHandle& A, const FCardIdentityHandle& B)
+{
+	return A == B;
+}
+
 void UCardShooterUtilityLibrary::AddSourceToContext(FGameplayEffectContextHandle Handle, UObject* Source)
 {
 	Handle.AddSourceObject(Source);
@@ -237,4 +275,115 @@ void UCardShooterUtilityLibrary::SortCardIdentityArray(TArray<FCardIdentity>& Ar
 
 			return false;
 		});
+}
+
+UCardAugment* UCardShooterUtilityLibrary::GetCardAugmentCDO(const FCardAugmentData& AugmentData)
+{// 1. Try soft class path first
+	if (AugmentData.AugmentClass.IsValid())
+	{
+		if (UClass* LoadedClass = AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		{
+			if (LoadedClass->IsChildOf(UCardAugment::StaticClass()))
+			{
+				return LoadedClass->GetDefaultObject<UCardAugment>();
+			}
+		}
+	}
+
+	// 2. Fallback: find loaded subclasses by matching AugmentTag on their CDO
+	for (TObjectIterator<UClass> It; It; ++It)
+	{
+		UClass* Class = *It;
+
+		if (!Class || Class->HasAnyClassFlags(CLASS_Abstract | CLASS_Deprecated | CLASS_NewerVersionExists))
+		{
+			continue;
+		}
+
+		if (!Class->IsChildOf(UCardAugment::StaticClass()))
+		{
+			continue;
+		}
+
+		UCardAugment* CDO = Class->GetDefaultObject<UCardAugment>();
+		if (!CDO)
+		{
+			continue;
+		}
+
+		if (CDO->AugmentTag == AugmentData.AugmentTag)
+		{
+			return CDO;
+		}
+	}
+
+	return nullptr;
+}
+
+void UCardShooterUtilityLibrary::GetChildGameplayTags(FGameplayTag ParentTag, TArray<FGameplayTag>& ChildTags, bool bIncludeParent /*= false*/)
+{
+	if (!ParentTag.IsValid())
+	{
+		return;
+	}
+
+	FGameplayTagContainer TagContainer = UGameplayTagsManager::Get().RequestGameplayTagChildren(ParentTag);
+
+	for (const FGameplayTag& Tag : TagContainer)
+	{
+		if (!bIncludeParent && Tag == ParentTag)
+		{
+			continue;
+		}
+
+		ChildTags.Add(Tag);
+	}
+
+	ChildTags.Sort([](const FGameplayTag& A, const FGameplayTag& B)
+		{
+			return A.ToString() < B.ToString();
+		});
+}
+
+TArray<FGameplayTag> UCardShooterUtilityLibrary::GetCardSetByCallerTags(const FCardIdentity& Identity)
+{
+	TArray<FGameplayTag> Result;
+
+	const UCardData* CardData = GetCardDataFromIdentity(Identity);
+	if (!CardData)
+	{
+		return Result;
+	}
+
+	TSet<FGameplayTag> UniqueTags;
+
+	auto GatherTags =
+		[&UniqueTags](const UCardEffectFragment_Execution* Execution)
+		{
+			const UCardEffectFragment_ExecutionWithParameters* ParamExecution =
+				Cast<UCardEffectFragment_ExecutionWithParameters>(Execution);
+
+			if (!ParamExecution)
+			{
+				return;
+			}
+
+			for (const TPair<FGameplayTag, FSetByCallerMetaData>& Pair
+				: ParamExecution->SetByCallerMagnitudes)
+			{
+				UniqueTags.Add(Pair.Key);
+			}
+		};
+
+	GatherTags(CardData->PrimaryExecution);
+	GatherTags(CardData->SecondaryExecution);
+
+	Result = UniqueTags.Array();
+
+	Result.Sort([](const FGameplayTag& A, const FGameplayTag& B)
+		{
+			return A.ToString() < B.ToString();
+		});
+
+	return Result;
 }

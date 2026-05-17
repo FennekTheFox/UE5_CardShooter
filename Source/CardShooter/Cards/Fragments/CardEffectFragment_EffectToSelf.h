@@ -27,6 +27,8 @@ class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_Execut
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_ApplyEffectToOwner();
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect")
 	TSubclassOf<UGameplayEffect> GameplayEffect;
@@ -40,9 +42,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Effect")
 	bool bResolveImmediately = false;
 
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
-
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

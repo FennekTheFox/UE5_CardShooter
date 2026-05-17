@@ -2,69 +2,12 @@
 
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "Augments/CardAugment.h"
+#include "CardIdentity.h"
 
 #include "CardData.generated.h"
 
 class UTexture2D;
-
-UENUM()
-enum class ECardRarity : uint8 
-{
-	Common			=0, 
-	Rare			=1,
-	UltraRare		=2
-};
-
-USTRUCT(BlueprintType)
-struct FCardIdentity
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
-	FGameplayTag AssetTag;
-
-	//This is supposed to make the access to the card faster. If not found because the asset is moved
-	//we need to look through all card data assets to find the right one
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
-	FSoftObjectPath CardDataPath;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, SaveGame)
-	ECardRarity CardRarity = ECardRarity::Common;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, SaveGame)
-	bool bFullArt = false;
-
-	bool operator== (const FCardIdentity& Other) const
-	{
-		return AssetTag == Other.AssetTag 
-			&& CardRarity == Other.CardRarity
-			&& bFullArt == Other.bFullArt;
-	}
-
-	bool operator!= (const FCardIdentity& Other) const
-	{
-		return !(*this == Other);
-	}
-};
-
-FORCEINLINE uint32 GetTypeHash(const FCardIdentity& Identity)
-{
-	uint32 Hash = GetTypeHash(Identity.CardDataPath);
-	Hash = HashCombine(Hash, GetTypeHash(Identity.CardRarity));
-	Hash = HashCombine(Hash, GetTypeHash(Identity.bFullArt));
-	return Hash;
-}
-
-USTRUCT(BlueprintType)
-struct FCardIdentityList
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FCardIdentity> Cards;
-};
 
 class UCardEffectFragment_Attribute;
 class UCardEffectFragment_Execution;
@@ -79,7 +22,7 @@ public:
 	FText CardName;
 
 	//This tag needs to be set in order for the utility functions to be able to load the card from the tag alone
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Gameplay.Cards.IDs"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Gameplay.Cards.IDs"))
 	FGameplayTag AssetTag;
 
 	//This tag needs to be set in order for the utility functions to be able to load the card from the tag alone
@@ -110,11 +53,11 @@ public:
 	UCardEffectFragment_Attribute* GetAttributeOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
 
 	UFUNCTION(BlueprintPure)
-	FText GetDescription();
+	FText GetDescription(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintPure)
-	FText GetAttributesDescription();
+	FText GetAttributesDescription(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintPure)
-	FText GetExecutionsDescription();
+	FText GetExecutionsDescription(const FCardIdentity& CardIdentity);
 };

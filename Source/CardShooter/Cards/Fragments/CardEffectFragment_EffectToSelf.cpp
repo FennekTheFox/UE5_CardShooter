@@ -36,9 +36,10 @@ void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 	Context.AddSourceObject(this);
 	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AsEffectToOwner->GameplayEffect, AsEffectToOwner->GameplayEffectLevel, Context);
 
-	for (auto&& KVPair : AsEffectToOwner->SetByCallerMagnitudes)
+	for (int32 i = 0 ; i < AdditionalData.SetByCallerMetaDataTags.Num(); i++)
 	{
-		SpecHandle.Data->SetSetByCallerMagnitude(KVPair.Key, KVPair.Value.Magnitude);
+		SpecHandle.Data->SetSetByCallerMagnitude(AdditionalData.SetByCallerMetaDataTags[i],
+			AdditionalData.SetByCallerMetaDataValues[i].Magnitude);
 	}
 
 	FActiveGameplayEffectHandle EffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
@@ -63,14 +64,7 @@ void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 	}
 }
 
-UCardExecutionInstance* UCardEffectFragment_ApplyEffectToOwner::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_ApplyEffectToOwner>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (!ensure(GameplayEffect))
 	{
@@ -88,16 +82,23 @@ FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implemen
 		}
 
 		FFormatNamedArguments Args;
-		GetSetByCallerFormattingArgs(Args);
+		GetSetByCallerFormattingArgs(Args, CardIdentity);
 
-		return FText::Format(LOCTEXT("EffectToSelfDesc", "{0} <hover id=\"{1}\" relatedEffectExec=\"{2}\">{3}</>."),
+		return FText::Format(LOCTEXT("EffectToSelfDesc", "{0} <hover id=\"{1}\" relatedEffectExec=\"{2}\" cardidentityhandle=\"{3}\">{4}</>."),
 			Base,
 			FText::FromString(AsGE_CE->GetPathName()),
 			FText::FromString(this->GetPathName()),
+			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
 			FText::Format(AsGE_CE->GetDetailedLocalizableName(), Args));
 	}
 
 	ensure(false);
 	return FText::GetEmpty();
 }
+
+UCardEffectFragment_ApplyEffectToOwner::UCardEffectFragment_ApplyEffectToOwner()
+{
+	ExecInstanceClass = UCardExecutionInstance_ApplyEffectToOwner::StaticClass();
+}
+
 #undef LOCTEXT_NAMESPACE

@@ -42,14 +42,7 @@ void UCardExecutionInstance_Cycle::ProcessExecutionInstance()
 	}
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution_Cycle::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_Cycle>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_Execution_Cycle::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Execution_Cycle::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	TArray<FText> ExecDescs;
 	ExecDescs.Add(LOCTEXT("CycleName", "Cycle"));
@@ -59,7 +52,7 @@ FText UCardEffectFragment_Execution_Cycle::GetLocalizableDescription_Implementat
 	{
 		if (IsValid(Exec))
 		{
-			FText Base = Exec->GetLocalizableDescription();
+			FText Base = Exec->GetLocalizableDescription(CardIdentity);
 			FText SequenceFormat = LOCTEXT("CycleFormat", "{0}: {1}");
 			ExecDescs.Add(FText::Format(SequenceFormat, Count, Base));
 			Count++;
@@ -67,6 +60,11 @@ FText UCardEffectFragment_Execution_Cycle::GetLocalizableDescription_Implementat
 	}
 
 	return FText::Join(FText::FromString("\n"), ExecDescs);
+}
+
+UCardEffectFragment_Execution_Cycle::UCardEffectFragment_Execution_Cycle()
+{
+	ExecInstanceClass = UCardExecutionInstance_Cycle::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

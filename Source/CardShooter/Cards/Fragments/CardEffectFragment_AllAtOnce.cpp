@@ -40,14 +40,7 @@ void UCardExecutionInstance_AllAtOnce::ProcessExecutionInstance()
 	}
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution_AllAtOnce::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_AllAtOnce>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	TArray<FText> ExecDescs;
 
@@ -55,11 +48,16 @@ FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Impleme
 	{
 		if (IsValid(Exec))
 		{
-			ExecDescs.Add(Exec->GetLocalizableDescription());
+			ExecDescs.Add(Exec->GetLocalizableDescription(CardIdentity));
 		}
 	}
 
 	return FText::Join(FText::FromString(" "), ExecDescs);
+}
+
+UCardEffectFragment_Execution_AllAtOnce::UCardEffectFragment_Execution_AllAtOnce()
+{
+	ExecInstanceClass = UCardExecutionInstance_AllAtOnce::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

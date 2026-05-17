@@ -18,6 +18,8 @@ class UCardEffectFragment_Execution_DebugPrint : public UCardEffectFragment_Exec
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Execution_DebugPrint();
+
 public:
 	UPROPERTY(EditDefaultsOnly)
 	FString Message;
@@ -28,9 +30,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DisplayDuration = 2.f;
 
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
-
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

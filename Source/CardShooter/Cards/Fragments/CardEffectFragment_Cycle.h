@@ -21,10 +21,10 @@ class UCardEffectFragment_Execution_Cycle : public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
 
-public:
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+	UCardEffectFragment_Execution_Cycle();
 
+public:
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

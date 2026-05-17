@@ -25,24 +25,24 @@ void UCardExecutionInstance_RemoveAttributeFromNextCards::ProcessExecutionInstan
 	OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution_RemoveAttributeFromNextCards::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_RemoveAttributeFromNextCards>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
 
-FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (!ensure(AttributeClass))
 	{
 		return FText::GetEmpty();
 	}
 
-	return FText::Format(LOCTEXT("RemoveAttributesToNextDesc", "Removes <hover id=\"{0}\">{1}</> from the next {2} cards."),
+	return FText::Format(LOCTEXT("RemoveAttributesToNextDesc", "Removes <hover id=\"{0}\" cardidentityhandle=\"{1}\">{2}</> from the next {3} cards."),
 		FText::FromString(AttributeClass->GetDefaultObject()->GetPathName()),
+		FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
 		Cast<UCardEffectFragment_Attribute>(AttributeClass->GetDefaultObject())->GetLocalizableName(),
 		Count);
+}
+
+UCardEffectFragment_Execution_RemoveAttributeFromNextCards::UCardEffectFragment_Execution_RemoveAttributeFromNextCards()
+{
+	ExecInstanceClass = UCardExecutionInstance_RemoveAttributeFromNextCards::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

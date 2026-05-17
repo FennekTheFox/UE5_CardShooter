@@ -7,7 +7,7 @@ FText UCardEffectFragment_Opener::GetLocalizableName_Implementation()
 	return LOCTEXT("OpenerAttrName", "Opener");
 }
 
-FText UCardEffectFragment_Opener::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Opener::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("OpenerAttrDesc", "This card will always be shuffled to the front of the deck.");
 }

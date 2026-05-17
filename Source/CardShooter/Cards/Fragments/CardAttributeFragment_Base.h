@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Cards/CardIdentity.h"
 #include "CardAttributeFragment_Base.generated.h"
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
@@ -15,7 +16,7 @@ public:
 	FText GetLocalizableName();	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
-	FText GetLocalizableDescription();
+	FText GetLocalizableDescription(const FCardIdentity& CardIdentity);
 
 protected:
 	bool bShowInDescription = true;

@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "CardShooterSaveGameSubsystem.h"
 #include "Engine/LocalPlayer.h"
+#include "Algo/Count.h"
 
 static FAutoConsoleCommandWithWorldAndArgs GiveCurrencyCmd(
 	TEXT("GiveCurrency"),
@@ -72,61 +73,239 @@ void UCardShooterSaveData::ValidateAndFix(FCardIdentity& CardIdentity)
 	}
 }
 
-void UCardShooterSaveData::AddCardToCollection(const FCardIdentity& CardIdentity)
+int32 UCardShooterSaveData::GetCardCount(const FCardIdentity& CardIdentity) const
 {
-	FCardIdentity FixedIdentity = CardIdentity;
-	ValidateAndFix(FixedIdentity);
-
-	int32& Count = Collection.Cards.FindOrAdd(FixedIdentity, 0);
-	Count += 1;
+	return Algo::CountIf(Collection.Cards, [&CardIdentity](const FCardIdentity& ItemCardIdentity)
+		{
+			return CardIdentity == ItemCardIdentity;
+		});
 }
 
-bool UCardShooterSaveData::RemoveCardFromCollection(const FCardIdentity& CardIdentity)
+bool UCardShooterSaveData::GetCardFromCollection(const FCardIdentityHandle& Handle, FCardIdentity& OutCard) const
 {
-	FCardIdentity FixedIdentity = CardIdentity;
-	ValidateAndFix(FixedIdentity);
-
-	if (int32* Count = Collection.Cards.Find(FixedIdentity))
+	if (!ensure(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
 	{
-		if (*Count == 1)
-		{
-			Collection.Cards.Remove(FixedIdentity);
-		}
-		else
-		{
-			Collection.Cards.Add(FixedIdentity, *Count - 1);
-		}
+		return false;
+	}
 
+	if (ensure(Collection.Cards.IsValidIndex(Handle.Index)))
+	{
+		OutCard = Collection.Cards[Handle.Index];
 		return true;
 	}
-	else
+
+	return false;
+}
+
+FCardIdentityHandle UCardShooterSaveData::GetFirstCardHandle(const FCardIdentity& CardIdentity) const
+{
+	int32 Index = INDEX_NONE;
+	Collection.Cards.Find(CardIdentity, Index);
+
+	ensure(Index != INDEX_NONE);
+
+	FCardIdentityHandle NewHandle;
+	NewHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
+	NewHandle.Index = Index;
+
+	return NewHandle;
+}
+
+void UCardShooterSaveData::GetAllCardHandles(const FCardIdentity& CardIdentity, TArray<FCardIdentityHandle>& CardHandles) const
+{
+	for (int32 i = 0; i < Collection.Cards.Num(); i++)
 	{
-		//Card not contained
-		return false;
+		const FCardIdentity& CardIdentityIt = Collection.Cards[i];
+
+		if (CardIdentity == CardIdentityIt)
+		{
+			FCardIdentityHandle NewHandle;
+			NewHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
+			NewHandle.Index = i;
+
+			CardHandles.Add(NewHandle);
+		}
 	}
 }
 
-void UCardShooterSaveData::GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards)
+void UCardShooterSaveData::ModifyCardInCollection(UObject* WorldContext, const FCardIdentityHandle& Handle, const FCardIdentity& InCard)
 {
-	Collection.Cards.GetKeys(OutCards);
+	if (!ensure(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
+	{
+		return;
+	}
+
+	FCardIdentity Copy = InCard;
+	FCardIdentity FromCollection;
+
+	if (!ensure(GetCardFromCollection(Handle, FromCollection)))
+	{
+		return;
+	}
+
+	Copy.UsedInDecksWithIndices = FromCollection.UsedInDecksWithIndices;
+
+	Collection.Cards[Handle.Index] = Copy;
+
+	CallOnCollectionCardModifiedCallback(Handle);
+}
+
+void UCardShooterSaveData::AddCardToCollection(UObject* WorldContext, const FCardIdentity& CardIdentity)
+{
+	FCardIdentity FixedIdentity = CardIdentity;
+	ValidateAndFix(FixedIdentity);
+	CallAnyCardChangedNextTick(WorldContext);
+
+	Collection.Cards.Add(FixedIdentity);
+}
+
+bool UCardShooterSaveData::RemoveCardFromCollection(UObject* WorldContext, const FCardIdentity& CardIdentity)
+{
+	int32 Index = INDEX_NONE;
+	Collection.Cards.Find(CardIdentity, Index);
+
+	if (Index == INDEX_NONE)
+	{
+		return false;
+	}
+
+	for (FCardDeck& Deck : DeckList)
+	{
+		FCardIdentityHandle HandleToRemove;
+		HandleToRemove.StorageLocation = ECardIdentityStorageLocation::Collection;
+		HandleToRemove.Index = Index;
+		Deck.CardHandles.Remove(HandleToRemove);
+	}
+
+	FCardIdentity FixedIdentity = CardIdentity;
+	ValidateAndFix(FixedIdentity);
+	CallAnyCardChangedNextTick(WorldContext);
+
+	return Collection.Cards.RemoveSingle(CardIdentity) == 1;
+}
+
+void UCardShooterSaveData::GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards) const
+{
+	TSet<FCardIdentity> CardIDSet(Collection.Cards);
+	OutCards = CardIDSet.Array();
 
 	OutCards.Sort([](const FCardIdentity& A, const FCardIdentity& B) {
-		if (A.AssetTag != B.AssetTag)
-		{
-			return A.AssetTag.ToString() < B.AssetTag.ToString();
-		}
-		if (A.CardRarity != B.CardRarity)
-		{
-			return A.CardRarity < B.CardRarity;
-		}
-		if (A.bFullArt != B.bFullArt)
-		{
-			return B.bFullArt;
-		}
-
-		ensure(false);
-		return false;
+		return A < B;
 		});
+}
+
+bool UCardShooterSaveData::AssignCardToDeck(UObject* WorldContext, const FCardIdentityHandle& CardHandle, int32 DeckHandle)
+{
+	if (!ensure(CardHandle.StorageLocation == ECardIdentityStorageLocation::Collection))
+	{
+		return false;
+	}
+
+	if (!ensure(Collection.Cards.IsValidIndex(CardHandle.Index)))
+	{
+		return false;
+	}
+
+	Collection.Cards[CardHandle.Index].UsedInDecksWithIndices.AddUnique(DeckHandle);
+	CallOnCollectionCardModifiedCallback(CardHandle);
+	CallAnyCardChangedNextTick(WorldContext);
+
+	return true;
+}
+
+bool UCardShooterSaveData::UnassignCardFromDeck(UObject* WorldContext, const FCardIdentityHandle& Handle, int32 DeckIndex)
+{
+	if (!ensure(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
+	{
+		return false;
+	}
+
+	if (!ensure(Collection.Cards.IsValidIndex(Handle.Index)))
+	{
+		return false;
+	}
+
+	Collection.Cards[Handle.Index].UsedInDecksWithIndices.Remove(DeckIndex);
+	CallOnCollectionCardModifiedCallback(Handle);
+	CallAnyCardChangedNextTick(WorldContext);
+
+	return true;
+}
+
+bool UCardShooterSaveData::UpdateDeckAtIndex(const FCardDeck& UpdatedDeck, int32 DeckHandle)
+{
+	if (!ensure(DeckList.IsValidIndex(DeckHandle)))
+	{
+		return false;
+	}
+
+	DeckList[DeckHandle] = UpdatedDeck;
+
+	return true;
+}
+
+
+void UCardShooterSaveData::AddNewDeck(const FCardDeck& NewDeck)
+{
+	DeckList.Add(NewDeck);
+}
+
+bool UCardShooterSaveData::DeleteDeckAtIndex(UObject* WorldContext, int32 DeckHandle)
+{
+	if (!ensure(DeckList.IsValidIndex(DeckHandle)))
+	{
+		return false;
+	}
+
+	DeckList.RemoveAt(DeckHandle);
+
+	//Sanitize all cards
+
+	for (int CardIndex = 0; CardIndex < Collection.Cards.Num(); CardIndex++)
+	{
+		const FCardIdentity& Card = Collection.Cards[CardIndex];
+		for (int i = 0; i < Card.UsedInDecksWithIndices.Num(); i++)
+		{
+			const int32& AssignedDeck = Card.UsedInDecksWithIndices[i];
+			if (AssignedDeck >= DeckHandle)
+			{
+				FCardIdentityHandle OutHandle;
+				OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
+				OutHandle.Index = CardIndex;
+
+				UnassignCardFromDeck(WorldContext, OutHandle, DeckHandle);
+				i--;
+			}
+
+			if (AssignedDeck > DeckHandle)
+			{
+				FCardIdentityHandle OutHandle;
+				OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
+				OutHandle.Index = CardIndex;
+
+				AssignCardToDeck(WorldContext, OutHandle, AssignedDeck - 1);
+				i++;
+			}
+		}
+	}
+
+	return true;
+}
+
+void UCardShooterSaveData::GetAllDecks(TArray<FCardDeck>& OutDecks) const
+{
+	OutDecks = DeckList;
+}
+
+bool UCardShooterSaveData::GetDeckAtIndex(int32 DeckIndex, FCardDeck& OutDeck) const
+{
+	if (!ensure(DeckList.IsValidIndex(DeckIndex)))
+	{
+		return false;
+	}
+
+	OutDeck = DeckList[DeckIndex];
+	return true;
 }
 
 void UCardShooterSaveData::AddCurrency(FGameplayTag CurrencyTag, int32 Amount)
@@ -148,10 +327,16 @@ bool UCardShooterSaveData::DeductCurrency(FGameplayTag CurrencyTag, int32 Amount
 	return false;
 }
 
-int32 UCardShooterSaveData::GetCurrencyAmount(FGameplayTag CurrencyTag)
+int32 UCardShooterSaveData::GetCurrencyAmount(FGameplayTag CurrencyTag) const
 {
-	int32& HaveAmount = Currencies.FindOrAdd(CurrencyTag, 0);
-	return HaveAmount;
+	const int32* HaveAmount = Currencies.Find(CurrencyTag);
+
+	if (HaveAmount)
+	{
+		return *HaveAmount;
+	}
+
+	return 0.f;
 }
 
 bool UCardShooterSaveData::HasSufficientCurrency(const FGameplayTag CurrencyTag, int32 RequiredAmount) const
@@ -164,5 +349,65 @@ bool UCardShooterSaveData::HasSufficientCurrency(const FGameplayTag CurrencyTag,
 	}
 
 	return false;
+}
+
+void UCardShooterSaveData::CallAnyCardChangedNextTick(UObject* WorldContext)
+{
+	if (!AnyCardChangedTimer.IsValid())
+	{
+		AnyCardChangedTimer = WorldContext->GetWorld()->GetTimerManager().SetTimerForNextTick([this]() {
+			OnAnyCardChanged.Broadcast();
+			AnyCardChangedTimer.Invalidate();
+			});
+	}
+}
+
+void UCardShooterSaveData::BindEventToOnCollectionCardModified(const FCardIdentityHandle& Handle, FOnCollectionCardModified Callback)
+{
+	if (!ensure(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
+	{
+		return;
+	}
+
+	if (!ensure(Collection.Cards.IsValidIndex(Handle.Index)))
+	{
+		ensure(false);
+		return;
+	}
+
+	CleanUpOnCardModifiedCallbacks(Handle);
+
+	auto& Callbacks = OnCardModifiedCallbacks.FindOrAdd(Handle);
+	Callbacks.Add(Callback);
+}
+
+void UCardShooterSaveData::CallOnCollectionCardModifiedCallback(const FCardIdentityHandle& Handle)
+{
+	if (!ensure(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
+	{
+		return;
+	}
+
+	if (TArray<FOnCollectionCardModified>* Callbacks =
+		OnCardModifiedCallbacks.Find(Handle))
+	{
+		for (FOnCollectionCardModified& Callback : *Callbacks)
+		{
+			Callback.ExecuteIfBound(Handle);
+		}
+	}
+}
+
+void UCardShooterSaveData::CleanUpOnCardModifiedCallbacks(const FCardIdentityHandle& Handle)
+{
+	if (TArray<FOnCollectionCardModified>* Callbacks =
+		OnCardModifiedCallbacks.Find(Handle))
+	{
+		Callbacks->RemoveAll(
+			[](const FOnCollectionCardModified& Callback)
+			{
+				return !Callback.IsBound();
+			});
+	}
 }
 

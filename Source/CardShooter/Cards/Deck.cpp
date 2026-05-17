@@ -1,19 +1,23 @@
 #include "Deck.h"
+#include "CardIdentity.h"
 
 void UPrebuiltDeck::GetDeck(FCardDeck& OutDeck)
 {
 	OutDeck.DeckName = DeckTag.ToString();
 
-	OutDeck.CardList.Empty();
+	OutDeck.CardHandles.Empty();
 
-	for(UCardData* CardData : CardList)
+	int32 i = 0;
+	for (const FCardIdentity& CardData : CardList)
 	{
-		if (CardData)
-		{
-			FCardIdentity Identity;
-			CardData->GetIdentity(Identity);
-			OutDeck.CardList.Add(Identity);
-		}
+		FCardIdentityHandle Handle;
+		Handle.StorageLocation = ECardIdentityStorageLocation::Prebuilt;
+		Handle.Index = i;
+		Handle.PrebuiltPath = FSoftObjectPath(this);
+
+		OutDeck.CardHandles.Add(Handle);
+
+		i++;
 	}
 }
 

@@ -123,7 +123,7 @@ protected:
 
 		const FSlateBrush* Brush = Decorator->FindInputActionBrush(CurrentPlatformName, InputAction, bWarnIfMissing, Owner.Get());
 
-		//No ensure here, else it triggers in UI
+		//No ensure here, else it triggers in UMG Editor
 		if (/*ensure*/(Brush))
 		{
 			TOptional<int32> Width;

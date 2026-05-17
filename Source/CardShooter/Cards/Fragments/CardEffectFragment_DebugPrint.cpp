@@ -21,20 +21,17 @@ void UCardExecutionInstance_DebugPrint::ProcessExecutionInstance()
 	OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 }
 
-
-UCardExecutionInstance* UCardEffectFragment_Execution_DebugPrint::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_DebugPrint>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_Execution_DebugPrint::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Execution_DebugPrint::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(
 		LOCTEXT("DebugPrintName", "Prints Debug Message: {0}"),
 		FText::FromString(Message)
 	);
+}
+
+UCardEffectFragment_Execution_DebugPrint::UCardEffectFragment_Execution_DebugPrint()
+{
+	ExecInstanceClass = UCardExecutionInstance_DebugPrint::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

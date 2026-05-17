@@ -21,7 +21,7 @@ FText UCardEffectFragment_Utility::GetLocalizableName_Implementation()
 	return FText::GetEmpty();
 }
 
-FText UCardEffectFragment_Utility::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Utility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	UCardData* OwningCard = Cast<UCardData>(GetOuter());
 

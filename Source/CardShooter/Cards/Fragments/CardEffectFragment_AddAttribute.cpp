@@ -23,14 +23,7 @@ void UCardExecutionInstance_AddAttributeToNextCards::ProcessExecutionInstance()
 	OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution_AddAttributeToNextCards::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_AddAttributeToNextCards>(this);
-	NewInstance->StartExecutionInstance(ExecutingPawn, AdditionalData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (!ensure(Attribute))
 	{
@@ -41,6 +34,11 @@ FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescr
 		FText::FromString(Attribute->GetPathName()),
 		Attribute->GetLocalizableName(),
 		Count);
+}
+
+UCardEffectFragment_Execution_AddAttributeToNextCards::UCardEffectFragment_Execution_AddAttributeToNextCards()
+{
+	ExecInstanceClass = UCardExecutionInstance_AddAttributeToNextCards::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

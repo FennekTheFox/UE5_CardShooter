@@ -3,6 +3,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Gameplay/GameplayAbility_CardExecution.h"
+#include "Cards/Augments/CardAugment.h"
 
 
 #define LOCTEXT_NAMESPACE "CardEffects"
@@ -96,20 +97,7 @@ void UCardExecutionInstance_GameplayAbility::ProcessExecutionInstance()
 			}));
 }
 
-UCardExecutionInstance* UCardEffectFragment_GameplayAbility::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
-{
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance_GameplayAbility>(this);
-	FCardExecution_AdditionalData AppendedData = AdditionalData;
-	for (auto&& KVPair : SetByCallerMagnitudes)
-	{
-		AppendedData.SetByCallerMetaDataTags.Add(KVPair.Key);
-		AppendedData.SetByCallerMetaDataValues.Add(KVPair.Value);
-	}
-	NewInstance->StartExecutionInstance(ExecutingPawn, AppendedData, this);
-	return NewInstance;
-}
-
-FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (!ensure(AbilityToExecute.Ability))
 	{
@@ -119,16 +107,20 @@ FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementat
 	if (UGameplayAbility_CardExecution* AsGA_CE = Cast<UGameplayAbility_CardExecution>(AbilityToExecute.Ability->GetDefaultObject()))
 	{
 		FFormatNamedArguments Args;
-		GetSetByCallerFormattingArgs(Args);
+		GetSetByCallerFormattingArgs(Args, CardIdentity);
 
 		return FText::Format(FText::FromString("{0}: {1}"), 
 			AsGA_CE->GetName(), 
-			FText::Format(AsGA_CE->GetDescription(), Args));
+			FText::Format(AsGA_CE->GetDescription(CardIdentity), Args));
 	}
 
 	ensure(false);
 	return FText::GetEmpty();
 }
 
+UCardEffectFragment_GameplayAbility::UCardEffectFragment_GameplayAbility()
+{
+	ExecInstanceClass = UCardExecutionInstance_GameplayAbility::StaticClass();
+}
 
 #undef LOCTEXT_NAMESPACE

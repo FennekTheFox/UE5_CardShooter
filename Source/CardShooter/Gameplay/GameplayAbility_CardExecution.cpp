@@ -16,63 +16,72 @@ UGameplayAbility_CardExecution::UGameplayAbility_CardExecution()
 	ActivationTriggers.Add(Cast<TC_ONGRANTED>(TC_ONGRANTED::StaticClass()->GetDefaultObject(false)));
 }
 
-bool UGameplayAbility_CardExecution::GetEffectContextSourceSetByCallerValue(FGameplayTag Tag, FSetByCallerMetaData& Out)
+float UGameplayAbility_CardExecution::GetEffectContextSourceSetByCallerValue(FGameplayTag Tag)
 {
-	//The source object could either be an instance, if the ability was granted by a GE which was applied via a card execution, or 
-	//an ability execution if applied via an effect that was applied via an ability (yes i know its confusing). Either way we need
-	//to retrieve the set by caller data from the _WithParameters fragment
-
-	TMap<FGameplayTag, FSetByCallerMetaData>* SetByCallerData = nullptr;
-	UCardEffectFragment_ExecutionWithParameters* WithParams = nullptr;
-
-	FGameplayEffectContextHandle Context = GetGrantedByEffectContext();
-	UObject* ContextSourceObject = Context.GetSourceObject();
-	if ((ContextSourceObject))
-	{
-		WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(ContextSourceObject);
-
-		if (!WithParams)
-		{
-			UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(ContextSourceObject);
-
-			if (AsInstance)
-			{
-				WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(AsInstance->Exec);
-			}
-		}
-	}
-
-	//If added directly via the CEF_GA, it should be the Source Object
-	if (!WithParams)
-	{
-		UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(GetCurrentSourceObject());
-
-		if (AsInstance)
-		{
-			WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(AsInstance->Exec);
-		}
-	}		
+	int32 Index = AdditionalData.SetByCallerMetaDataTags.Find(Tag);
 	
-	if (WithParams)
+	if (Index != INDEX_NONE)
 	{
-		SetByCallerData = &(WithParams->SetByCallerMagnitudes);
+		return AdditionalData.SetByCallerMetaDataValues[Index].Magnitude;
 	}
 
-	if (ensure(SetByCallerData))
-	{
-		FSetByCallerMetaData* Data = WithParams->SetByCallerMagnitudes.Find(Tag);
+	return 0.f;
 
-		if (Data)
-		{
-			Out = *Data;
-			return true;
-		}
-	}
+	////The source object could either be an instance, if the ability was granted by a GE which was applied via a card execution, or 
+	////an ability execution if applied via an effect that was applied via an ability (yes i know its confusing). Either way we need
+	////to retrieve the set by caller data from the _WithParameters fragment
 
-	return false;
+	//TMap<FGameplayTag, FSetByCallerMetaData>* SetByCallerData = nullptr;
+	//UCardEffectFragment_ExecutionWithParameters* WithParams = nullptr;
+
+	//FGameplayEffectContextHandle Context = GetGrantedByEffectContext();
+	//UObject* ContextSourceObject = Context.GetSourceObject();
+	//if ((ContextSourceObject))
+	//{
+	//	WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(ContextSourceObject);
+
+	//	if (!WithParams)
+	//	{
+	//		UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(ContextSourceObject);
+
+	//		if (AsInstance)
+	//		{
+	//			WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(AsInstance->Exec);
+	//		}
+	//	}
+	//}
+
+	////If added directly via the CEF_GA, it should be the Source Object
+	//if (!WithParams)
+	//{
+	//	UCardExecutionInstance* AsInstance = Cast<UCardExecutionInstance>(GetCurrentSourceObject());
+
+	//	if (AsInstance)
+	//	{
+	//		WithParams = Cast<UCardEffectFragment_ExecutionWithParameters>(AsInstance->Exec);
+	//	}
+	//}		
+	//
+	//if (WithParams)
+	//{
+	//	SetByCallerData = &(WithParams->SetByCallerMagnitudes);
+	//}
+
+	//if (ensure(SetByCallerData))
+	//{
+	//	FSetByCallerMetaData* Data = WithParams->SetByCallerMagnitudes.Find(Tag);
+
+	//	if (Data)
+	//	{
+	//		Out = *Data;
+	//		return true;
+	//	}
+	//}
+
+	//return false;
 }
 
-void UGameplayAbility_CardExecution::GetFormatingArguments(FFormatNamedArguments& Args)
+void UGameplayAbility_CardExecution::GetFormatingArguments(const FCardIdentity& CardIdentity, FFormatNamedArguments& Args)
 {
 	for (auto&& KVPair : ReferencedEffects)
 	{
@@ -82,8 +91,9 @@ void UGameplayAbility_CardExecution::GetFormatingArguments(FFormatNamedArguments
 		}
 
 		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
-			"<hover id=\"{0}\">{1}</>"),
+			"<hover id=\"{0}\" cardidentityhandle=\"{1}\">{2}</>"),
 			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
+			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
 			Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject())->GetDetailedLocalizableName()
 		));
 	}

@@ -24,7 +24,7 @@ struct FCardDeck_DataOnly
 	bool bDebugDeck = false;
 };
 
-
+//Used for decks that are in the players collection -> Card identities come from the player save file
 USTRUCT(BlueprintType)
 struct FCardDeck
 {
@@ -35,10 +35,13 @@ struct FCardDeck
 
 	//Set utility cards that need not be drawn and can be played at any time
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
-	TArray<FCardIdentity> UtilityCards;
+	TArray<FCardIdentityHandle> UtilityCards;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
-	TArray<FCardIdentity> CardList;
+	TArray<FCardIdentityHandle> CardHandles;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
+	FLinearColor DeckColor;
 
 	//If true, the deck does not get checked for card availability in collection
 	//TODO
@@ -56,7 +59,7 @@ public:
 	FGameplayTag DeckTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<TObjectPtr<UCardData>> CardList;
+	TArray<FCardIdentity> CardList;
 
 	UFUNCTION(BlueprintPure)
 	void GetDeck(FCardDeck& OutDeck);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
+
 #include "Currency.generated.h"
 
 
@@ -10,6 +12,9 @@ class UCurrencyDef : public UPrimaryDataAsset
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FGameplayTag CurrencyTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText CurrencyName;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
@@ -17,9 +22,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<class UTexture2D> CurrencyIcon;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag CurrencyTag;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, AssetRegistrySearchable)
 	FString CommandString;

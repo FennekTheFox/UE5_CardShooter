@@ -20,16 +20,15 @@ class UCardEffectFragment_Execution_RemoveAttributeFromNextCards : public UCardE
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Execution_RemoveAttributeFromNextCards();
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UCardEffectFragment_ExecutionAttribute> AttributeClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	int32 Count = 1;
-
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
-
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

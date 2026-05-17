@@ -28,7 +28,7 @@ public:
 	//static bool CanAddCardToDeck(UPARAM()const FCardDeck& Deck, FCardIdentity* CardToAdd, TArray<class UDeckLimitationViolation*>& FailureReasons);
 
 	UFUNCTION(BlueprintCallable)
-	static bool VerifyDeck(const FCardDeck& Deck, TArray<class UDeckLimitationViolation*>& FailureReasons);
+	static bool VerifyDeck(const FCardDeck& Deck, APlayerController* Player, TArray<class UDeckLimitationViolation*>& FailureReasons);
 
 	UFUNCTION(BlueprintPure)
 	static bool StringLexComparison(const FString& A, const FString& B);
@@ -40,7 +40,10 @@ public:
 	static class UCardEffectFragment_Attribute* GetAttributeOfClassFromArray(TArray<UCardEffectFragment_Attribute*> Array, TSubclassOf<UCardEffectFragment_Attribute> Class);
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (Card Identity)", CompactNodeTitle = "==", Keywords = "== equal"), Category = "Card")
-	static bool Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B);
+	static bool Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B);	
+	
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (Card Identity)", CompactNodeTitle = "==", Keywords = "== equal"), Category = "Card")
+	static bool Equal_CardIdentityHandle(const FCardIdentityHandle& A, const FCardIdentityHandle& B);
 
 	UFUNCTION(BlueprintPure)
 	static AActor* GetInstigatorFromEffectHandle(const FActiveGameplayEffectHandle& Handle);
@@ -54,7 +57,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	static class UCurrencyDef* FindCurrencyDef(FGameplayTag CurrencyTag);
 
-
 	UFUNCTION(BlueprintCallable, Category = "CardShooter|Sorting")
 	static void SortCardIdentityArray(UPARAM(ref) TArray<FCardIdentity>& Array,	FCardIdentitySortPredicate Predicate);
+
+	UFUNCTION(BlueprintCallable, Category = "CardShooter|Augments")
+	static UCardAugment* GetCardAugmentCDO(const FCardAugmentData& AugmentData);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gameplay Tags")
+	static void GetChildGameplayTags(FGameplayTag ParentTag, TArray<FGameplayTag>& ChildTags, bool bIncludeParent = false);
+
+	UFUNCTION(BlueprintCallable, Category = "CardShooter|Cards")
+	static TArray<FGameplayTag> GetCardSetByCallerTags(const FCardIdentity& Identity);
 };

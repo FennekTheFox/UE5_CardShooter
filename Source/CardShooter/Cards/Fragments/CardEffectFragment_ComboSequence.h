@@ -19,10 +19,10 @@ class UCardEffectFragment_Execution_ComboSequence : public UCardEffectFragment_E
 {
 	GENERATED_BODY()
 
-public:
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+	UCardEffectFragment_Execution_ComboSequence();
 
+public:
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

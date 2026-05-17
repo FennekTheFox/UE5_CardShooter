@@ -20,16 +20,15 @@ class UCardEffectFragment_GameplayAbility
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_GameplayAbility();
+
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayAbilitySpecDef AbilityToExecute;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag TargetDataID;
-
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData);
-
 	//~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

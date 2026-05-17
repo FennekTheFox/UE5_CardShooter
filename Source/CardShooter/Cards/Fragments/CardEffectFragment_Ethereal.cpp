@@ -8,7 +8,7 @@ FText UCardEffectFragment_Ethereal::GetLocalizableName_Implementation()
 	return LOCTEXT("EtherealAttrName", "Ethereal");
 }
 
-FText UCardEffectFragment_Ethereal::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Ethereal::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("EtherealAttrDesc", "Once used, this card is removed from your deck.");
 }

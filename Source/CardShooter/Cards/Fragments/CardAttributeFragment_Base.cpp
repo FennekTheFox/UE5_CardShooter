@@ -10,7 +10,7 @@ FText UCardEffectFragment_Base::GetLocalizableName_Implementation()
 	return FText::GetEmpty();
 }
 
-FText UCardEffectFragment_Base::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Base::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::GetEmpty();
 }

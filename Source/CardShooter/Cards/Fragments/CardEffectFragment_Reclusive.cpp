@@ -27,7 +27,7 @@ bool UCardEffectFragment_Reclusive::Verify(const FCardDeck_DataOnly& Deck, TArra
 	return bSuccess;
 }
 
-FText UCardEffectFragment_Reclusive::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Reclusive::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("ReclusiveAttrDesc", "This card can only be part of decks with no more than {0} cards."), FText::AsNumber(MaximumDeckSize));
 }

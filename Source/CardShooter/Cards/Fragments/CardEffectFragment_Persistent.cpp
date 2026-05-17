@@ -12,7 +12,7 @@ FText UCardEffectFragment_Persistent::GetLocalizableName_Implementation()
 	return LOCTEXT("PersistentAttrName", "Persistent");
 }
 
-FText UCardEffectFragment_Persistent::GetLocalizableDescription_Implementation()
+FText UCardEffectFragment_Persistent::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (!TrackedEffect)
 	{

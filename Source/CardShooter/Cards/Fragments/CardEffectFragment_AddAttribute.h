@@ -18,6 +18,8 @@ class UCardEffectFragment_Execution_AddAttributeToNextCards : public UCardEffect
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Execution_AddAttributeToNextCards();
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
 	TObjectPtr<UCardEffectFragment_ExecutionAttribute> Attribute;
@@ -25,9 +27,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	int32 Count = 1;
 
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
-
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation() override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };
