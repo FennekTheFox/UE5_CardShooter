@@ -103,7 +103,10 @@ void AWarwolfExampleGameState::SendMissionEvent_Implementation(const FStateTreeE
 
 	IWarwolfMissionInterface::Execute_SendMissionEvent(MissionManager, Event);
 
-	UE_LOG(LogWarwolfGameState, Log, TEXT("%s Starting mission event %s for mission %s"), *FString(__FUNCTION__), *Event.Tag.ToString(), *SelectedMission->MissionName.ToString());
+	if (SelectedMission)
+	{
+		UE_LOG(LogWarwolfGameState, Log, TEXT("%s Starting mission event %s for mission %s"), *FString(__FUNCTION__), *Event.Tag.ToString(), *SelectedMission->MissionName.ToString());
+	}
 }
 
 void AWarwolfExampleGameState::ToastMission_Implementation(const FText& InMissionName, const EWarwolfMissionType InMissionType, const EWarwolfMissionToastType InToastType)
