@@ -81,22 +81,5 @@ float UGameplayAbility_CardExecution::GetEffectContextSourceSetByCallerValue(FGa
 	//return false;
 }
 
-void UGameplayAbility_CardExecution::GetFormatingArguments(const FCardIdentity& CardIdentity, FFormatNamedArguments& Args)
-{
-	for (auto&& KVPair : ReferencedEffects)
-	{
-		if (!ensure(KVPair.Value))
-		{
-			continue;
-		}
-
-		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
-			"<hover id=\"{0}\" cardidentityhandle=\"{1}\">{2}</>"),
-			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
-			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
-			Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject())->GetDetailedLocalizableName()
-		));
-	}
-}
 
 #undef LOCTEXT_NAMESPACE

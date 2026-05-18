@@ -28,8 +28,14 @@ class URichTextBlockHoverObjectDecorator : public URichTextBlockDecorator
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
-	FTextBlockStyle TextStyle;
+	UPROPERTY(EditDefaultsOnly, Category = "Tooltip")
+	TSubclassOf<UUserWidget> TooltipWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
+	FTextBlockStyle DefaultTextStyle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hover")
+	TObjectPtr<UDataTable> TextStyleSet;
 
 	virtual TSharedPtr<ITextDecorator> CreateDecorator(URichTextBlock* InOwner) override;
 

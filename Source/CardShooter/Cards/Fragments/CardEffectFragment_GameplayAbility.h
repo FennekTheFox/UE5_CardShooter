@@ -16,7 +16,7 @@ public:
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Activate Gameplay Ability"))
 class UCardEffectFragment_GameplayAbility 
-	: public UCardEffectFragment_ExecutionWithParameters
+	: public UCardEffectFragment_Execution_WithParameters
 {
 	GENERATED_BODY()
 
@@ -26,9 +26,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayAbilitySpecDef AbilityToExecute;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<FString, TSubclassOf<class UGameplayEffect_CardExecution>> ReferencedEffects;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag TargetDataID;
 	//~UCardEffectFragment
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
+
+	void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) override;
+
 };

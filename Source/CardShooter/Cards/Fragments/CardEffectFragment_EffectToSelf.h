@@ -23,7 +23,7 @@ public:
 };
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Apply Effect To Self"))
-class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_ExecutionWithParameters
+class UCardEffectFragment_ApplyEffectToOwner : public UCardEffectFragment_Execution_WithParameters
 {
 	GENERATED_BODY()
 

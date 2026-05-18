@@ -76,7 +76,7 @@ void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassO
 	}
 }
 
-UCardExecutionInstance* UCardEffectFragment_ExecutionWithParameters::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
 {
 	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance>(this, ExecInstanceClass);
 
@@ -107,7 +107,7 @@ UCardExecutionInstance* UCardEffectFragment_ExecutionWithParameters::ExecuteCard
 	return NewInstance;
 }
 
-void UCardEffectFragment_ExecutionWithParameters::GetSetByCallerFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
+void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
 {
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;

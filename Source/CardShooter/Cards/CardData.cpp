@@ -6,6 +6,7 @@
 #include "Fragments/CardAttributeFragment_Base.h"
 #include "Fragments/CardAttributeFragment_Execution.h"
 #include "CardIdentity.h"
+#include "Util/CardShooterUtility.h"
 
 #define LOCTEXT_NAMESPACE "CardData"
 
@@ -62,7 +63,7 @@ FText UCardData::GetDescription(const FCardIdentity& CardIdentity)
 	Sections.Add(GetExecutionsDescription(CardIdentity));
 
 	// Final join with spacing
-	return FText::Join(FText::FromString("\n\n"), Sections);
+	return UCardShooterUtilityLibrary::FormatTextForDisplay(FText::Join(FText::FromString("\n\n"), Sections));
 }
 
 FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
@@ -76,7 +77,7 @@ FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 		{
 			FText AttrName = Attr->GetLocalizableName();
 			FText Wrapped = FText::Format(
-				FText::FromString(TEXT("<hover id=\"{0}\" cardidentityhandle=\"{1}\">{2}</>")),
+				FText::FromString(TEXT("<hover id=\"{0}\" cardidentityhandle=\"{1}\" style=\"HoverContent\">{2}</>")),
 				FText::FromString(Attr->GetPathName()), 
 				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
 				AttrName
@@ -87,7 +88,7 @@ FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 
 	FText AttributesDesc = FText::Join(FText::FromString(", "), AttributeDescs);
 
-	return AttributesDesc;
+	return UCardShooterUtilityLibrary::FormatTextForDisplay(AttributesDesc);
 }
 
 FText UCardData::GetExecutionsDescription(const FCardIdentity& CardIdentity)
@@ -129,7 +130,7 @@ FText UCardData::GetExecutionsDescription(const FCardIdentity& CardIdentity)
 	}
 
 	// Final join with spacing
-	return FText::Join(FText::FromString("\n\n"), Sections);
+	return UCardShooterUtilityLibrary::FormatTextForDisplay((FText::Join(FText::FromString("\n\n"), Sections)));
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -67,7 +67,7 @@ private:
 
 
 UCLASS(Abstract)
-class UCardEffectFragment_ExecutionWithParameters : public UCardEffectFragment_Execution
+class UCardEffectFragment_Execution_WithParameters : public UCardEffectFragment_Execution
 {
 	GENERATED_BODY()
 
@@ -77,7 +77,7 @@ public:
 
 	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 
-	void GetSetByCallerFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
+	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
 };
 
 UCLASS()

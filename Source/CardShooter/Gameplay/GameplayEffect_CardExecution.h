@@ -38,12 +38,9 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure)
-	FText GetDescription(const FCardIdentity& CardIdentity)
-{
-		return EffectDesc;
-	}
+	FText GetDescription(const FCardIdentity& CardIdentity);
 
-	FText GetDescription(const FCardIdentity& CardIdentity, class UCardEffectFragment_ApplyEffectToOwner* OwningCEF_AETO);
+	FText GetDescription(const FCardIdentity& CardIdentity, class UCardEffectFragment_Execution_WithParameters* OwningCEF_E_WP);
 
 	UFUNCTION(BlueprintPure)
 	class UTexture2D* GetIcon() 

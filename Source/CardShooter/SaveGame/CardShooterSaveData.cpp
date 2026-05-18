@@ -266,14 +266,15 @@ bool UCardShooterSaveData::DeleteDeckAtIndex(UObject* WorldContext, int32 DeckHa
 		const FCardIdentity& Card = Collection.Cards[CardIndex];
 		for (int i = 0; i < Card.UsedInDecksWithIndices.Num(); i++)
 		{
-			const int32& AssignedDeck = Card.UsedInDecksWithIndices[i];
+			const int32 AssignedDeck = Card.UsedInDecksWithIndices[i];
+
 			if (AssignedDeck >= DeckHandle)
 			{
 				FCardIdentityHandle OutHandle;
 				OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
 				OutHandle.Index = CardIndex;
 
-				UnassignCardFromDeck(WorldContext, OutHandle, DeckHandle);
+				UnassignCardFromDeck(WorldContext, OutHandle, AssignedDeck);
 				i--;
 			}
 
@@ -299,7 +300,7 @@ void UCardShooterSaveData::GetAllDecks(TArray<FCardDeck>& OutDecks) const
 
 bool UCardShooterSaveData::GetDeckAtIndex(int32 DeckIndex, FCardDeck& OutDeck) const
 {
-	if (!ensure(DeckList.IsValidIndex(DeckIndex)))
+	if (!(DeckList.IsValidIndex(DeckIndex)))
 	{
 		return false;
 	}

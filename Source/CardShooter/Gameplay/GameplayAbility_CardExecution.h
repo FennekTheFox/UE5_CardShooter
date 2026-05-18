@@ -22,13 +22,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText AbilityDesc;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<FString, TSubclassOf<class UGameplayEffect_CardExecution>> ReferencedEffects;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FCardExecution_AdditionalData AdditionalData;
-
-	void GetFormatingArguments(const FCardIdentity& CardIdentity, FFormatNamedArguments& Args);
 
 	FText GetName() 
 	{
@@ -38,10 +33,7 @@ public:
 
 	FText GetDescription(const FCardIdentity& CardIdentity) 
 	{
-		FFormatNamedArguments Args;
-		GetFormatingArguments(CardIdentity,Args);
-
-		return FText::Format(AbilityDesc, Args);
+		return AbilityDesc;
 	}
 
 	UFUNCTION(BlueprintImplementableEvent)

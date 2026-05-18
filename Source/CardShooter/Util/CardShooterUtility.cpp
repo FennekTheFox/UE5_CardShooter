@@ -5,11 +5,10 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
-#include "UObject/UnrealType.h"
-#include "UObject/Stack.h"
 #include "GameplayTagsManager.h"
 #include "SaveGame/CardShooterSaveGameSubsystem.h"
 #include "SaveGame/CardShooterSaveData.h"
+#include "Internationalization/Regex.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -357,21 +356,31 @@ TArray<FGameplayTag> UCardShooterUtilityLibrary::GetCardSetByCallerTags(const FC
 
 	TSet<FGameplayTag> UniqueTags;
 
-	auto GatherTags =
-		[&UniqueTags](const UCardEffectFragment_Execution* Execution)
+	TFunction<void(const UCardEffectFragment_Execution*)> GatherTags =
+		[&UniqueTags, &GatherTags](const UCardEffectFragment_Execution* Execution)
 		{
-			const UCardEffectFragment_ExecutionWithParameters* ParamExecution =
-				Cast<UCardEffectFragment_ExecutionWithParameters>(Execution);
-
-			if (!ParamExecution)
+			if (!Execution)
 			{
 				return;
 			}
 
-			for (const TPair<FGameplayTag, FSetByCallerMetaData>& Pair
-				: ParamExecution->SetByCallerMagnitudes)
+			if (const UCardEffectFragment_Execution_WithParameters* ParamExecution =
+				Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
 			{
-				UniqueTags.Add(Pair.Key);
+				for (const TPair<FGameplayTag, FSetByCallerMetaData>& Pair
+					: ParamExecution->SetByCallerMagnitudes)
+				{
+					UniqueTags.Add(Pair.Key);
+				}
+			}
+
+			if (const UCardEffectFragment_Execution_Compound* CompoundExecution =
+				Cast<UCardEffectFragment_Execution_Compound>(Execution))
+			{
+				for (const UCardEffectFragment_Execution* ChildExecution : CompoundExecution->Executions)
+				{
+					GatherTags(ChildExecution);
+				}
 			}
 		};
 
@@ -386,4 +395,67 @@ TArray<FGameplayTag> UCardShooterUtilityLibrary::GetCardSetByCallerTags(const FC
 		});
 
 	return Result;
+}
+
+FText UCardShooterUtilityLibrary::FormatTextForDisplay(const FText& Text)
+{
+	//DamageTypes
+	FString Result = Text.ToString();
+
+	const TSet<FString> ValidDamageTypes =
+	{
+		TEXT("Poison"),
+		TEXT("Fire"),
+		TEXT("Cold"),
+		TEXT("Eelctric"),
+		TEXT("Physical")
+	};
+
+	for (const FString& DamageType : ValidDamageTypes)
+	{
+		const FString Token = FString::Printf(
+			TEXT("<%s>"),
+			*DamageType
+		);
+
+		const FString Replacement = FString::Printf(
+			TEXT("<img id=\"%s\"/> <DamageType%s>%s</>"),
+			*DamageType,
+			*DamageType,
+			*DamageType
+		);
+
+		Result.ReplaceInline(
+			*Token,
+			*Replacement,
+			ESearchCase::CaseSensitive
+		);
+	}
+
+	const FRegexPattern Pattern(TEXT(R"(\{[^}]*Magnitude\})"));
+	FRegexMatcher Matcher(Pattern, Result);
+
+	TArray<FString> Matches;
+
+	while (Matcher.FindNext())
+	{
+		Matches.Add(Matcher.GetCaptureGroup(0));
+	}
+
+	for (const FString& Match : Matches)
+	{
+		const FString Replacement = FString::Printf(
+			TEXT("<SetByCallerValue>%s</>"),
+			*Match
+		);
+
+		Result.ReplaceInline(
+			*Match,
+			*Replacement,
+			ESearchCase::CaseSensitive
+		);
+	}
+
+
+	return FText::FromString(Result);
 }

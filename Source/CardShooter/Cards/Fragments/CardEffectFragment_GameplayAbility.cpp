@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "Gameplay/GameplayAbility_CardExecution.h"
 #include "Cards/Augments/CardAugment.h"
+#include "Gameplay/GameplayEffect_CardExecution.h"
 
 
 #define LOCTEXT_NAMESPACE "CardEffects"
@@ -107,7 +108,7 @@ FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementat
 	if (UGameplayAbility_CardExecution* AsGA_CE = Cast<UGameplayAbility_CardExecution>(AbilityToExecute.Ability->GetDefaultObject()))
 	{
 		FFormatNamedArguments Args;
-		GetSetByCallerFormattingArgs(Args, CardIdentity);
+		GetFormattingArgs(Args, CardIdentity);
 
 		return FText::Format(FText::FromString("{0}: {1}"), 
 			AsGA_CE->GetName(), 
@@ -121,6 +122,27 @@ FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementat
 UCardEffectFragment_GameplayAbility::UCardEffectFragment_GameplayAbility()
 {
 	ExecInstanceClass = UCardExecutionInstance_GameplayAbility::StaticClass();
+}
+
+void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
+{
+	Super::GetFormattingArgs(Args, CardIdentity);
+
+	for (auto&& KVPair : ReferencedEffects)
+	{
+		if (!ensure(KVPair.Value))
+		{
+			continue;
+		}
+
+		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
+			"<hover id=\"{0}\" relatedExec=\"{1\" cardidentityhandle=\"{2}\" style=\"HoverContent\">{3}</>"),
+			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
+			FText::FromString(this->GetPathName()),
+			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
+			Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject())->GetSimpleLocalizableName()
+		));
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

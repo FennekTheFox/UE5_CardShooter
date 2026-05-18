@@ -3,6 +3,7 @@
 #include "Gameplay/GameplayEffect_CardExecution.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "../Util/CardShooterUtility.h"
 
 
 #define LOCTEXT_NAMESPACE "CardEffects"
@@ -36,14 +37,14 @@ void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 	Context.AddSourceObject(this);
 	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AsEffectToOwner->GameplayEffect, AsEffectToOwner->GameplayEffectLevel, Context);
 
-	for (int32 i = 0 ; i < AdditionalData.SetByCallerMetaDataTags.Num(); i++)
+	for (int32 i = 0; i < AdditionalData.SetByCallerMetaDataTags.Num(); i++)
 	{
 		SpecHandle.Data->SetSetByCallerMagnitude(AdditionalData.SetByCallerMetaDataTags[i],
 			AdditionalData.SetByCallerMetaDataValues[i].Magnitude);
 	}
 
 	FActiveGameplayEffectHandle EffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-	
+
 
 	if (AsEffectToOwner->bResolveImmediately)
 	{
@@ -82,14 +83,16 @@ FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implemen
 		}
 
 		FFormatNamedArguments Args;
-		GetSetByCallerFormattingArgs(Args, CardIdentity);
+		GetFormattingArgs(Args, CardIdentity);
 
-		return FText::Format(LOCTEXT("EffectToSelfDesc", "{0} <hover id=\"{1}\" relatedEffectExec=\"{2}\" cardidentityhandle=\"{3}\">{4}</>."),
-			Base,
-			FText::FromString(AsGE_CE->GetPathName()),
-			FText::FromString(this->GetPathName()),
-			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
-			FText::Format(AsGE_CE->GetDetailedLocalizableName(), Args));
+		return UCardShooterUtilityLibrary::FormatTextForDisplay(
+			FText::Format(LOCTEXT("EffectToSelfDesc", "{0} <hover id=\"{1}\" relatedExec=\"{2}\" cardidentityhandle=\"{3}\" style=\"HoverContent\">{4}</>."),
+				Base,
+				FText::FromString(AsGE_CE->GetPathName()),
+				FText::FromString(this->GetPathName()),
+				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
+				FText::Format(AsGE_CE->GetDetailedLocalizableName(), Args))
+		);
 	}
 
 	ensure(false);

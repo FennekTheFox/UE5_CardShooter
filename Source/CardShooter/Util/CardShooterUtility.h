@@ -68,4 +68,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CardShooter|Cards")
 	static TArray<FGameplayTag> GetCardSetByCallerTags(const FCardIdentity& Identity);
+
+	UFUNCTION(BlueprintCallable)
+	static FText FormatTextForDisplay(const FText& Text);
 };
