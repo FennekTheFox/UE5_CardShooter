@@ -79,6 +79,9 @@ public:
 
 	void AddDefaults(AActor* InOwnerActor, AActor* InAvatarActor);
 
+	UFUNCTION(BlueprintCallable)
+	void CancelAbilitiesWithTag(const FGameplayTag& GameplayTag);
+
 private:
 	UPROPERTY()
 	TMap<FGameplayTag, FAbilitySetApplicationData> ContextData;

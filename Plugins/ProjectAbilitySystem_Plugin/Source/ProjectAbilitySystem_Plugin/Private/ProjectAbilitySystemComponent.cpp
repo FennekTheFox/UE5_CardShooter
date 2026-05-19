@@ -41,7 +41,7 @@ void UProjectAbilitySystemComponent::AddAbilitySet(const FAbilitySet& AbilitySet
 	for (const TSubclassOf<UGameplayEffect> GameplayEffect : AbilitySet.Effects)
 	{
 		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(GameplayEffect, 1.f, MakeEffectContext());
-		
+
 		NewData.AppliedEffects.Add(ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get()));
 	}
 }
@@ -118,7 +118,7 @@ void UProjectAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Ability
 			if (OnTagAddedAbilityList.IsEmpty())
 			{
 				auto DelegateHandle = RegisterGameplayTagEvent(AsOnTagAdded->GameplayTag, EGameplayTagEventType::NewOrRemoved)
-										  .AddUObject(this, &UProjectAbilitySystemComponent::OnGameplayTagNewOrRemoved_HandleOnTagAdded);
+					.AddUObject(this, &UProjectAbilitySystemComponent::OnGameplayTagNewOrRemoved_HandleOnTagAdded);
 				OnTagAddedDelegateHandles.Add(AsOnTagAdded->GameplayTag, DelegateHandle);
 			}
 
@@ -147,7 +147,7 @@ void UProjectAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Ability
 			if (WhileTagPresentAbilityList.IsEmpty())
 			{
 				auto DelegateHandle = RegisterGameplayTagEvent(AsWhileTagPresent->GameplayTag, EGameplayTagEventType::NewOrRemoved)
-										  .AddUObject(this, &UProjectAbilitySystemComponent::OnGameplayTagNewOrRemoved_WhileTagPresent);
+					.AddUObject(this, &UProjectAbilitySystemComponent::OnGameplayTagNewOrRemoved_WhileTagPresent);
 				WhileTagPresentDelegateHandles.Add(AsWhileTagPresent->GameplayTag, DelegateHandle);
 			}
 
@@ -168,7 +168,7 @@ void UProjectAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Ability
 			{
 				auto DelegateHandle =
 					RegisterGameplayTagEvent(AsWhileTagPresentOngoing->GameplayTag, EGameplayTagEventType::NewOrRemoved)
-						.AddUObject(this, &UProjectAbilitySystemComponent::OnGameplayTagNewOrRemoved_WhileTagPresentOngoing);
+					.AddUObject(this, &UProjectAbilitySystemComponent::OnGameplayTagNewOrRemoved_WhileTagPresentOngoing);
 				WhileTagPresentOngoingDelegateHandles.Add(AsWhileTagPresentOngoing->GameplayTag, DelegateHandle);
 			}
 
@@ -277,7 +277,7 @@ void UProjectAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& Abili
 					if (ensure(DelegateHandle))
 					{
 						UnregisterGameplayTagEvent(*DelegateHandle, AsWhileTagPresentOngoing->GameplayTag,
-												   EGameplayTagEventType::NewOrRemoved);
+							EGameplayTagEventType::NewOrRemoved);
 					}
 				}
 			}
@@ -304,19 +304,19 @@ void UProjectAbilitySystemComponent::BindAbilityInputs(FGameplayAbilitySpec& Spe
 			{
 				AbilityBindings = &(AbilityBindingsPerInputAction.Add(Ability->InputAction));
 				AbilityBindings->BindingTriggered = EnhancedInputComp
-														->BindAction(Ability->InputAction.Get(), ETriggerEvent::Triggered, this,
-																	 &ThisClass::AbilityInputActionTriggered, Ability->InputAction.Get())
-														.GetHandle();
+					->BindAction(Ability->InputAction.Get(), ETriggerEvent::Triggered, this,
+						&ThisClass::AbilityInputActionTriggered, Ability->InputAction.Get())
+					.GetHandle();
 				AbilityBindings->BindingCompleted =
 					EnhancedInputComp
-						->BindAction(Ability->InputAction.Get(), ETriggerEvent::Completed, this,
-									 &ThisClass::AbilityInputActionCancelledOrCompleted, Ability->InputAction.Get())
-						.GetHandle();
+					->BindAction(Ability->InputAction.Get(), ETriggerEvent::Completed, this,
+						&ThisClass::AbilityInputActionCancelledOrCompleted, Ability->InputAction.Get())
+					.GetHandle();
 				AbilityBindings->BindingCancelled =
 					EnhancedInputComp
-						->BindAction(Ability->InputAction.Get(), ETriggerEvent::Canceled, this,
-									 &ThisClass::AbilityInputActionCancelledOrCompleted, Ability->InputAction.Get())
-						.GetHandle();
+					->BindAction(Ability->InputAction.Get(), ETriggerEvent::Canceled, this,
+						&ThisClass::AbilityInputActionCancelledOrCompleted, Ability->InputAction.Get())
+					.GetHandle();
 			}
 			AbilityBindings->Abilities.Add(Spec.Handle);
 		}
@@ -389,7 +389,7 @@ void UProjectAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool b
 						TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
 						const FGameplayAbilityActivationInfo& ActivationInfo = Instances.Last()->GetCurrentActivationInfoRef();
 						InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, SpecHandle,
-											  ActivationInfo.GetActivationPredictionKey());
+							ActivationInfo.GetActivationPredictionKey());
 					}
 				}
 				else
@@ -399,14 +399,14 @@ void UProjectAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool b
 						for (UAbilityActivationTrigger* ActivationTrigger : AbilityCDO->ActivationTriggers)
 						{
 							if (UAbilityActivationTrigger_OnInputTriggered* OnInputTriggered =
-									Cast<UAbilityActivationTrigger_OnInputTriggered>(ActivationTrigger))
+								Cast<UAbilityActivationTrigger_OnInputTriggered>(ActivationTrigger))
 							{
 								AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
 
 								if (OnInputTriggered->InputBufferDuration > 0.f)
 								{
 									BufferedAbilityActivations.Add(SpecHandle, GetWorld()->GetRealTimeSeconds() +
-																				   OnInputTriggered->InputBufferDuration);
+										OnInputTriggered->InputBufferDuration);
 								}
 
 								break;
@@ -450,7 +450,7 @@ void UProjectAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool b
 						TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
 						const FGameplayAbilityActivationInfo& ActivationInfo = Instances.Last()->GetCurrentActivationInfoRef();
 						InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, SpecHandle,
-											  ActivationInfo.GetActivationPredictionKey());
+							ActivationInfo.GetActivationPredictionKey());
 					}
 				}
 			}
@@ -462,7 +462,7 @@ void UProjectAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool b
 }
 
 void UProjectAbilitySystemComponent::AbilityInputActionTriggered(const FInputActionInstance& InputActionInstance,
-																	UInputAction* InputAction)
+	UInputAction* InputAction)
 {
 	if (InputAction)
 	{
@@ -478,7 +478,7 @@ void UProjectAbilitySystemComponent::AbilityInputActionTriggered(const FInputAct
 }
 
 void UProjectAbilitySystemComponent::AbilityInputActionCancelledOrCompleted(const FInputActionInstance& InputActionInstance,
-																			   UInputAction* InputAction)
+	UInputAction* InputAction)
 {
 	if (InputAction)
 	{
@@ -602,13 +602,24 @@ void UProjectAbilitySystemComponent::AddDefaults(AActor* InOwnerActor, AActor* I
 	}
 }
 
+void UProjectAbilitySystemComponent::CancelAbilitiesWithTag(const FGameplayTag& GameplayTag)
+{
+	for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		if (Spec.Ability->AbilityTags.HasTag(GameplayTag))
+		{
+			CancelAbilitySpec(Spec, nullptr);
+		}
+	}
+}
+
 UProjectAbilitySystemComponent::UProjectAbilitySystemComponent()
 {
 	//SetReplicationMode(EGameplayEffectReplicationMode::Full);
 }
 
 void UProjectAbilitySystemComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
-													  FActorComponentTickFunction* ThisTickFunction)
+	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 

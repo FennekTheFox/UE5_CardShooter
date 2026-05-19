@@ -70,12 +70,18 @@ FCardIdentityHandle UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(
 	{
 		if (CachedIdentities[i] == Identity)
 		{
-			return FCardIdentityHandle{ i };
+			FCardIdentityHandle OutHandle;
+			OutHandle.StorageLocation = ECardIdentityStorageLocation::Cache;
+			OutHandle.Index = i;
+			return OutHandle;
 		}
 	}
 
 	const int32 NewIndex = CachedIdentities.Add(Identity);
-	return FCardIdentityHandle{ NewIndex };
+	FCardIdentityHandle OutHandle;
+	OutHandle.StorageLocation = ECardIdentityStorageLocation::Cache;
+	OutHandle.Index = NewIndex;
+	return OutHandle;
 }
 
 bool UCardIdentityHandleLibrary::GetCardIdentityFromHandle(
