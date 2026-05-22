@@ -81,7 +81,8 @@ enum class ECardIdentityStorageLocation : uint8
 	Invalid = 0,
 	Collection = 1,
 	Cache = 2,
-	Prebuilt = 3,
+	PrebuiltCardList = 3,
+	PrebuiltUtilityList = 4,
 };
 
 USTRUCT(BlueprintType)

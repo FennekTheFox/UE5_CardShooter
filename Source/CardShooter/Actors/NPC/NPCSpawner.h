@@ -2,6 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NativeGameplayTags.h"
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_IdleTaskInjection);
+
 #include "NPCSpawner.generated.h"
 
 class UNPCSpawnerConfig;
@@ -9,6 +13,7 @@ class UNPCSpawnerTrigger;
 class USceneComponent;
 class UArrowComponent;
 class APawn;
+
 
 UCLASS()
 class ANPCSpawner : public AActor

@@ -41,7 +41,7 @@ struct FCardDeck
 	TArray<FCardIdentityHandle> CardHandles;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
-	FLinearColor DeckColor;
+	FLinearColor DeckColor = FLinearColor::White;
 
 	//If true, the deck does not get checked for card availability in collection
 	//TODO
@@ -57,6 +57,10 @@ class UPrebuiltDeck : public UPrimaryDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag DeckTag;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FCardIdentity> UtilityCards;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FCardIdentity> CardList;

@@ -6,6 +6,10 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "AIController.h"
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_IdleTaskInjection, "Gameplay.AI.Behaviour.InjectionTags.IdleTask");
 
 ANPCSpawner::ANPCSpawner()
 {
@@ -163,6 +167,13 @@ bool ANPCSpawner::SpawnOne()
 	if (Config->bSpawnControllers)
 	{
 		SpawnedPawn->SpawnDefaultController();
+
+		if (Config->IdleTaskTree)
+		{
+			Cast<AAIController>(SpawnedPawn->GetController())
+				->GetComponentByClass<UBehaviorTreeComponent>()
+				->SetDynamicSubtree(TAG_IdleTaskInjection, Config->IdleTaskTree);
+		}
 	}
 
 	SpawnedPawn->OnDestroyed.AddDynamic(this, &ANPCSpawner::HandleSpawnedPawnDestroyed);

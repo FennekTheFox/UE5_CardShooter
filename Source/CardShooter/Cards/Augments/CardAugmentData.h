@@ -12,10 +12,10 @@ struct FCardAugmentParameter
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
-	float Magnitude;
+	float Magnitude = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
-	int32 VariantOption;
+	int32 VariantOption = 0;
 
 	bool operator== (const FCardAugmentParameter& Other) const
 	{

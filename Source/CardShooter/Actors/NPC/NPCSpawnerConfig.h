@@ -44,6 +44,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
 	bool bDestroySpawnedOnSpawnerDestroyed = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	TObjectPtr<class UBehaviorTree> IdleTaskTree;
+
+
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadOnly, Category = "Triggers")
 	TArray<TObjectPtr<UNPCSpawnerTrigger>> Triggers;
+
+
 };

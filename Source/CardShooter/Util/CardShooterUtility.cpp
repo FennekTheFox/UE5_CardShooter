@@ -407,7 +407,7 @@ FText UCardShooterUtilityLibrary::FormatTextForDisplay(const FText& Text)
 		TEXT("Poison"),
 		TEXT("Fire"),
 		TEXT("Cold"),
-		TEXT("Eelctric"),
+		TEXT("Lightning"),
 		TEXT("Physical")
 	};
 

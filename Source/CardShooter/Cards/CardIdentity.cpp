@@ -105,21 +105,22 @@ bool UCardIdentityHandleLibrary::GetCardIdentityFromHandle(
 		}
 		return false;
 	}
-	case ECardIdentityStorageLocation::Prebuilt:
-		UPrebuiltDeck* PrebuiltDeck =
-			Cast<UPrebuiltDeck>(Handle.PrebuiltPath.TryLoad());
+	}
 
-		if (!PrebuiltDeck)
-		{
-			return false;
-		}
+	UPrebuiltDeck* PrebuiltDeck =
+		Cast<UPrebuiltDeck>(Handle.PrebuiltPath.TryLoad());
 
-		if (!PrebuiltDeck->CardList.IsValidIndex(Handle.Index))
-		{
-			return false;
-		}
-
+	switch (Handle.StorageLocation)
+	{
+	case ECardIdentityStorageLocation::PrebuiltCardList:
+		if (!PrebuiltDeck) { return false; }
+		if (!PrebuiltDeck->CardList.IsValidIndex(Handle.Index))	{return false;}
 		OutIdentity = PrebuiltDeck->CardList[Handle.Index];
+		return true;
+	case ECardIdentityStorageLocation::PrebuiltUtilityList:
+		if (!PrebuiltDeck){	return false;}
+		if (!PrebuiltDeck->CardList.IsValidIndex(Handle.Index))	{return false;}
+		OutIdentity = PrebuiltDeck->UtilityCards[Handle.Index];
 		return true;
 	}
 	return false;

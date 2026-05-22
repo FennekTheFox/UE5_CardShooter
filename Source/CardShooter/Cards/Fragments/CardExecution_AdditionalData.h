@@ -29,7 +29,7 @@ public:
 	float Magnitude = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ESetByCallerMagnitudeDisplayType DisplayType;
+	ESetByCallerMagnitudeDisplayType DisplayType = ESetByCallerMagnitudeDisplayType::Flat;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText ParameterName;
