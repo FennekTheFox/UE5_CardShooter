@@ -4,6 +4,7 @@
 #include "GameFramework/SaveGame.h"
 #include "GameplayTagContainer.h"
 #include "Cards/CardIdentity.h"
+#include "Cards/Augments/CardAugmentShard.h"
 
 #include "CardShooterSaveData.generated.h"
 
@@ -50,6 +51,9 @@ public:
 private:
 	UPROPERTY(SaveGame)
 	FCardCollection Collection;
+
+	UPROPERTY(SaveGame)
+	TMap<FCardAugmentShard, int32> AugmentShards;
 
 	UPROPERTY(SaveGame)
 	TArray<FCardDeck> DeckList;
@@ -108,6 +112,15 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool HasSufficientCurrency(const FGameplayTag CurrencyTag, int32 RequiredAmount) const;
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	void AddShard(UObject* WorldContext, const FCardAugmentShard& Shard);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	bool RemoveShard(UObject* WorldContext, const FCardAugmentShard& Shard);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	void GetAllShards(const TMap<FCardAugmentShard, int32>& Shards);
+
+
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAnyCardChanged OnAnyCardChanged;

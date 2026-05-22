@@ -352,6 +352,36 @@ bool UCardShooterSaveData::HasSufficientCurrency(const FGameplayTag CurrencyTag,
 	return false;
 }
 
+void UCardShooterSaveData::AddShard(UObject* WorldContext, const FCardAugmentShard& Shard)
+{
+	int32& Count = AugmentShards.FindOrAdd(Shard, 0);
+	Count++;
+}
+
+bool UCardShooterSaveData::RemoveShard(UObject* WorldContext, const FCardAugmentShard& Shard)
+{
+	if (int32* Count = AugmentShards.Find(Shard))
+	{
+		if (*Count <= 1)
+		{
+			AugmentShards.Remove(Shard);
+			return true;
+		}
+		else
+		{
+			*Count--;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void UCardShooterSaveData::GetAllShards(const TMap<FCardAugmentShard, int32>& OutShards)
+{
+	OutShards;
+}
+
 void UCardShooterSaveData::CallAnyCardChangedNextTick(UObject* WorldContext)
 {
 	if (!AnyCardChangedTimer.IsValid())

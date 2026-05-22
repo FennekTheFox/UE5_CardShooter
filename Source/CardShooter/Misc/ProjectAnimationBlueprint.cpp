@@ -5,6 +5,7 @@
 #include "GameplayTagAssetInterface.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 void UProjectAnimationInstance::NativeInitializeAnimation()
 {
@@ -91,6 +92,11 @@ bool UProjectAnimationInstance::OwnerHasTag(const FGameplayTag& Tag) const
 		{
 			return ASC->HasMatchingGameplayTag(Tag);
 		}
+	}
+
+	if (const UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(CachedOwner))
+	{
+		return ASC->HasMatchingGameplayTag(Tag);
 	}
 
 	return false;
