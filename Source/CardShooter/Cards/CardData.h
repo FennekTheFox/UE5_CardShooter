@@ -54,10 +54,15 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FText GetDescription(const FCardIdentity& CardIdentity);
+	//Helper function mostly to separate out the parameter magnitudes for data validation
+	FText GetRawDescription(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintPure)
 	FText GetAttributesDescription(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintPure)
 	FText GetExecutionsDescription(const FCardIdentity& CardIdentity);
+
+	UFUNCTION(BlueprintCallable)
+	void GetAllUsedParameters(TArray<FGameplayTag>& OutParameters);
 };

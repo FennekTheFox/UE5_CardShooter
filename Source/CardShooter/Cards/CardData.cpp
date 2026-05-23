@@ -42,6 +42,11 @@ UCardEffectFragment_Attribute* UCardData::GetAttributeOfClass(TSubclassOf<UCardE
 
 FText UCardData::GetDescription(const FCardIdentity& CardIdentity)
 {
+	return UCardShooterUtilityLibrary::FormatTextForDisplay(GetRawDescription(CardIdentity));
+}
+
+FText UCardData::GetRawDescription(const FCardIdentity& CardIdentity)
+{
 	// Ensure primary execution exists
 	if (!ensure(PrimaryExecution))
 	{
@@ -63,7 +68,7 @@ FText UCardData::GetDescription(const FCardIdentity& CardIdentity)
 	Sections.Add(GetExecutionsDescription(CardIdentity));
 
 	// Final join with spacing
-	return UCardShooterUtilityLibrary::FormatTextForDisplay(FText::Join(FText::FromString("\n\n"), Sections));
+	return FText::Join(FText::FromString("\n\n"), Sections);
 }
 
 FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
@@ -78,7 +83,7 @@ FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 			FText AttrName = Attr->GetLocalizableName();
 			FText Wrapped = FText::Format(
 				FText::FromString(TEXT("<hover id=\"{0}\" cardidentityhandle=\"{1}\" style=\"HoverContent\">{2}</>")),
-				FText::FromString(Attr->GetPathName()), 
+				FText::FromString(Attr->GetPathName()),
 				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
 				AttrName
 			);
@@ -131,6 +136,36 @@ FText UCardData::GetExecutionsDescription(const FCardIdentity& CardIdentity)
 
 	// Final join with spacing
 	return UCardShooterUtilityLibrary::FormatTextForDisplay((FText::Join(FText::FromString("\n\n"), Sections)));
+}
+
+void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<FGameplayTag>& OutParameters)
+{
+	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
+	{
+		for (auto&& KVPair : AsCEF_E_WP->SetByCallerMagnitudes)
+		{
+			OutParameters.AddUnique(KVPair.Key);
+		}
+	}
+	else if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
+	{
+		for (UCardEffectFragment_Execution* CompExec : AsCEF_E_C->Executions)
+		{
+			GatherParametersFromExecution(CompExec, OutParameters);
+		}
+	}
+}
+
+void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters)
+{
+	if (ensure(PrimaryExecution))
+	{
+		GatherParametersFromExecution(PrimaryExecution, OutParameters);
+	}
+	if (SecondaryExecution)
+	{
+		GatherParametersFromExecution(SecondaryExecution, OutParameters);
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -11,9 +11,7 @@ UENUM()
 enum class EModifyOperationType : uint8
 {
 	Add = 0,
-	Subtract = 1,
-	Multiply = 2,
-	Divide = 3,
+	Multiply = 1,
 };
 
 UCLASS()

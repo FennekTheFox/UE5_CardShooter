@@ -4,48 +4,52 @@ using UnrealBuildTool;
 
 public class CardShooter : ModuleRules
 {
-	public CardShooter(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+    public CardShooter(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] {
-			"Core",
-			"CoreUObject",
-			"Engine",
-			"InputCore",
-			"SlateCore",
+        PublicDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject",
+            "Engine",
+            "InputCore",
+            "SlateCore",
             "CommonUI",
             "CommonInput",
             "EnhancedInput",
-			"AIModule",
-			"StateTreeModule",
-			"GameplayStateTreeModule",
-			"UMG",
-			"Slate",
-			"SlateCore",
-			"GameplayTags",
-			"GameplayAbilities",
-			"ProjectAbilitySystem_Plugin",
-		});
+            "AIModule",
+            "StateTreeModule",
+            "GameplayStateTreeModule",
+            "UMG",
+            "Slate",
+            "SlateCore",
+            "GameplayTags",
+            "GameplayAbilities",
+            "ProjectAbilitySystem_Plugin",
+        });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+        PrivateDependencyModuleNames.AddRange(new string[]
+        {
+            "UnrealEd",
+            "DataValidation"
+        });
 
-		PublicIncludePaths.AddRange(new string[] {
-			"CardShooter",
-			"CardShooter/Variant_Horror",
-			"CardShooter/Variant_Horror/UI",
-			"CardShooter/Variant_Shooter",
-			"CardShooter/Variant_Shooter/AI",
-			"CardShooter/Variant_Shooter/UI",
-			"CardShooter/Variant_Shooter/Weapons"
-		});
+        PublicIncludePaths.AddRange(new string[] {
+            "CardShooter",
+            "CardShooter/Variant_Horror",
+            "CardShooter/Variant_Horror/UI",
+            "CardShooter/Variant_Shooter",
+            "CardShooter/Variant_Shooter/AI",
+            "CardShooter/Variant_Shooter/UI",
+            "CardShooter/Variant_Shooter/Weapons"
+        });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        // Uncomment if you are using Slate UI
+        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        // Uncomment if you are using online features
+        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+    }
 }

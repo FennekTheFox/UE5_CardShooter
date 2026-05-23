@@ -19,7 +19,7 @@ void UCardAugment_ModifySetByCallerParameter::ApplyAugment(FCardExecution_Additi
 {
 	for (auto&& KVPair : AugmentData.AugmentParameters)
 	{
-		if (!ensure(KVPair.Value.VariantOption >= 0 && KVPair.Value.VariantOption <= 3))
+		if (!ensure(KVPair.Value.VariantOption >= 0 && KVPair.Value.VariantOption <= 1))
 		{
 			continue;
 		}
@@ -37,9 +37,7 @@ void UCardAugment_ModifySetByCallerParameter::ApplyAugment(FCardExecution_Additi
 		switch ((EModifyOperationType)KVPair.Value.VariantOption)
 		{
 		case EModifyOperationType::Add: MagnitudePtr += KVPair.Value.Magnitude; break;
-		case EModifyOperationType::Subtract: MagnitudePtr -= KVPair.Value.Magnitude; break;
 		case EModifyOperationType::Multiply: MagnitudePtr *= KVPair.Value.Magnitude; break;
-		case EModifyOperationType::Divide: MagnitudePtr /= KVPair.Value.Magnitude; break;
 		}
 	}
 }
