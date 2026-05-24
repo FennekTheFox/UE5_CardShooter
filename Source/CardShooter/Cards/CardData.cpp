@@ -156,6 +156,25 @@ void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<F
 	}
 }
 
+
+void GatherScalingGroupsFromExecution(UCardEffectFragment_Execution* Exec, TArray<FGameplayTag>& OutParameters)
+{
+	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
+	{
+		for (auto&& KVPair : AsCEF_E_WP->SetByCallerMagnitudes)
+		{
+			OutParameters.AddUnique(KVPair.Value.ScalingGroup);
+		}
+	}
+	else if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
+	{
+		for (UCardEffectFragment_Execution* CompExec : AsCEF_E_C->Executions)
+		{
+			GatherScalingGroupsFromExecution(CompExec, OutParameters);
+		}
+	}
+}
+
 void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters)
 {
 	if (ensure(PrimaryExecution))
@@ -165,6 +184,18 @@ void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters)
 	if (SecondaryExecution)
 	{
 		GatherParametersFromExecution(SecondaryExecution, OutParameters);
+	}
+}
+
+void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters)
+{
+	if (ensure(PrimaryExecution))
+	{
+		GatherScalingGroupsFromExecution(PrimaryExecution, OutParameters);
+	}
+	if (SecondaryExecution)
+	{
+		GatherScalingGroupsFromExecution(SecondaryExecution, OutParameters);
 	}
 }
 

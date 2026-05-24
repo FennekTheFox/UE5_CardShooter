@@ -70,7 +70,7 @@ bool UCardShooterSaveGameSubsystem::SaveGame(bool bIsAutoSave)
     {
         return false;
     }
-
+    LocalPlayerSaveData->BeforeSave();
     return UGameplayStatics::SaveGameToSlot(LocalPlayerSaveData, PLAYER_SAVEDATA_PREFIX + LocalPlayerSaveData->ProfileName, 0);
 }
 
@@ -94,6 +94,7 @@ UCardShooterSaveData* UCardShooterSaveGameSubsystem::GetLocalPlayerSaveData()
         if (UCardShooterSaveData* LoadedSave = Cast<UCardShooterSaveData>(UGameplayStatics::LoadGameFromSlot(PLAYER_SAVEDATA_DEFAULTPROFILE , 0)))
         {
             LocalPlayerSaveData = LoadedSave;
+            LocalPlayerSaveData->AfterLoad();
         }
         else
         {

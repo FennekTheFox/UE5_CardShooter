@@ -65,4 +65,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GetAllUsedParameters(TArray<FGameplayTag>& OutParameters);
+
+	UFUNCTION(BlueprintCallable)
+	void GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters);
 };

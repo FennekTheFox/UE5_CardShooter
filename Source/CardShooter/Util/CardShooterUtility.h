@@ -40,8 +40,8 @@ public:
 	static class UCardEffectFragment_Attribute* GetAttributeOfClassFromArray(TArray<UCardEffectFragment_Attribute*> Array, TSubclassOf<UCardEffectFragment_Attribute> Class);
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (Card Identity)", CompactNodeTitle = "==", Keywords = "== equal"), Category = "Card")
-	static bool Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B);	
-	
+	static bool Equal_CardIdentity(const FCardIdentity& A, const FCardIdentity& B);
+
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (Card Identity)", CompactNodeTitle = "==", Keywords = "== equal"), Category = "Card")
 	static bool Equal_CardIdentityHandle(const FCardIdentityHandle& A, const FCardIdentityHandle& B);
 
@@ -58,7 +58,7 @@ public:
 	static class UCurrencyDef* FindCurrencyDef(FGameplayTag CurrencyTag);
 
 	UFUNCTION(BlueprintCallable, Category = "CardShooter|Sorting")
-	static void SortCardIdentityArray(UPARAM(ref) TArray<FCardIdentity>& Array,	FCardIdentitySortPredicate Predicate);
+	static void SortCardIdentityArray(UPARAM(ref) TArray<FCardIdentity>& Array, FCardIdentitySortPredicate Predicate);
 
 	UFUNCTION(BlueprintCallable, Category = "CardShooter|Augments")
 	static UCardAugment* GetCardAugmentCDO(const FCardAugmentData& AugmentData);
@@ -69,6 +69,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CardShooter|Cards")
 	static TArray<FGameplayTag> GetCardSetByCallerTags(const FCardIdentity& Identity);
 
+	UFUNCTION(BlueprintCallable, Category = "CardShooter|Cards")
+	static TArray<FGameplayTag> GetCardScalingGroups(const FCardIdentity& Identity);
+
 	UFUNCTION(BlueprintCallable)
 	static FText FormatTextForDisplay(const FText& Text);
+
+	UFUNCTION(BlueprintCallable, Category = "Utilities|Object")
+	static void FilterObjectsByClass(const TArray<UObject*>& Objects, TSubclassOf<UObject> Class, TArray<UObject*>& OutObjects);
 };

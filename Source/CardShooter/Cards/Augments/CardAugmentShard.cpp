@@ -29,70 +29,78 @@ void UCardAugmentShardGenerator_ParameterModifier::Generate_Implementation(const
 {
 	TArray<FGameplayTag> ParameterTags;
 	UCardData* CardData = UCardShooterUtilityLibrary::GetCardDataFromIdentity(Card);
-	CardData->GetAllUsedParameters(ParameterTags);
+	CardData->GetAllUsedScalingGroups(ParameterTags);
 
 	if (ParameterTags.IsEmpty())
 	{
 		return;
 	}
 
-	int32 RandomIndex = FMath::RandRange(0, ParameterTags.Num()-1);
+	int32 RandomIndex = FMath::RandRange(0, ParameterTags.Num() - 1);
 	FGameplayTag ChosenParameter = ParameterTags[RandomIndex];
 
 	FString Discard;
 	FString ParameterKey;
 	ChosenParameter.ToString().Split(TEXT("."), &Discard, &ParameterKey, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
 
-	if (!ensure(LookupTable))
+	float U1 = FMath::FRand();
+	float U2 = FMath::FRand();
+	float T = FMath::FRand();
+	// Standard normal distribution (mean=0, stddev=1)
+	float Z = FMath::Sqrt(-2.f * FMath::Loge(U1))
+		* FMath::Cos(2.f * PI * U2);
+	// Convert to [0,1] centered at 0.5
+	// 3 sigma ≈ covers most values
+	float BiasedT = FMath::Clamp(0.5f + Z / 6.f, 0.f, 1.f);
+	float Magnitude = 1.0f + BiasedT * 0.5f;
+	Magnitude = FMath::RoundToFloat(Magnitude / 0.05f) * 0.05f;
+	Magnitude *= (FMath::FRand() > 0.5f ? 1.f : -1.f);
+
+	FCardAugmentShard NewShard;
+	NewShard.AugmentType = UCardAugment_ModifySetByCallerParameter::StaticClass();
+	NewShard.PieceType = (ECardShardPiece)FMath::RandRange(0, 2);
+	NewShard.ShardProperty = ChosenParameter;
+	NewShard.ShardMagnitude = Magnitude;
+	NewShard.ShardOption = (FMath::RandRange(0.f, 1.f) > 0.5f ? 0 : 1); 
+	OutShards.Add(NewShard);
+}
+
+bool UItem_Stackable_CardAugmentShard::SameItem_Implementation(const UItem* Other) const
+{
+	if (const UItem_Stackable_CardAugmentShard* OtherAsShardItem = Cast<UItem_Stackable_CardAugmentShard>(Other))
 	{
-		return;
+		return ShardData == OtherAsShardItem->ShardData;
 	}
 
-	FParameterAugmentGeneratorRow* GeneratorData = LookupTable->FindRow<FParameterAugmentGeneratorRow>(FName(*ParameterKey), TEXT("Parameter Lookup)"));
+	return false;
+}
+	
+void UItem_Stackable_CardAugmentShard::GetItemBrush_Implementation(FSlateBrush& OutBrush)
+{
+	UTexture2D* Texture;
+	FLinearColor Tint;
 
-	if (ensure(GeneratorData))
+	UCardAugment::GetShardStyleData(ShardData, Texture, Tint);
+
+	OutBrush = FSlateBrush();
+	OutBrush.SetResourceObject(Texture);
+	OutBrush.TintColor = FSlateColor(Tint);
+
+	if (Texture)
 	{
-		float SumWeights = 0.f;
-
-		for (const FWeighteParameterValue& Entry : GeneratorData->AddMagnitudes)
-		{
-			SumWeights += Entry.Weight;
-		}
-		for (const FWeighteParameterValue& Entry : GeneratorData->MultiplyMagnitudes)
-		{
-			SumWeights += Entry.Weight;
-		}
-
-		float RandomValue = FMath::RandRange(0.f, SumWeights);
-
-		for (const FWeighteParameterValue& Entry : GeneratorData->AddMagnitudes)
-		{
-			RandomValue -= Entry.Weight;
-
-			if (RandomValue <= 0.f)
-			{
-				FCardAugmentShard NewShard;
-				NewShard.AugmentType = UCardAugment_ModifySetByCallerParameter::StaticClass();
-				NewShard.ShardProperty = ChosenParameter;
-				NewShard.ShardMagnitude = Entry.Magnitude;
-				NewShard.ShardOption = 0; // for add
-				OutShards.Add(NewShard);
-			}
-		}
-
-		for (const FWeighteParameterValue& Entry : GeneratorData->MultiplyMagnitudes)
-		{
-			RandomValue -= Entry.Weight;
-
-			if (RandomValue <= 0.f)
-			{
-				FCardAugmentShard NewShard;
-				NewShard.AugmentType = UCardAugment_ModifySetByCallerParameter::StaticClass();
-				NewShard.ShardProperty = ChosenParameter;
-				NewShard.ShardMagnitude = Entry.Magnitude;
-				NewShard.ShardOption = 1; // for multiply
-				OutShards.Add(NewShard);
-			}
-		}
+		OutBrush.ImageSize = FVector2D(
+			Texture->GetSizeX(),
+			Texture->GetSizeY()
+		);
 	}
+}
+
+FText UItem_Stackable_CardAugmentShard::GetItemName_Implementation()
+{
+	return UCardAugment_ModifySetByCallerParameter::GetShardName(ShardData);
+}
+
+FText UItem_Stackable_CardAugmentShard::GetItemDescription_Implementation()
+{
+	return UCardAugment_ModifySetByCallerParameter::GetShardDescription(ShardData);
 }

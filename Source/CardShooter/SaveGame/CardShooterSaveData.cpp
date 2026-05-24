@@ -7,6 +7,7 @@
 #include "CardShooterSaveGameSubsystem.h"
 #include "Engine/LocalPlayer.h"
 #include "Algo/Count.h"
+#include "../Inventory/Item.h"
 
 static FAutoConsoleCommandWithWorldAndArgs GiveCurrencyCmd(
 	TEXT("GiveCurrency"),
@@ -352,34 +353,192 @@ bool UCardShooterSaveData::HasSufficientCurrency(const FGameplayTag CurrencyTag,
 	return false;
 }
 
-void UCardShooterSaveData::AddShard(UObject* WorldContext, const FCardAugmentShard& Shard)
+void UCardShooterSaveData::AddItem(UObject* WorldContext, UItem* Item)
 {
-	int32& Count = AugmentShards.FindOrAdd(Shard, 0);
-	Count++;
-}
-
-bool UCardShooterSaveData::RemoveShard(UObject* WorldContext, const FCardAugmentShard& Shard)
-{
-	if (int32* Count = AugmentShards.Find(Shard))
+	if (UItem_Stackable* AsStackable = Cast<UItem_Stackable>(Item))
 	{
-		if (*Count <= 1)
+		TObjectPtr<UItem>* ExistingStack = RuntimeItems.FindByPredicate([AsStackable](UItem* Other)
+			{
+				if (UItem_Stackable* OtherAsStackable = Cast<UItem_Stackable>(Other))
+				{
+					return AsStackable->SameItem(OtherAsStackable) && !OtherAsStackable->IsFullStack();
+				}
+				return false;
+			});
+
+		if (ExistingStack)
 		{
-			AugmentShards.Remove(Shard);
-			return true;
+			if (UItem_Stackable* ExistingStackAStackable = Cast<UItem_Stackable>(*ExistingStack))
+			{
+				int32 Overflow = ExistingStackAStackable->AddToCount(AsStackable->Count);
+
+				while (Overflow > 0)
+				{
+					UItem_Stackable* NewStack = DuplicateObject<UItem_Stackable>(ExistingStackAStackable, this);
+					Overflow = NewStack->OverrideCount(Overflow);
+					RuntimeItems.Add(NewStack);
+				}
+			}
+			else
+			{
+				ensure(false);
+			}
 		}
 		else
 		{
-			*Count--;
+			RuntimeItems.Add(Item);
+		}
+	}
+	else
+	{
+		RuntimeItems.Add(Item);
+	}
+}
+
+
+bool UCardShooterSaveData::RemoveItem(UObject* WorldContext, UItem* Item, int32 Count /*= 1*/)
+{
+	if (!CamRemoveItems(Item, Count))
+	{
+		return false;
+	}
+	else
+	{
+		if (UItem_Stackable* AsStackable = Cast<UItem_Stackable>(Item))
+		{
+			TArray<TObjectPtr<UItem>> FoundStacks = RuntimeItems.FilterByPredicate([AsStackable](TObjectPtr<UItem> Other)
+				{
+					return Other->SameItem(AsStackable);
+				});
+
+			int32 Remaining = AsStackable->Count * Count;
+			int32 i = 0;
+			while (Remaining > 0 && i < FoundStacks.Num())
+			{
+				if (UItem_Stackable* FoundStackAsStackable = Cast<UItem_Stackable>(FoundStacks[i]))
+				{
+					Remaining -= FoundStackAsStackable->RemoveFromCount(Remaining);
+				}
+
+				i++;
+			}
+
+			return Remaining <= 0;
+		}
+		else
+		{
+			TArray<TObjectPtr<UItem>> FoundItems = RuntimeItems.FilterByPredicate([Item](TObjectPtr<UItem> OtherItem)
+				{
+					return Item->SameItem(OtherItem);
+				});
+
+			for (int32 i = 0; i < Count; i++)
+			{
+				TObjectPtr<UItem>* ItemToRemove = RuntimeItems.FindByPredicate([Item](TObjectPtr<UItem> Other) {
+					return Item->SameItem(Other);
+					});
+
+				if (ItemToRemove)
+				{
+					RuntimeItems.Remove(*ItemToRemove);
+				}
+				else
+				{
+					return ensure(false);
+				}
+			}
+
 			return true;
 		}
 	}
-
-	return false;
 }
 
-void UCardShooterSaveData::GetAllShards(const TMap<FCardAugmentShard, int32>& OutShards)
+bool UCardShooterSaveData::CamRemoveItems(UItem* Item, int32 Count)
 {
-	OutShards;
+	if (UItem_Stackable* AsStackable = Cast<UItem_Stackable>(Item))
+	{
+		TArray<TObjectPtr<UItem>> FoundStacks = RuntimeItems.FilterByPredicate([AsStackable](TObjectPtr<UItem> Other)
+			{
+				return Other->SameItem(AsStackable);
+			});
+
+		int32 Remaining = AsStackable->Count * Count;
+		int32 i = 0;
+		while (Remaining > 0 && i < FoundStacks.Num())
+		{
+			if (UItem_Stackable* FoundStackAsStackable = Cast<UItem_Stackable>(FoundStacks[i]))
+			{
+				Remaining -= FoundStackAsStackable->Count;
+			}
+
+			i++;
+		}
+
+		return Remaining <= 0;
+	}
+	else
+	{
+		TArray<TObjectPtr<UItem>> FoundItems = RuntimeItems.FilterByPredicate([Item](TObjectPtr<UItem> OtherItem)
+			{
+				return Item->SameItem(OtherItem);
+			});
+
+		return FoundItems.Num() >= Count;
+	}
+}
+
+void UCardShooterSaveData::GetAllItems(TArray<UItem*>& OutItems)
+{
+	OutItems = RuntimeItems;
+}
+
+void UCardShooterSaveData::BeforeSave()
+{
+	Items.Empty();
+	Items.Reserve(RuntimeItems.Num());
+
+	for (UItem* Item : RuntimeItems)
+	{
+		if (!IsValid(Item))
+		{
+			continue;
+		}
+
+		FItemSaveData& SaveData = Items.AddDefaulted_GetRef();
+
+		SaveData.ItemClass = Item->GetClass();
+
+		FMemoryWriter MemoryWriter(SaveData.Data, true);
+		FItemSaveArchive Archive(MemoryWriter);
+
+		Item->Serialize(Archive);
+	}
+}
+
+void UCardShooterSaveData::AfterLoad()
+{
+	RuntimeItems.Empty();
+	RuntimeItems.Reserve(Items.Num());
+
+	for (const FItemSaveData& SaveData : Items)
+	{
+		if (!SaveData.ItemClass)
+		{
+			continue;
+		}
+
+		UItem* Item = NewObject<UItem>(
+			this,
+			SaveData.ItemClass
+		);
+
+		FMemoryReader MemoryReader(SaveData.Data, true);
+		FItemSaveArchive Archive(MemoryReader);
+
+		Item->Serialize(Archive);
+
+		RuntimeItems.Add(Item);
+	}
 }
 
 void UCardShooterSaveData::CallAnyCardChangedNextTick(UObject* WorldContext)

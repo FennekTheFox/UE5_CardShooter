@@ -5,6 +5,8 @@
 #include "GameplayTagContainer.h"
 #include "Cards/CardIdentity.h"
 #include "Cards/Augments/CardAugmentShard.h"
+#include "Inventory/Item.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include "CardShooterSaveData.generated.h"
 
@@ -12,7 +14,7 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCollectionCardModified, const FCardIdentity
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnyCardChanged);
 
 USTRUCT(BlueprintType)
-struct FCardCollection 
+struct FCardCollection
 {
 	GENERATED_BODY()
 
@@ -53,13 +55,16 @@ private:
 	FCardCollection Collection;
 
 	UPROPERTY(SaveGame)
-	TMap<FCardAugmentShard, int32> AugmentShards;
-
-	UPROPERTY(SaveGame)
 	TArray<FCardDeck> DeckList;
 
 	UPROPERTY(SaveGame)
 	TMap<FGameplayTag, int32> Currencies;
+
+	UPROPERTY(SaveGame)
+	TArray<FItemSaveData> Items;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UItem>> RuntimeItems;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -75,16 +80,12 @@ public:
 	FCardIdentityHandle GetFirstCardHandle(const FCardIdentity& CardIdentity) const;
 	UFUNCTION(BlueprintCallable)
 	void GetAllCardHandles(const FCardIdentity& CardIdentity, TArray<FCardIdentityHandle>& CardHandles) const;
-
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	void ModifyCardInCollection(UObject* WorldContext, const FCardIdentityHandle& Handle, const FCardIdentity& InCard);
-
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	void AddCardToCollection(UObject* WorldContext, const FCardIdentity& CardIdentity);
-
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	bool RemoveCardFromCollection(UObject* WorldContext, const FCardIdentity& CardIdentity);
-
 	UFUNCTION(BlueprintCallable)
 	void GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards) const;
 
@@ -114,13 +115,15 @@ public:
 	bool HasSufficientCurrency(const FGameplayTag CurrencyTag, int32 RequiredAmount) const;
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	void AddShard(UObject* WorldContext, const FCardAugmentShard& Shard);
+	void AddItem(UObject* WorldContext, UItem* Item);
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	bool RemoveShard(UObject* WorldContext, const FCardAugmentShard& Shard);
+	bool RemoveItem(UObject* WorldContext, UItem* Item, int32 Count = 1);
+	bool CamRemoveItems(UItem* Item, int32 Count);
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	void GetAllShards(const TMap<FCardAugmentShard, int32>& Shards);
+	void GetAllItems(TArray<UItem*>& OutItems);
 
-
+	void BeforeSave();
+	void AfterLoad();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAnyCardChanged OnAnyCardChanged;

@@ -459,3 +459,74 @@ FText UCardShooterUtilityLibrary::FormatTextForDisplay(const FText& Text)
 
 	return FText::FromString(Result);
 }
+
+TArray<FGameplayTag> UCardShooterUtilityLibrary::GetCardScalingGroups(const FCardIdentity& Identity)
+{
+	TArray<FGameplayTag> Result;
+
+	const UCardData* CardData = GetCardDataFromIdentity(Identity);
+	if (!CardData)
+	{
+		return Result;
+	}
+
+	TSet<FGameplayTag> UniqueTags;
+
+	TFunction<void(const UCardEffectFragment_Execution*)> GatherTags =
+		[&UniqueTags, &GatherTags](const UCardEffectFragment_Execution* Execution)
+		{
+			if (!Execution)
+			{
+				return;
+			}
+
+			if (const UCardEffectFragment_Execution_WithParameters* ParamExecution =
+				Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
+			{
+				for (const TPair<FGameplayTag, FSetByCallerMetaData>& Pair
+					: ParamExecution->SetByCallerMagnitudes)
+				{
+					UniqueTags.Add(Pair.Value.ScalingGroup);
+				}
+			}
+
+			if (const UCardEffectFragment_Execution_Compound* CompoundExecution =
+				Cast<UCardEffectFragment_Execution_Compound>(Execution))
+			{
+				for (const UCardEffectFragment_Execution* ChildExecution : CompoundExecution->Executions)
+				{
+					GatherTags(ChildExecution);
+				}
+			}
+		};
+
+	GatherTags(CardData->PrimaryExecution);
+	GatherTags(CardData->SecondaryExecution);
+
+	Result = UniqueTags.Array();
+
+	Result.Sort([](const FGameplayTag& A, const FGameplayTag& B)
+		{
+			return A.ToString() < B.ToString();
+		});
+
+	return Result;
+}
+
+void UCardShooterUtilityLibrary::FilterObjectsByClass(const TArray<UObject*>& Objects, TSubclassOf<UObject> Class, TArray<UObject*>& OutObjects)
+{
+	OutObjects.Reset();
+
+	if (!Class)
+	{
+		return;
+	}
+
+	for (UObject* Object : Objects)
+	{
+		if (IsValid(Object) && Object->IsA(Class))
+		{
+			OutObjects.Add(Object);
+		}
+	}
+}
