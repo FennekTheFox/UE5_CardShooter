@@ -67,6 +67,18 @@ void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 
 FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
+	FFormatNamedArguments Args;
+	GetFormattingArgs(Args, CardIdentity);
+	return FText::Format(GetRawLocalizableDescription(CardIdentity), Args);
+}
+
+UCardEffectFragment_ApplyEffectToOwner::UCardEffectFragment_ApplyEffectToOwner()
+{
+	ExecInstanceClass = UCardExecutionInstance_ApplyEffectToOwner::StaticClass();
+}
+
+FText UCardEffectFragment_ApplyEffectToOwner::GetRawLocalizableDescription(const FCardIdentity& CardIdentity)
+{
 	if (!ensure(GameplayEffect))
 	{
 		return FText::GetEmpty();
@@ -82,26 +94,18 @@ FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implemen
 		case EEffectInclination::Detrimental: Base = LOCTEXT("EffectToSelfDescBaseDetrimental", "Inflicts"); break;
 		}
 
-		FFormatNamedArguments Args;
-		GetFormattingArgs(Args, CardIdentity);
-
 		return UCardShooterUtilityLibrary::FormatTextForDisplay(
 			FText::Format(LOCTEXT("EffectToSelfDesc", "{0} <hover id=\"{1}\" relatedExec=\"{2}\" cardidentityhandle=\"{3}\" style=\"HoverContent\">{4}</>."),
 				Base,
 				FText::FromString(AsGE_CE->GetPathName()),
 				FText::FromString(this->GetPathName()),
 				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
-				FText::Format(AsGE_CE->GetDetailedLocalizableName(), Args))
+				AsGE_CE->GetDetailedLocalizableName())
 		);
 	}
 
 	ensure(false);
 	return FText::GetEmpty();
-}
-
-UCardEffectFragment_ApplyEffectToOwner::UCardEffectFragment_ApplyEffectToOwner()
-{
-	ExecInstanceClass = UCardExecutionInstance_ApplyEffectToOwner::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

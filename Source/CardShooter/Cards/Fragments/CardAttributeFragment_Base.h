@@ -17,6 +17,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	FText GetLocalizableDescription(const FCardIdentity& CardIdentity);
+	virtual FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity);
 
 protected:
 	bool bShowInDescription = true;

@@ -14,3 +14,8 @@ FText UCardEffectFragment_Base::GetLocalizableDescription_Implementation(const F
 {
 	return FText::GetEmpty();
 }
+
+FText UCardEffectFragment_Base::GetRawLocalizableDescription(const FCardIdentity& CardIdentity)
+{
+	return FText::GetEmpty();
+}

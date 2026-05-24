@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EditorValidatorBase.h"
+#include "Cards/CardIdentity.h"
 #include "Validator_CardDescUsesAllParameters.generated.h"
 
 UCLASS()
@@ -21,4 +22,11 @@ public:
 		const FAssetData& InAssetData, 
 		UObject* InAsset, 
 		FDataValidationContext& Context) override;
+
+private:
+	void ValidateExecutionRecursive(
+		class UCardEffectFragment_Execution* Execution,
+		const FCardIdentity& Identity,
+		TArray<FGameplayTag>& UsedParameters,
+		UObject* Asset);
 };

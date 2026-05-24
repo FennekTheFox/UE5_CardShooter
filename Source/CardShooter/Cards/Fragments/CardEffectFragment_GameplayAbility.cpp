@@ -32,7 +32,7 @@ void UCardExecutionInstance_GameplayAbility::ProcessExecutionInstance()
 		return;
 	}
 
-	FGameplayAbilitySpec AbilitySpec(AsGA->AbilityToExecute.Ability, 1, -1, this);	
+	FGameplayAbilitySpec AbilitySpec(AsGA->AbilityToExecute.Ability, 1, -1, this);
 	FGameplayAbilitySpecHandle SpecHandle = ASC->GiveAbility(AbilitySpec);
 
 	//This relies on the ability 100% getting executed, else it wont get removed properly
@@ -100,6 +100,19 @@ void UCardExecutionInstance_GameplayAbility::ProcessExecutionInstance()
 
 FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
+	FFormatNamedArguments Args;
+	GetFormattingArgs(Args, CardIdentity);
+
+	return	FText::Format(GetRawLocalizableDescription(CardIdentity), Args);
+}
+
+UCardEffectFragment_GameplayAbility::UCardEffectFragment_GameplayAbility()
+{
+	ExecInstanceClass = UCardExecutionInstance_GameplayAbility::StaticClass();
+}
+
+FText UCardEffectFragment_GameplayAbility::GetRawLocalizableDescription(const FCardIdentity& CardIdentity)
+{
 	if (!ensure(AbilityToExecute.Ability))
 	{
 		return FText::GetEmpty();
@@ -107,21 +120,14 @@ FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementat
 
 	if (UGameplayAbility_CardExecution* AsGA_CE = Cast<UGameplayAbility_CardExecution>(AbilityToExecute.Ability->GetDefaultObject()))
 	{
-		FFormatNamedArguments Args;
-		GetFormattingArgs(Args, CardIdentity);
 
-		return FText::Format(FText::FromString("{0}: {1}"), 
-			AsGA_CE->GetName(), 
-			FText::Format(AsGA_CE->GetDescription(CardIdentity), Args));
+		return FText::Format(FText::FromString("{0}: {1}"),
+			AsGA_CE->GetName(),
+			AsGA_CE->GetDescription(CardIdentity));
 	}
 
 	ensure(false);
 	return FText::GetEmpty();
-}
-
-UCardEffectFragment_GameplayAbility::UCardEffectFragment_GameplayAbility()
-{
-	ExecInstanceClass = UCardExecutionInstance_GameplayAbility::StaticClass();
 }
 
 void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)

@@ -1,9 +1,16 @@
-// Validator_CardDescUsesAllParameters.cpp
-
 #include "Validator_CardDescUsesAllParameters.h"
 
 #include "Cards/CardData.h"
 #include "Cards/CardIdentity.h"
+#include "Cards/Fragments/CardAttributeFragment_Execution.h"
+#include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
+#include "Cards/Fragments/CardEffectFragment_GameplayAbility.h"
+#include "Gameplay/GameplayEffect_CardExecution.h"
+
+//UValidator_CardDescUsesAllParameters::UValidator_CardDescUsesAllParameters()
+//{
+//	bIsEnabled = true;
+//}
 
 bool UValidator_CardDescUsesAllParameters::CanValidateAsset_Implementation(
 	const FAssetData& InAssetData,
@@ -15,9 +22,8 @@ bool UValidator_CardDescUsesAllParameters::CanValidateAsset_Implementation(
 
 EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_Implementation(
 	const FAssetData& InAssetData,
-	UObject* InAsset, 
+	UObject* InAsset,
 	FDataValidationContext& Context)
-
 {
 	UCardData* CardData = Cast<UCardData>(InAsset);
 	if (!CardData)
@@ -25,29 +31,25 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 		return EDataValidationResult::NotValidated;
 	}
 
-	bool bValid = true;
-
 	TArray<FGameplayTag> UsedParameters;
 	CardData->GetAllUsedParameters(UsedParameters);
+
+	bool bValid = true;
 
 	FCardIdentity Identity;
 	CardData->GetIdentity(Identity);
 
-	const FString Description = CardData->GetRawDescription(Identity).ToString();
+	ValidateExecutionRecursive(CardData->PrimaryExecution, Identity, UsedParameters, InAsset);
+	ValidateExecutionRecursive(CardData->SecondaryExecution, Identity, UsedParameters, InAsset);
 
-	for (const FGameplayTag& ParameterTag : UsedParameters)
+	for(const FGameplayTag& MissingParameter : UsedParameters)
 	{
-		if (!ParameterTag.IsValid())
-		{
-			continue;
-		}
-
-		FString Discard;
+		FString Unused;
 		FString ParameterKey;
 
-		if (!ParameterTag.ToString().Split(
+		if (!MissingParameter.ToString().Split(
 			TEXT("."),
-			&Discard,
+			&Unused,
 			&ParameterKey,
 			ESearchCase::IgnoreCase,
 			ESearchDir::FromEnd))
@@ -55,36 +57,139 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 			AssetFails(
 				InAsset,
 				FText::FromString(FString::Printf(
-					TEXT("Invalid parameter tag '%s'. RawDesc: %s"),
-					*ParameterTag.ToString(),
-					*Description
+					TEXT("%s: Invalid parameter tag '%s'."),
+					*CardData->GetName(),
+					*MissingParameter.ToString()
 				))
 			);
-
-			bValid = false;
 			continue;
 		}
 
 		const FString RequiredToken =
 			FString::Printf(TEXT("{%sMagnitude}"), *ParameterKey);
 
-		if (!Description.Contains(RequiredToken, ESearchCase::CaseSensitive))
-		{
-			AssetFails(
-				InAsset,
-				FText::FromString(FString::Printf(
-					TEXT("Missing description token '%s' for parameter '%s'. RawDesc: %s"),
-					*RequiredToken,
-					*ParameterTag.ToString(),
-					*Description
-				))
-			);
-
-			bValid = false;
-		}
+		AssetFails(
+			InAsset,
+			FText::FromString(FString::Printf(
+				TEXT("%s: Missing token '%s' in raw localizable description for parameter '%s'."),
+				*CardData->GetName(),
+				*RequiredToken,
+				*MissingParameter.ToString()
+			))
+		);
 	}
 
-	return bValid
+	return UsedParameters.IsEmpty()
 		? EDataValidationResult::Valid
 		: EDataValidationResult::Invalid;
+}
+
+void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
+	class UCardEffectFragment_Execution* Execution,
+	const FCardIdentity& Identity,
+	TArray<FGameplayTag>& UsedParameters,
+	UObject* Asset)
+{
+	if (!Execution)
+	{
+		return;
+	}
+
+	if (UCardEffectFragment_Execution_Compound* Compound =
+		Cast<UCardEffectFragment_Execution_Compound>(Execution))
+	{
+		for (UCardEffectFragment_Execution* ChildExecution : Compound->Executions)
+		{
+			ValidateExecutionRecursive(ChildExecution, Identity, UsedParameters, Asset);
+		}
+
+		return;
+	}
+
+	if (UCardEffectFragment_Execution_WithParameters* WithParameters =
+		Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
+	{
+		const FString ExecDesc =
+			WithParameters->GetRawLocalizableDescription(Identity).ToString();
+
+
+		UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(WithParameters);
+		FString EffectDesc = "";
+		if (AsCEF_AETO)
+		{
+			if (auto* AsGE_CE = Cast<UGameplayEffect_CardExecution>(AsCEF_AETO->GameplayEffect->GetDefaultObject()))
+			{
+				EffectDesc = AsGE_CE->EffectDesc.ToString();
+			}
+		}
+		UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(WithParameters);
+
+		for (int32 i = 0; i < UsedParameters.Num(); i++)
+		{
+			const FGameplayTag ParameterTag = UsedParameters[i];
+
+			if (!ParameterTag.IsValid())
+			{
+				continue;
+			}
+
+			FString Unused;
+			FString ParameterKey;
+
+			if (!ParameterTag.ToString().Split(
+				TEXT("."),
+				&Unused,
+				&ParameterKey,
+				ESearchCase::IgnoreCase,
+				ESearchDir::FromEnd))
+			{
+				AssetFails(
+					Asset,
+					FText::FromString(FString::Printf(
+						TEXT("%s: Invalid parameter tag '%s'."),
+						*Execution->GetName(),
+						*ParameterTag.ToString()
+					))
+				);
+
+				continue;
+			}
+
+			const FString RequiredToken =
+				FString::Printf(TEXT("{%sMagnitude}"), *ParameterKey);
+
+			if (ExecDesc.Contains(RequiredToken, ESearchCase::CaseSensitive))
+			{
+				UsedParameters.Remove(ParameterTag);
+				i--;
+
+				continue;
+			}
+
+			if (AsCEF_AETO)
+			{
+				if (EffectDesc.Contains(RequiredToken, ESearchCase::CaseSensitive))
+				{
+					UsedParameters.Remove(ParameterTag);
+					i--;
+					continue;
+				}
+			}
+
+			if (AsCEF_GA) 
+			{
+				for (auto&& KVPair : AsCEF_GA->ReferencedEffects)
+				{
+					UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
+
+					if (AsGE_CE&& AsGE_CE->EffectDesc.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
+					{
+						UsedParameters.Remove(ParameterTag);
+						i--;
+						continue;
+					}
+				}
+			}
+		}
+	}
 }
