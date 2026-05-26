@@ -3,18 +3,39 @@
 #include "GameplayTagContainer.h"
 #include "Cards/Fragments/CardExecution_AdditionalData.h"
 #include "CardAugmentShard.h"
+#include "Inventory/Item.h"
 
 #include "CardAugment.generated.h"
 
 #define MAX_AUGMENT_SOCKET_COUNT 3
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
-class UCardAugmentNameGenerator : public UPrimaryDataAsset
+class UCardAugmentBrushGenerator : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	virtual FText GenerateName(const FCardAugmentData& AugmentData) { return FText::GetEmpty(); };
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
+	void GenerateBrush(const FCardAugmentData& AugmentData, FSlateBrush& OutBrush) const;
+};
+
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class UCardAugmentShardBrushGenerator : public UPrimaryDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
+	void GenerateBrush(const FCardAugmentShard& AugmentData, FSlateBrush& OutBrush) const;
+};
+
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class UCardAugmentTextGenerator : public UPrimaryDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	virtual FText GenerateText(const FCardAugmentData& AugmentData) const { return FText::GetEmpty(); };
 };
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
@@ -41,7 +62,7 @@ public:
 	class UTexture2D* DefaultAugmentTexutre;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TMap<ECardShardPiece, class UTexture2D*> DefaultShardTextures;
+	TMap<EAugmentShardPiece, class UTexture2D*> DefaultShardTextures;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FLinearColor DefaultTint = FLinearColor::White;
@@ -53,7 +74,16 @@ public:
 	int32 MaxLevel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UCardAugmentNameGenerator> AugmentNameGenerator = nullptr;
+	TObjectPtr<UCardAugmentBrushGenerator> AugmentBushGenerator = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UCardAugmentShardBrushGenerator> AugmentShardBrushGenerator = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UCardAugmentTextGenerator> AugmentNameGenerator = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UCardAugmentTextGenerator> AugmentDescriptionGenerator = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UCardAugmentShardTextGenerator> ShardNameGenerator = nullptr;
@@ -62,17 +92,39 @@ public:
 	TObjectPtr<UCardAugmentShardTextGenerator> ShardDescriptionGenerator = nullptr;
 
 	UFUNCTION(BlueprintPure)
-	static void GetAugmentStyleData(const FCardAugmentData& Data, class UTexture2D*& Texture, FLinearColor& Tint);
+	static void GetAugmentStyleData(const FCardAugmentData& Data, FSlateBrush& OutBrush);
 
 	UFUNCTION(BlueprintPure)
 	static FText GetAugmentName(const FCardAugmentData& Data);
 
 	UFUNCTION(BlueprintPure)
-	static void GetShardStyleData(const FCardAugmentShard& Data, class UTexture2D*& Texture, FLinearColor& Tint);
+	static FText GetAugmentDescription(const FCardAugmentData& Data);
+
+	UFUNCTION(BlueprintPure)
+	static void GetShardStyleData(const FCardAugmentShard& Data, FSlateBrush& OutBrush);
 
 	UFUNCTION(BlueprintPure)
 	static FText GetShardName(const FCardAugmentShard& Data);
 
 	UFUNCTION(BlueprintPure)
 	static FText GetShardDescription(const FCardAugmentShard& Data);
+};
+
+UCLASS(BlueprintType)
+class UItem_CardAugment : public UItem 
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FCardAugmentData AugmentData;
+
+	void GetItemBrush_Implementation(FSlateBrush& OutBrush) override;
+	bool SameItem_Implementation(const UItem* Other) const override;
+	FText GetItemName_Implementation() override;
+	FText GetItemDescription_Implementation() override;
+
+
+	bool SortAmongSames(const UItem* Other) const override;
+
 };

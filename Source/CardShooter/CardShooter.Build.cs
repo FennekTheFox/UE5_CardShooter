@@ -13,7 +13,6 @@ public class CardShooter : ModuleRules
             "CoreUObject",
             "Engine",
             "InputCore",
-            "SlateCore",
             "CommonUI",
             "CommonInput",
             "EnhancedInput",
@@ -31,7 +30,9 @@ public class CardShooter : ModuleRules
         PrivateDependencyModuleNames.AddRange(new string[]
         {
             "UnrealEd",
-            "DataValidation"
+            "DataValidation",
+            "Blutility",
+            "EditorScriptingUtilities"
         });
 
         PublicIncludePaths.AddRange(new string[] {

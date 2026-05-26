@@ -85,8 +85,9 @@ void UValidator_CardParamsHaveScalingGroup::ValidateExecutionRecursive(
         {
             const FGameplayTag& Tag = KVPair.Key;
             const FSetByCallerMetaData& MetaData = KVPair.Value;
+            const FString SGAsString = MetaData.ScalingGroup.ToString();
 
-            if (!MetaData.ScalingGroup.IsValid())
+            if (!MetaData.ScalingGroup.IsValid() || !SGAsString.StartsWith(TEXT("Gameplay.Effect.ScalingGroups.")))
             {
                 bIsValid = false;
 
@@ -95,7 +96,7 @@ void UValidator_CardParamsHaveScalingGroup::ValidateExecutionRecursive(
                         NSLOCTEXT(
                             "CardValidation",
                             "MissingScalingGroup",
-                            "{0}: {1} → SetByCaller '{2}' has no ScalingGroup"
+                            "{0}: {1} → SetByCaller '{2}' has no or invalid ScalingGroup"
                         ),
                         FText::FromString(GetNameSafe(CardData)),
                         FText::FromString(Path),

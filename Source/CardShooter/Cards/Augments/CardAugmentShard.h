@@ -9,7 +9,7 @@
 class UCardAugment;
 
 UENUM(BlueprintType)
-enum class ECardShardPiece : uint8
+enum class EAugmentShardPiece : uint8
 {
 	Piece1 = 0,
 	Piece2 = 1,
@@ -31,7 +31,7 @@ public:
 
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame)
-	ECardShardPiece PieceType = ECardShardPiece::Piece1;
+	EAugmentShardPiece PieceType = EAugmentShardPiece::Piece1;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame)
 	float ShardMagnitude = 0.f;
@@ -43,24 +43,33 @@ public:
 		return AugmentType == Other.AugmentType
 			&& ShardProperty == Other.ShardProperty
 			&& ShardMagnitude == Other.ShardMagnitude
+			&& PieceType == Other.PieceType
 			&& ShardOption == Other.ShardOption;
 	}
-};
 
-UCLASS(BlueprintType)
-class UItem_Stackable_CardAugmentShard : public UItem_Stackable
-{
-	GENERATED_BODY()
+	bool operator<(const FCardAugmentShard& Other) const {
+		if (AugmentType != Other.AugmentType)
+		{
+			return AugmentType.ToString() < Other.AugmentType.ToString();
+		}
 
-public:
-	UPROPERTY(BlueprintReadWrite, SaveGame, meta = (ExposeOnSpawn = true))
-	FCardAugmentShard ShardData;
+		if (ShardProperty != Other.ShardProperty)
+		{
+			return ShardProperty.ToString() < Other.ShardProperty.ToString();
+		}
 
-	bool SameItem_Implementation(const UItem* Other) const override;
-	void GetItemBrush_Implementation(FSlateBrush& OutBrush) override;
-	FText GetItemName_Implementation() override;
-	FText GetItemDescription_Implementation() override;
+		if (PieceType != Other.PieceType)
+		{
+			return PieceType < Other.PieceType;
+		}
 
+		if (ShardOption != Other.ShardOption)
+		{
+			return ShardOption < Other.ShardOption;
+		}
+
+		return ShardMagnitude < Other.ShardMagnitude;
+	}
 };
 
 FORCEINLINE uint32 GetTypeHash(const FCardAugmentShard& Shard)
@@ -94,14 +103,23 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float  Magnitude = 0.f;
 };
-UCLASS(BlueprintType, Abstract, Blueprintable)
-class UCardAugmentShardGenerator_ParameterModifier : public UCardAugmentShardGenerator
+
+UCLASS(BlueprintType)
+class UItem_Stackable_CardAugmentShard : public UItem_Stackable
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadWrite, SaveGame, meta = (ExposeOnSpawn = true))
+	FCardAugmentShard ShardData;
 
-	void Generate_Implementation(const FCardIdentity& Card, TArray<FCardAugmentShard>& OutShards) const override;
+	bool SameItem_Implementation(const UItem* Other) const override;
+	void GetItemBrush_Implementation(FSlateBrush& OutBrush) override;
+	FText GetItemName_Implementation() override;
+	FText GetItemDescription_Implementation() override;
+
+	bool SortAmongSames(const UItem* Other) const override;
+
 };
 
 UCLASS()

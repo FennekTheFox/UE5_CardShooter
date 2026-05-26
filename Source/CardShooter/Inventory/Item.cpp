@@ -43,3 +43,35 @@ int32 UItem_Stackable::OverrideCount(int32 NewCount)
 	return Overflow;
 }
 
+bool UItem_Stackable::SortAmongSames(const UItem* Other) const
+{
+	const UItem_Stackable* OtherAsStackable = Cast<UItem_Stackable>(Other);
+	if (ensure(OtherAsStackable))
+	{
+		return Count > OtherAsStackable->Count;
+	}
+
+	return false;
+}
+
+TArray<UItem*> UItem::SortItems(const TArray<UItem*> InItems)
+{
+	TArray<UItem*> OutArray = InItems;
+
+	Algo::Sort(OutArray, [](const UItem* A, const UItem* B) {
+		if (A->GetClass() != B->GetClass())
+		{
+			FString AClassName;
+			FString BClassName;
+
+			A->GetClass()->GetName(AClassName);
+			B->GetClass()->GetName(BClassName);
+			return AClassName < BClassName;
+		}
+
+		return A->SortAmongSames(B);
+		});
+
+	return OutArray;
+}
+

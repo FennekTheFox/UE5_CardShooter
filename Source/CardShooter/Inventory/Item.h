@@ -41,6 +41,11 @@ public:
     FText GetItemName();
     UFUNCTION(BlueprintPure, BlueprintNativeEvent)
     FText GetItemDescription();
+
+    virtual bool SortAmongSames(const UItem* Other) const { return ensure(false); };
+
+    UFUNCTION(BlueprintCallable)
+    static TArray<UItem*> SortItems(const TArray<UItem*> InItems);
 };
 
 UCLASS(BlueprintType)
@@ -68,4 +73,7 @@ public:
 
     UFUNCTION(BlueprintPure)
     bool IsFullStack() { return Count == MaxStackSize; };
+
+
+    virtual bool SortAmongSames(const UItem* Other) const override;
 };

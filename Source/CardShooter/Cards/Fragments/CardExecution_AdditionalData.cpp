@@ -10,8 +10,10 @@ FText FSetByCallerMetaData::GetDisplayText() const
 		return FText::AsNumber(Magnitude);
 	case ESetByCallerMagnitudeDisplayType::Percent:
 		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * Magnitude));
-	case ESetByCallerMagnitudeDisplayType::PercentOneMinus:
+	case ESetByCallerMagnitudeDisplayType::PercentOneMinusX:
 		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * (1.f - Magnitude)));
+	case ESetByCallerMagnitudeDisplayType::PercentXMinusOne:
+		return FText::Format(FText::FromString("{0}%"), FText::AsNumber(100.f * (-1.f + Magnitude)));
 	case ESetByCallerMagnitudeDisplayType::Absolute:
 		return FText::Format(FText::FromString("{0}"), FText::AsNumber(FMath::Abs(Magnitude)));
 	case ESetByCallerMagnitudeDisplayType::AbsolutePercent:

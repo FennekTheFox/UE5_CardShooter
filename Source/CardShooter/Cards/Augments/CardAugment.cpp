@@ -1,6 +1,6 @@
 #include "CardAugment.h"
 
-void UCardAugment::GetAugmentStyleData(const FCardAugmentData& Data, UTexture2D*& Texture, FLinearColor& Tint)
+void UCardAugment::GetAugmentStyleData(const FCardAugmentData& Data, FSlateBrush& OutBrush)
 {
 	UClass* LoadedClass = Data.AugmentClass.TryLoadClass<UCardAugment>();
 	if (!LoadedClass)
@@ -10,8 +10,10 @@ void UCardAugment::GetAugmentStyleData(const FCardAugmentData& Data, UTexture2D*
 
 	const UCardAugment* CDO = LoadedClass->GetDefaultObject<UCardAugment>();
 
-	Texture = CDO->DefaultAugmentTexutre;
-	Tint = CDO->DefaultTint;
+	if (CDO->AugmentBushGenerator)
+	{
+		CDO->AugmentBushGenerator->GenerateBrush(Data, OutBrush);
+	}
 }
 
 FText UCardAugment::GetAugmentName(const FCardAugmentData& Data)
@@ -26,13 +28,31 @@ FText UCardAugment::GetAugmentName(const FCardAugmentData& Data)
 
 	if (ensure(CDO->AugmentNameGenerator))
 	{
-		return CDO->AugmentNameGenerator->GenerateName(Data);
+		return CDO->AugmentNameGenerator->GenerateText(Data);
 	}
 
 	return FText::GetEmpty();
 }
 
-void UCardAugment::GetShardStyleData(const FCardAugmentShard& Data, UTexture2D*& Texture, FLinearColor& Tint)
+FText UCardAugment::GetAugmentDescription(const FCardAugmentData& Data)
+{
+	UClass* LoadedClass = Data.AugmentClass.TryLoadClass<UCardAugment>();
+	if (!ensure(LoadedClass))
+	{
+		return FText::GetEmpty();
+	}
+
+	UCardAugment* CDO = LoadedClass->GetDefaultObject<UCardAugment>();
+
+	if (ensure(CDO->AugmentDescriptionGenerator))
+	{
+		return CDO->AugmentDescriptionGenerator->GenerateText(Data);
+	}
+
+	return FText::GetEmpty();
+}
+
+void UCardAugment::GetShardStyleData(const FCardAugmentShard& Data, FSlateBrush& OutBrush)
 {
 	UClass* LoadedClass = Data.AugmentType.TryLoadClass<UCardAugment>();
 	if (!LoadedClass)
@@ -40,14 +60,12 @@ void UCardAugment::GetShardStyleData(const FCardAugmentShard& Data, UTexture2D*&
 		return;
 	}
 
-	UCardAugment* CDO = LoadedClass->GetDefaultObject<UCardAugment>();
+	const UCardAugment* CDO = LoadedClass->GetDefaultObject<UCardAugment>();
 
-	if (UTexture2D** FoundValue = CDO->DefaultShardTextures.Find(Data.PieceType))
+	if (CDO->AugmentBushGenerator)
 	{
-		Texture = *FoundValue;
+		CDO->AugmentShardBrushGenerator->GenerateBrush(Data, OutBrush);
 	}
-
-	Tint = CDO->DefaultTint;
 }
 
 FText UCardAugment::GetShardName(const FCardAugmentShard& Data)
@@ -88,3 +106,44 @@ FText UCardAugment::GetShardDescription(const FCardAugmentShard& Data)
 	return FText::GetEmpty();
 }
 
+void UItem_CardAugment::GetItemBrush_Implementation(FSlateBrush& OutBrush)
+{
+	UCardAugment::GetAugmentStyleData(AugmentData, OutBrush);
+}
+
+bool UItem_CardAugment::SameItem_Implementation(const UItem* Other) const
+{
+	if (const UItem_CardAugment* AsAugment = Cast<UItem_CardAugment>(Other))
+	{
+		return AugmentData == AsAugment->AugmentData;
+	}
+
+	return false;
+}
+
+FText UItem_CardAugment::GetItemName_Implementation()
+{
+	return UCardAugment::GetAugmentName(AugmentData);
+}
+
+FText UItem_CardAugment::GetItemDescription_Implementation()
+{
+	return UCardAugment::GetAugmentDescription(AugmentData);
+}
+
+bool UItem_CardAugment::SortAmongSames(const UItem* Other) const
+{
+	const UItem_CardAugment* OtherAsAugment = Cast<UItem_CardAugment>(Other);
+
+	if (ensure(OtherAsAugment))
+	{
+		if (AugmentData != OtherAsAugment->AugmentData)
+		{
+			return AugmentData < OtherAsAugment->AugmentData;
+		}
+
+		return Super::SortAmongSames(Other);
+	}
+
+	return false;
+}

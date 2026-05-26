@@ -89,7 +89,7 @@ public:
 
 	bool operator<(const FCardAugmentData& Other) const
 	{
-		// AugmentTag
+		//AugmentTag
 		if (AugmentTag != Other.AugmentTag)
 		{
 			return AugmentTag.ToString() < Other.AugmentTag.ToString();
@@ -148,8 +148,8 @@ public:
 
 FORCEINLINE uint32 GetTypeHash(const FCardAugmentData& Data)
 {
-	uint32 Hash = GetTypeHash(Data.AugmentTag);
-	Hash = HashCombine(Hash, GetTypeHash(Data.AugmentClass));
+	uint32 Hash = GetTypeHash(Data.AugmentClass);
+	//Hash = HashCombine(Hash, GetTypeHash(Data.AugmentClass));
 
 	for (const auto& Pair : Data.AugmentParameters)
 	{

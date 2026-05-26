@@ -12,12 +12,13 @@ enum class ESetByCallerMagnitudeDisplayType : uint8
 {
 	Flat = 0,
 	Percent = 1,
-	PercentOneMinus = 2,
+	PercentOneMinusX = 2,
 	Absolute,
 	AbsolutePercent,
 	AbsolutePercentOneOver,
 	XOver100,
 	Rotation,
+	PercentXMinusOne,
 };
 
 USTRUCT(BlueprintType)
