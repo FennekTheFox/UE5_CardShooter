@@ -10,6 +10,7 @@ void UCardAugmentShardGenerator_ParameterModifier::Generate_Implementation(const
 
 	if (ParameterTags.IsEmpty())
 	{
+		ensure(false);
 		return;
 	}
 
