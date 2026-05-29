@@ -24,7 +24,10 @@ public class CardShooter : ModuleRules
             "SlateCore",
             "GameplayTags",
             "GameplayAbilities",
+            "GameplayTasks",
             "ProjectAbilitySystem_Plugin",
+            "AnimationModifiers",
+            "AnimationBlueprintLibrary"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]

@@ -1,6 +1,8 @@
 #include "NPCSpawnerTrigger.h"
 #include "NPCSpawner.h"
 #include "Components/BoxComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 
 void UNPCSpawnerTrigger::Initialize(ANPCSpawner* InSpawner)
 {
@@ -16,6 +18,28 @@ void UNPCSpawnerBeginPlayTrigger::Initialize(ANPCSpawner* InSpawner)
 {
 	Super::Initialize(InSpawner);
 
+	if (Spawner)
+	{
+		Spawner->RequestSpawn();
+	}
+}
+
+void UNPCSpawnerEventTrigger::Initialize(ANPCSpawner* InSpawner)
+{
+	Super::Initialize(InSpawner);
+
+	if (Spawner)
+	{
+		UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Spawner);
+		if (ASC)
+		{
+				CallbackHandle = ASC->GenericGameplayEventCallbacks.FindOrAdd(EventTag).AddUObject(this, &UNPCSpawnerEventTrigger::Callback);
+		}
+	}
+}
+
+void UNPCSpawnerEventTrigger::Callback(const FGameplayEventData* Data)
+{
 	if (Spawner)
 	{
 		Spawner->RequestSpawn();

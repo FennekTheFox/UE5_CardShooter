@@ -2,6 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "GameplayTagContainer.h"
+#include "Delegates/IDelegateInstance.h"
+
 #include "NPCSpawnerTrigger.generated.h"
 
 class ANPCSpawner;
@@ -30,6 +33,24 @@ class UNPCSpawnerBeginPlayTrigger : public UNPCSpawnerTrigger
 public:
 	virtual void Initialize(ANPCSpawner* InSpawner) override;
 };
+
+UCLASS(BlueprintType, EditInlineNew, DefaultToInstanced)
+class UNPCSpawnerEventTrigger : public UNPCSpawnerTrigger
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag EventTag;
+
+	FDelegateHandle CallbackHandle;
+
+	virtual void Initialize(ANPCSpawner* InSpawner) override;
+
+	void Callback(const struct FGameplayEventData* Data);
+};
+
+
 
 UCLASS(BlueprintType, EditInlineNew, DefaultToInstanced)
 class UNPCSpawnerBoxOverlapTrigger : public UNPCSpawnerTrigger

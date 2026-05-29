@@ -39,10 +39,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UArrowComponent> DefaultSpawnPoint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawner")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
 	TObjectPtr<UNPCSpawnerConfig> Config;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawner")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
 	TArray<TObjectPtr<USceneComponent>> SpawnPoints;
 
 private:

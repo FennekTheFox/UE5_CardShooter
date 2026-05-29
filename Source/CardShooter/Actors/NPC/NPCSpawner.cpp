@@ -74,12 +74,15 @@ void ANPCSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	if (Config && Config->bDestroySpawnedOnSpawnerDestroyed)
 	{
-		for (APawn* Pawn : SpawnedPawns)
+		while (SpawnedPawns.Num() > 0)
 		{
-			if (IsValid(Pawn))
+			APawn* SpawnedPawn = SpawnedPawns[0];
+			if (IsValid(SpawnedPawn))
 			{
-				Pawn->Destroy();
+				SpawnedPawn->Destroy();
 			}
+
+			SpawnedPawns.Remove(SpawnedPawn);
 		}
 	}
 
