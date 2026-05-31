@@ -2,7 +2,7 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Echo::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Echo::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("EchoAttrName", "Echo({0}x | {1}s)"), EchoCount, EchoDelay);
 }

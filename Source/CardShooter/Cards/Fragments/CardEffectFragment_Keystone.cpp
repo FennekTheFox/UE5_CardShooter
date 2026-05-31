@@ -13,7 +13,7 @@ FText UDeckLimitationViolation_KeystoneLimit::GetFailureReasonText()
 		return FText::Format(TextToFormat, FormatArgs);
 }
 
-FText UCardEffectFragment_Keystone::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Keystone::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("KeystoneAttrName", "Keystone({0})"), FText::AsNumber(KeystoneLimit));
 }

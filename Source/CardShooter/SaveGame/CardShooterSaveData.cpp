@@ -84,7 +84,7 @@ int32 UCardShooterSaveData::GetCardCount(const FCardIdentity& CardIdentity) cons
 
 bool UCardShooterSaveData::GetCardFromCollection(const FCardIdentityHandle& Handle, FCardIdentity& OutCard) const
 {
-	if (!ensure(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
+	if (!(Handle.StorageLocation == ECardIdentityStorageLocation::Collection))
 	{
 		return false;
 	}

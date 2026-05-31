@@ -80,7 +80,7 @@ FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 	{
 		if (IsValid(Attr) && Attr->GetShouldShowInDescription())
 		{
-			FText AttrName = Attr->GetLocalizableName();
+			FText AttrName = Attr->GetLocalizableName(CardIdentity);
 			FText Wrapped = FText::Format(
 				FText::FromString(TEXT("<hover id=\"{0}\" cardidentityhandle=\"{1}\" style=\"HoverContent\">{2}</>")),
 				FText::FromString(Attr->GetPathName()),
@@ -175,7 +175,7 @@ void GatherScalingGroupsFromExecution(UCardEffectFragment_Execution* Exec, TArra
 	}
 }
 
-void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters)
+void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const
 {
 	if (ensure(PrimaryExecution))
 	{
@@ -185,17 +185,33 @@ void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters)
 	{
 		GatherParametersFromExecution(SecondaryExecution, OutParameters);
 	}
+
+	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
+	{
+		for (auto&& KVPair : Attribute->SetByCallerMagnitudes)
+		{
+			OutParameters.AddUnique(KVPair.Key);
+		}
+	}
 }
 
-void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters)
+void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) const 
 {
 	if (ensure(PrimaryExecution))
 	{
-		GatherScalingGroupsFromExecution(PrimaryExecution, OutParameters);
+		GatherScalingGroupsFromExecution(PrimaryExecution, OutScalingGroups);
 	}
 	if (SecondaryExecution)
 	{
-		GatherScalingGroupsFromExecution(SecondaryExecution, OutParameters);
+		GatherScalingGroupsFromExecution(SecondaryExecution, OutScalingGroups);
+	}
+
+	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
+	{
+		for (auto&& KVPair : Attribute->SetByCallerMagnitudes)
+		{
+			OutScalingGroups.AddUnique(KVPair.Value.ScalingGroup);
+		}
 	}
 }
 

@@ -55,7 +55,7 @@ FText UCardEffectFragment_Archetype::GetLocalizableDescription_Implementation(co
 	return LOCTEXT("ArchetypeAttrDesc", "Your deck can only contain cards of one archetype.");
 }
 
-FText UCardEffectFragment_Archetype::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Archetype::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	if (!ensure(Archetype))
 	{

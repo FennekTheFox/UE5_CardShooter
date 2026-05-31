@@ -28,7 +28,7 @@ public:
 	bool Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons) override;
 
 	 //~UCardEffectFragment
-	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

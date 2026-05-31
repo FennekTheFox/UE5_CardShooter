@@ -19,7 +19,7 @@ public:
 	float ComboWindow = 3.f;
 
 	//~UCardEffectFragment
-	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	//~UCardEffectFragment
 };

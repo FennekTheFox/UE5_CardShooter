@@ -11,7 +11,11 @@ class UValidator_CardAllDefinedParametersUsedByReferences
 {
 	GENERATED_BODY()
 
+	UValidator_CardAllDefinedParametersUsedByReferences();
+
 public:
+	UPROPERTY()
+	TArray<FGameplayTag> Exceptions;
 
 	virtual bool CanValidateAsset_Implementation(
 		const FAssetData& InAssetData,

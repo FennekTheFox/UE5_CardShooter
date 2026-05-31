@@ -9,6 +9,7 @@
 #include "SaveGame/CardShooterSaveGameSubsystem.h"
 #include "SaveGame/CardShooterSaveData.h"
 #include "Internationalization/Regex.h"
+#include "Cards/CardData.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -95,9 +96,10 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, APlayerContro
 	for (const FCardIdentityHandle& CardHandle : Deck.UtilityCards)
 	{
 		FCardIdentity Identity;
-		if (!ensure(SaveData->GetCardFromCollection(CardHandle, Identity)))
+		//no ensure here bc utility cards may have invalid handles
+		if (!(SaveData->GetCardFromCollection(CardHandle, Identity)))
 		{
-			return false;
+			continue;
 		}
 		DataOnlyDeck.UtilityCards.Add(GetCardDataFromIdentity(Identity));
 	}
@@ -470,40 +472,7 @@ TArray<FGameplayTag> UCardShooterUtilityLibrary::GetCardScalingGroups(const FCar
 		return Result;
 	}
 
-	TSet<FGameplayTag> UniqueTags;
-
-	TFunction<void(const UCardEffectFragment_Execution*)> GatherTags =
-		[&UniqueTags, &GatherTags](const UCardEffectFragment_Execution* Execution)
-		{
-			if (!Execution)
-			{
-				return;
-			}
-
-			if (const UCardEffectFragment_Execution_WithParameters* ParamExecution =
-				Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
-			{
-				for (const TPair<FGameplayTag, FSetByCallerMetaData>& Pair
-					: ParamExecution->SetByCallerMagnitudes)
-				{
-					UniqueTags.Add(Pair.Value.ScalingGroup);
-				}
-			}
-
-			if (const UCardEffectFragment_Execution_Compound* CompoundExecution =
-				Cast<UCardEffectFragment_Execution_Compound>(Execution))
-			{
-				for (const UCardEffectFragment_Execution* ChildExecution : CompoundExecution->Executions)
-				{
-					GatherTags(ChildExecution);
-				}
-			}
-		};
-
-	GatherTags(CardData->PrimaryExecution);
-	GatherTags(CardData->SecondaryExecution);
-
-	Result = UniqueTags.Array();
+	CardData->GetAllUsedScalingGroups(Result);
 
 	Result.Sort([](const FGameplayTag& A, const FGameplayTag& B)
 		{
@@ -529,4 +498,51 @@ void UCardShooterUtilityLibrary::FilterObjectsByClass(const TArray<UObject*>& Ob
 			OutObjects.Add(Object);
 		}
 	}
+}
+
+bool UCardShooterUtilityLibrary::GetSpecFromActiveEffect(const FActiveGameplayEffectHandle ActiveEffect, class UAbilitySystemComponent* OwningASC, FGameplayEffectSpec& OutSpec)
+{
+	if (!OwningASC || !ActiveEffect.IsValid())
+	{
+		return false;
+	}
+
+	const FActiveGameplayEffect* AGE =
+		OwningASC->GetActiveGameplayEffect(ActiveEffect);
+
+	if (!AGE)
+	{
+		return false;
+	}
+
+	OutSpec = AGE->Spec;
+	return true;
+}
+
+void UCardShooterUtilityLibrary::DuplicateSpec(class UAbilitySystemComponent* ASC, const FGameplayEffectSpec& InSpec, FGameplayEffectSpecHandle& OutSpec)
+{
+	if (!ASC || !InSpec.Def)
+	{
+		OutSpec = FGameplayEffectSpecHandle();
+		return;
+	}
+
+	OutSpec = ASC->MakeOutgoingSpec(
+		InSpec.Def->GetClass(),
+		InSpec.GetLevel(),
+		InSpec.GetContext()
+	);
+
+	if (!OutSpec.IsValid())
+	{
+		return;
+	}
+
+	FGameplayEffectSpec* NewSpec = OutSpec.Data.Get();
+
+	NewSpec->CopySetByCallerMagnitudes(InSpec);
+	NewSpec->SetDuration(InSpec.GetDuration(), true);
+
+	// Optional depending on your needs:
+	NewSpec->StackCount = InSpec.StackCount;
 }

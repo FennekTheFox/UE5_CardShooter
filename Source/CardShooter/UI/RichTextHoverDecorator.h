@@ -16,6 +16,28 @@ class ISlateStyle;
 class UInputAction;
 class URichTextBlock;
 
+UINTERFACE(BlueprintType)
+class UHoverableContext : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class IHoverableContext
+{
+	GENERATED_BODY()
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
+	void GetHoverText(FText& OutText) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
+	void GetHoverContentTitle(FText& OutText) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My Interface")
+	void GetHoverContent(FText& OutText) const;
+};
+
 /**
  * Allows you to setup an image decorator that can be configured
  * to map certain input actions to certain images, depending on the platform

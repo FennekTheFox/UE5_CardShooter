@@ -5,6 +5,8 @@
 #include "Gameplay/GameplayAbility_CardExecution.h"
 #include "Cards/Augments/CardAugment.h"
 #include "Gameplay/GameplayEffect_CardExecution.h"
+#include "Util/CardShooterUtility.h"
+#include "UI/RichTextHoverDecorator.h"
 
 
 #define LOCTEXT_NAMESPACE "CardEffects"
@@ -103,7 +105,7 @@ FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementat
 	FFormatNamedArguments Args;
 	GetFormattingArgs(Args, CardIdentity);
 
-	return	FText::Format(GetRawLocalizableDescription(CardIdentity), Args);
+	return	FText::Format(UCardShooterUtilityLibrary::FormatTextForDisplay(GetRawLocalizableDescription(CardIdentity)), Args);
 }
 
 UCardEffectFragment_GameplayAbility::UCardEffectFragment_GameplayAbility()
@@ -111,7 +113,7 @@ UCardEffectFragment_GameplayAbility::UCardEffectFragment_GameplayAbility()
 	ExecInstanceClass = UCardExecutionInstance_GameplayAbility::StaticClass();
 }
 
-FText UCardEffectFragment_GameplayAbility::GetRawLocalizableDescription(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_GameplayAbility::GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const
 {
 	if (!ensure(AbilityToExecute.Ability))
 	{
@@ -134,11 +136,25 @@ void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArgument
 {
 	Super::GetFormattingArgs(Args, CardIdentity);
 
-	for (auto&& KVPair : ReferencedEffects)
+	for (auto&& KVPair : HoverContextObjects)
 	{
 		if (!ensure(KVPair.Value))
 		{
 			continue;
+		}
+
+		FText DisplayText = FText::GetEmpty();
+
+		if (UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject())) 
+		{
+			DisplayText = AsGE_CE->GetSimpleLocalizableName();
+		}else
+		if(KVPair.Value->GetDefaultObject()->Implements<UHoverableContext>())
+		{
+			IHoverableContext::Execute_GetHoverText(
+				KVPair.Value->GetDefaultObject(),
+				DisplayText
+			);
 		}
 
 		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
@@ -146,7 +162,7 @@ void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArgument
 			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
 			FText::FromString(this->GetPathName()),
 			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
-			Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject())->GetSimpleLocalizableName()
+			DisplayText
 		));
 	}
 }

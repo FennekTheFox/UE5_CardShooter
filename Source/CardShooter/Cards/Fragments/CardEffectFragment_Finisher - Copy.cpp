@@ -2,7 +2,7 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Stable::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Stable::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("StableAttrName", "Stable");
 }

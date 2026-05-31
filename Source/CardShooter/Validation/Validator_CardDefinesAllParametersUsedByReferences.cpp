@@ -30,6 +30,10 @@ EDataValidationResult UValidator_CardDefinesAllParametersUsedByReferences::Valid
 
 	TArray<FGameplayTag> UsedParametersArray;
 	CardData->GetAllUsedParameters(UsedParametersArray);
+	UsedParametersArray.RemoveAll([this](const FGameplayTag& Tag)
+		{
+			return Exceptions.Contains(Tag);
+		});
 
 	TSet<FGameplayTag> DeclaredParameters;
 	DeclaredParameters.Append(UsedParametersArray);
@@ -105,6 +109,11 @@ EDataValidationResult UValidator_CardDefinesAllParametersUsedByReferences::Valid
 	return bIsValid
 		? EDataValidationResult::Valid
 		: EDataValidationResult::Invalid;
+}
+
+
+UValidator_CardDefinesAllParametersUsedByReferences::UValidator_CardDefinesAllParametersUsedByReferences()
+{
 }
 
 void UValidator_CardDefinesAllParametersUsedByReferences::CollectRecursiveDependencies(

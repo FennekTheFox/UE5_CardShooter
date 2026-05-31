@@ -35,6 +35,9 @@ protected:
 	virtual void ProcessExecutionInstance() {};
 };
 
+
+
+
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UCardEffectFragment_Execution : public UCardEffectFragment_Root
 {
@@ -51,9 +54,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	UCardExecutionInstance* ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData);
 
-	FText GetLocalizableName_Implementation() override
+	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 	{
-		return GetLocalizableName_Implementation();
+		return GetLocalizableName_Implementation(CardIdentity);
 	}
 
 protected:

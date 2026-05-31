@@ -1,11 +1,55 @@
 #include "CardEffectFragment_Utility.h"
 #include "Cards/CardData.h"
+#include "Util/CardShooterUtility.h"
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Utility::GetLocalizableName_Implementation()
+UE_DEFINE_GAMEPLAY_TAG(TAG_UtilityPrimaryCooldown, "Gameplay.Effect.Parameters.PrimaryUtilityCooldown");
+UE_DEFINE_GAMEPLAY_TAG(TAG_UtilitySecondaryCooldown, "Gameplay.Effect.Parameters.SecondaryUtilityCooldown");
+
+UCardEffectFragment_Utility::UCardEffectFragment_Utility()
+{
+	FSetByCallerMetaData DefaultCooldowns;
+	DefaultCooldowns.Magnitude = 10.f;
+	DefaultCooldowns.ScalingGroup = FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Effect.ScalingGroups.Cooldown"));
+	DefaultCooldowns.DisplayType = ESetByCallerMagnitudeDisplayType::Flat;
+
+	SetByCallerMagnitudes.Add(TAG_UtilityPrimaryCooldown, DefaultCooldowns);
+	SetByCallerMagnitudes.Add(TAG_UtilitySecondaryCooldown, DefaultCooldowns);
+}
+
+FText UCardEffectFragment_Utility::GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const
 {
 	UCardData* OwningCard = Cast<UCardData>(GetOuter());
+
+	float PrimaryUtilityCooldown = -1.f;
+	GetParameterValue(TAG_UtilityPrimaryCooldown, PrimaryUtilityCooldown, CardIdentity);
+
+	float SecondaryUtilityCooldown = -1.f;
+	GetParameterValue(TAG_UtilitySecondaryCooldown, SecondaryUtilityCooldown, CardIdentity);
+
+	if (OwningCard)
+	{
+		if (!OwningCard->SecondaryExecution || PrimaryUtilityCooldown == SecondaryUtilityCooldown)
+		{
+			return UCardShooterUtilityLibrary::FormatTextForDisplay(LOCTEXT("UtilityAttrDesc", "This card can be used in a decks utility slot. If used in a utility slot, this card has a cooldown of {PrimaryUtilityCooldownMagnitude}s."));
+		}
+		return UCardShooterUtilityLibrary::FormatTextForDisplay(LOCTEXT("UtilityAttrDesc", "This card can be used in a decks utility slot. If used in a utility slot, this card has a cooldown of {PrimaryUtilityCooldownMagnitude}s for its primary execution, or {SecondaryUtilityCooldownMagnitude}s for its secondary execution."));
+	}
+
+
+	return FText::GetEmpty();
+}
+
+FText UCardEffectFragment_Utility::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
+{
+	UCardData* OwningCard = Cast<UCardData>(GetOuter());
+
+	float PrimaryUtilityCooldown = -1.f;
+	GetParameterValue(TAG_UtilityPrimaryCooldown, PrimaryUtilityCooldown, CardIdentity);
+
+	float SecondaryUtilityCooldown = -1.f;
+	GetParameterValue(TAG_UtilitySecondaryCooldown, SecondaryUtilityCooldown, CardIdentity);
 
 	if (OwningCard || PrimaryUtilityCooldown == SecondaryUtilityCooldown)
 	{
@@ -23,20 +67,10 @@ FText UCardEffectFragment_Utility::GetLocalizableName_Implementation()
 
 FText UCardEffectFragment_Utility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
 {
-	UCardData* OwningCard = Cast<UCardData>(GetOuter());
 
-	if (OwningCard)
-	{
-		if (!OwningCard->SecondaryExecution || PrimaryUtilityCooldown == SecondaryUtilityCooldown)
-		{
-			return FText::Format(LOCTEXT("UtilityAttrDesc", "This card can be used in a decks utility slot. If used in a utility slot, this card has a cooldown of {0}s."), PrimaryUtilityCooldown);
-		}
+	FFormatNamedArguments Args;
+	GetFormattingArgs(Args, CardIdentity);
 
-		return FText::Format(LOCTEXT("UtilityAttrDesc", "This card can be used in a decks utility slot. If used in a utility slot, this card has a cooldown of {0}s for its primary execution, or {1}s for its secondary execution."), PrimaryUtilityCooldown, SecondaryUtilityCooldown);
-	}
-
-
-	return FText::GetEmpty();
+	return FText::Format(GetRawLocalizableDescription(CardIdentity), Args);
 }
-
 #undef LOCTEXT_NAMESPACE

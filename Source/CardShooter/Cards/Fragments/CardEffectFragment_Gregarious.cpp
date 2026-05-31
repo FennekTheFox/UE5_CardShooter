@@ -27,7 +27,7 @@ FText UCardEffectFragment_Gregarious::GetLocalizableDescription_Implementation(c
 	return FText::Format(LOCTEXT("GregariousAttrDesc", "This card can only be part of decks with at least {0} cards."), FText::AsNumber(MinimumDeckSize));
 }
 
-FText UCardEffectFragment_Gregarious::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Gregarious::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("GregariousAttrName", "Gregarious({0})"), FText::AsNumber(MinimumDeckSize));
 }

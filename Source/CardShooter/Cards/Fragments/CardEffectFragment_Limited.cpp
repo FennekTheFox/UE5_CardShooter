@@ -65,7 +65,7 @@ FText UCardEffectFragment_Limited::GetLocalizableDescription_Implementation(cons
 	return FText::GetEmpty();
 }
 
-FText UCardEffectFragment_Limited::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Limited::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("LimitedAttrName", "Limited({0})"), FText::AsNumber(Limit));
 }

@@ -44,6 +44,6 @@ public:
 
 	 //~UCardEffectFragment
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
-	FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) override;
+	FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 };

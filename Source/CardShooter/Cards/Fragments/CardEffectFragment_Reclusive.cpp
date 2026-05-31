@@ -11,7 +11,7 @@ FText UDeckLimitationViolation_Reclusive::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
-FText UCardEffectFragment_Reclusive::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Reclusive::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("ReclusiveAttrName", "Reclusive({0})"), FText::AsNumber(MaximumDeckSize));
 }

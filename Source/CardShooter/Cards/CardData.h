@@ -64,8 +64,8 @@ public:
 	FText GetExecutionsDescription(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintCallable)
-	void GetAllUsedParameters(TArray<FGameplayTag>& OutParameters);
+	void GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const;
 
 	UFUNCTION(BlueprintCallable)
-	void GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters);
+	void GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters) const;
 };

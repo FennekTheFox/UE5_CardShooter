@@ -12,7 +12,12 @@ class UValidator_CardDescUsesAllParameters : public UEditorValidatorBase
 {
 	GENERATED_BODY()
 
+	UValidator_CardDescUsesAllParameters();
+
 public:
+	UPROPERTY()
+	TArray<FGameplayTag> Exceptions;
+
 	virtual bool CanValidateAsset_Implementation(
 		const FAssetData& InAssetData,
 		UObject* InAsset,

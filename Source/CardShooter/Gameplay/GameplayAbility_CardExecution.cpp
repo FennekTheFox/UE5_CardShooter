@@ -3,6 +3,8 @@
 #include "Gameplay/GameplayEffect_CardExecution.h"
 #include "AbilityTriggers.h"
 #include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
+#include "Abilities/GameplayAbility.h"
+#include "AbilitySystemComponent.h"
 
 #define TC_ONGRANTED UAbilityActivationTrigger_OnAbilityGranted
 
@@ -16,7 +18,7 @@ UGameplayAbility_CardExecution::UGameplayAbility_CardExecution()
 	ActivationTriggers.Add(Cast<TC_ONGRANTED>(TC_ONGRANTED::StaticClass()->GetDefaultObject(false)));
 }
 
-float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag)
+float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) const
 {
 	//See if this was directly executed. then we dont need to look through the context
 	int32 Index = AdditionalData.SetByCallerMetaDataTags.Find(Tag);
@@ -59,23 +61,37 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag)
 		{
 			WithParams = Cast<UCardEffectFragment_Execution_WithParameters>(AsInstance->Exec);
 		}
-	}		
-	
+	}
+
 	if (WithParams)
 	{
 		SetByCallerData = &(WithParams->SetByCallerMagnitudes);
 	}
 
-	if (ensure(SetByCallerData))
+	if (SetByCallerData)
 	{
 		FSetByCallerMetaData* Data = WithParams->SetByCallerMagnitudes.Find(Tag);
 
 		if (Data)
-		{			
+		{
 			return Data->Magnitude;
 		}
-	}	
+	}
 
+	if (GetCurrentAbilitySpec()->GameplayEffectHandle.IsValid())
+	{
+		const FGameplayEffectSpec Spec = GetAbilitySystemComponentFromActorInfo()->GetActiveGameplayEffect(GetCurrentAbilitySpec()->GameplayEffectHandle)->Spec;
+
+		float Value = Spec.GetSetByCallerMagnitude(
+			Tag,
+			false,  
+			-1.f   
+		);
+
+		return Value;
+	}
+
+	ensure(false);
 	return 0.f;
 }
 

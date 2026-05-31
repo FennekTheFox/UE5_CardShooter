@@ -1,26 +1,26 @@
 #pragma once
 
 #include "CardAttributeFragment_Base.h"
+#include "NativeGameplayTags.h"
 
 #include "CardEffectFragment_Utility.generated.h"
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_UtilityPrimaryCooldown);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_UtilitySecondaryCooldown);
 
 UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Utility"))
 class UCardEffectFragment_Utility : public UCardEffectFragment_ExecutionAttribute
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Utility();
+
 public:
 	 //~UCardEffectFragment
-	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
+	FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 
-public:
-	//The cooldown length applied when this card is used as a utility card and its primary function is used
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float PrimaryUtilityCooldown = 5.f;
 
-	//The cooldown length applied when this card is used as a utility card and its primary function is used
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float SecondaryUtilityCooldown = 5.f;
 };

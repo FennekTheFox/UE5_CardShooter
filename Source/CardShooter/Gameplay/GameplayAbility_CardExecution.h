@@ -14,7 +14,7 @@ class UGameplayAbility_CardExecution : public UProjectGameplayAbility
 
 public:
 	UFUNCTION(BlueprintPure)
-	float GetSetByCallerValue(FGameplayTag Tag);
+	float GetSetByCallerValue(FGameplayTag Tag) const;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText AbilityName;

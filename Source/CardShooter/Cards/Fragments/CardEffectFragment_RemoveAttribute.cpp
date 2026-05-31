@@ -36,7 +36,7 @@ FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetLocalizable
 	return FText::Format(LOCTEXT("RemoveAttributesToNextDesc", "Removes <hover id=\"{0}\" cardidentityhandle=\"{1}\" style=\"HoverContent\">{2}</> from the next {3} cards."),
 		FText::FromString(AttributeClass->GetDefaultObject()->GetPathName()),
 		FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
-		Cast<UCardEffectFragment_Attribute>(AttributeClass->GetDefaultObject())->GetLocalizableName(),
+		Cast<UCardEffectFragment_Attribute>(AttributeClass->GetDefaultObject())->GetLocalizableName(CardIdentity),
 		Count);
 }
 

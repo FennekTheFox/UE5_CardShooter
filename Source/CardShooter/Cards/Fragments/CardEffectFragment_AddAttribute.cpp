@@ -32,7 +32,7 @@ FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescr
 
 	return FText::Format(LOCTEXT("AddAttributesToNextDesc", "Adds <hover id=\"{0}\" style=\"HoverContent\">{1}< / > to the next{2} cards."),
 		FText::FromString(Attribute->GetPathName()),
-		Attribute->GetLocalizableName(),
+		Attribute->GetLocalizableName(CardIdentity),
 		Count);
 }
 

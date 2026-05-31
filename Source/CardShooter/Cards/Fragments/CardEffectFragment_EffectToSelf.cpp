@@ -77,7 +77,7 @@ UCardEffectFragment_ApplyEffectToOwner::UCardEffectFragment_ApplyEffectToOwner()
 	ExecInstanceClass = UCardExecutionInstance_ApplyEffectToOwner::StaticClass();
 }
 
-FText UCardEffectFragment_ApplyEffectToOwner::GetRawLocalizableDescription(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_ApplyEffectToOwner::GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const
 {
 	if (!ensure(GameplayEffect))
 	{

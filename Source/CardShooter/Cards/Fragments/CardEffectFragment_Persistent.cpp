@@ -7,7 +7,7 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Persistent::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Persistent::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("PersistentAttrName", "Persistent");
 }

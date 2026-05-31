@@ -6,6 +6,7 @@
 #include "Cards/Fragments/CardEffectFragment_EffectToSelf.h"
 #include "Cards/Fragments/CardEffectFragment_GameplayAbility.h"
 #include "Gameplay/GameplayEffect_CardExecution.h"
+#include "UI/RichTextHoverDecorator.h"
 
 //UValidator_CardDescUsesAllParameters::UValidator_CardDescUsesAllParameters()
 //{
@@ -33,6 +34,10 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 
 	TArray<FGameplayTag> UsedParameters;
 	CardData->GetAllUsedParameters(UsedParameters);
+	UsedParameters.RemoveAll([this](const FGameplayTag& Tag)
+		{
+			return Exceptions.Contains(Tag);
+		});
 
 	bool bValid = true;
 
@@ -41,6 +46,55 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 
 	ValidateExecutionRecursive(CardData->PrimaryExecution, Identity, UsedParameters, InAsset);
 	ValidateExecutionRecursive(CardData->SecondaryExecution, Identity, UsedParameters, InAsset);
+
+	for (const UCardEffectFragment_Attribute* Attr : CardData->CardAttributes)
+	{
+		for (int32 i = 0; i < UsedParameters.Num(); i++)
+		{
+			const FGameplayTag ParameterTag = UsedParameters[i];
+
+			if (!ParameterTag.IsValid())
+			{
+				continue;
+			}
+
+			FString Unused;
+			FString ParameterKey;
+
+			if (!ParameterTag.ToString().Split(
+				TEXT("."),
+				&Unused,
+				&ParameterKey,
+				ESearchCase::IgnoreCase,
+				ESearchDir::FromEnd))
+			{
+				AssetFails(
+					InAsset,
+					FText::FromString(FString::Printf(
+						TEXT("%s: Invalid parameter tag '%s'."),
+						*Attr->GetName(),
+						*ParameterTag.ToString()
+					))
+				);
+
+				continue;
+			}
+
+			const FString RequiredToken =
+				FString::Printf(TEXT("{%sMagnitude}"), *ParameterKey);
+
+			const FString AttrDesc = Attr->GetRawLocalizableDescription(Identity).ToString();
+
+			if (AttrDesc.Contains(RequiredToken, ESearchCase::CaseSensitive))
+			{
+				UsedParameters.Remove(ParameterTag);
+				i--;
+
+				continue;
+			}
+		}
+
+	}
 
 	for(const FGameplayTag& MissingParameter : UsedParameters)
 	{
@@ -82,6 +136,12 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 	return UsedParameters.IsEmpty()
 		? EDataValidationResult::Valid
 		: EDataValidationResult::Invalid;
+}
+
+
+UValidator_CardDescUsesAllParameters::UValidator_CardDescUsesAllParameters()
+{
+	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.SecondaryUtilityCooldown"));
 }
 
 void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
@@ -178,11 +238,42 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 
 			if (AsCEF_GA) 
 			{
-				for (auto&& KVPair : AsCEF_GA->ReferencedEffects)
+				for (auto&& KVPair : AsCEF_GA->HoverContextObjects)
 				{
 					UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
 
 					if (AsGE_CE&& AsGE_CE->EffectDesc.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
+					{
+						UsedParameters.Remove(ParameterTag);
+						i--;
+						continue;
+					}
+				}
+
+				for (auto&& KVPair : AsCEF_GA->HoverContextObjects)
+				{
+					if (!ensure(KVPair.Value))
+					{
+						continue;
+					}
+
+					if (!KVPair.Value->ImplementsInterface(UHoverableContext::StaticClass()))
+					{
+						continue;
+					}
+
+					UObject* CDO = KVPair.Value->GetDefaultObject();
+
+					if (!ensure(CDO))
+					{
+						continue;
+					}
+
+					FText RawHoverContent;
+
+					IHoverableContext::Execute_GetHoverContent(CDO, RawHoverContent);
+
+					if (RawHoverContent.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
 					{
 						UsedParameters.Remove(ParameterTag);
 						i--;

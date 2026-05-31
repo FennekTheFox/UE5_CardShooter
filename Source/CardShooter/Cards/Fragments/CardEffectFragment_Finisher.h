@@ -11,7 +11,7 @@ class UCardEffectFragment_Finisher : public UCardEffectFragment_ShuffleAttribute
 
 public:
 	 //~UCardEffectFragment
-	FText GetLocalizableName_Implementation() override;
+	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
 	 //~UCardEffectFragment
 };

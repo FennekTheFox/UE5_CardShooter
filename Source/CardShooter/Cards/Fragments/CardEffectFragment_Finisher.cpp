@@ -2,7 +2,7 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Finisher::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Finisher::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("FinisherAttrName", "Finisher");
 }

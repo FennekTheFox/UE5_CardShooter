@@ -28,6 +28,10 @@ EDataValidationResult UValidator_CardAllDefinedParametersUsedByReferences::Valid
 
 	TArray<FGameplayTag> UsedParametersArray;
 	CardData->GetAllUsedParameters(UsedParametersArray);
+	UsedParametersArray.RemoveAll([this](const FGameplayTag& Tag)
+		{
+			return Exceptions.Contains(Tag);
+		});
 
 	TSet<FGameplayTag> DeclaredParameters;
 	DeclaredParameters.Append(UsedParametersArray);
@@ -85,6 +89,14 @@ EDataValidationResult UValidator_CardAllDefinedParametersUsedByReferences::Valid
 	return bIsValid
 		? EDataValidationResult::Valid
 		: EDataValidationResult::Invalid;
+}
+
+
+UValidator_CardAllDefinedParametersUsedByReferences::UValidator_CardAllDefinedParametersUsedByReferences()
+{
+	// These are exceptions because the only reference to them will be the utility fragment, which isn't a referenced asset
+	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.PrimaryUtilityCooldown"));
+	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.SecondaryUtilityCooldown"));
 }
 
 void UValidator_CardAllDefinedParametersUsedByReferences::CollectRecursiveDependencies(

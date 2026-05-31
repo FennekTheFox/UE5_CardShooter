@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cards/CardIdentity.h"
+#include "CardExecution_AdditionalData.h"
 #include "CardAttributeFragment_Base.generated.h"
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
@@ -13,11 +14,11 @@ public:
 	bool GetShouldShowInDescription();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
-	FText GetLocalizableName();	
+	FText GetLocalizableName(const FCardIdentity& CardIdentity);	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	FText GetLocalizableDescription(const FCardIdentity& CardIdentity);
-	virtual FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity);
+	virtual FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const;
 
 protected:
 	bool bShowInDescription = true;
@@ -41,6 +42,13 @@ class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SetByCallerParameters")
+	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
+
+	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
+
+	UFUNCTION(BlueprintPure)
+	bool GetParameterValue(FGameplayTag ParamTag, float& OutValue, const FCardIdentity& CardIdentity) const;
 
 };
 

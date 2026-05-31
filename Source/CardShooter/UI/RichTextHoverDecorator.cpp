@@ -19,6 +19,7 @@
 
 #include "InputCoreTypes.h"
 #include "Cards/Fragments/CardEffectFragment_GameplayAbility.h"
+#include "Util/CardShooterUtility.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RichTextHoverDecorator)
 
@@ -108,6 +109,19 @@ private:
 			}
 
 			return AsGA_CE->GetDescription(CardIdentity.Get());
+		}
+
+		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
+		{
+			if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP =
+				Cast<UCardEffectFragment_Execution_WithParameters>(relatedExecFrag))
+			{
+				IHoverableContext::Execute_GetHoverContent(HoverObject, Content);
+				FFormatNamedArguments Args;
+				AsCEF_E_WP->GetFormattingArgs(Args, CardIdentity.Get());
+				Content = UCardShooterUtilityLibrary::FormatTextForDisplay(Content);
+				Content = FText::Format(Content, Args);
+			}
 		}
 
 		return Content;

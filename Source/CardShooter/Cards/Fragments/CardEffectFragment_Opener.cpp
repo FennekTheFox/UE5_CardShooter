@@ -2,7 +2,7 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
-FText UCardEffectFragment_Opener::GetLocalizableName_Implementation()
+FText UCardEffectFragment_Opener::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return LOCTEXT("OpenerAttrName", "Opener");
 }

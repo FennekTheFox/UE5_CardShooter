@@ -26,14 +26,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayAbilitySpecDef AbilityToExecute;
 
+	//Replaces {Key} in the raw description with a hover tag block that references the object
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<FString, TSubclassOf<class UGameplayEffect_CardExecution>> ReferencedEffects;
+	TMap<FString, TSubclassOf<class UObject>> HoverContextObjects;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag TargetDataID;
 	//~UCardEffectFragment
 	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
-	FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) override;
+	FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 
 	void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) override;
