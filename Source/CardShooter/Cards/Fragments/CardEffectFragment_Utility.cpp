@@ -9,13 +9,52 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_UtilitySecondaryCooldown, "Gameplay.Effect.Parameters
 
 UCardEffectFragment_Utility::UCardEffectFragment_Utility()
 {
+	static ConstructorHelpers::FClassFinder<UCardParameter> BPCardParamClassFinder(
+		TEXT("/Game/Blueprint/Misc/CardParameters/BP_CardParameterBase"));
+
+
+	if (ensure(BPCardParamClassFinder.Succeeded()))
+	{
+		CooldownParamClass = BPCardParamClassFinder.Class;
+	}
+}
+
+void UCardEffectFragment_Utility::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		return;
+	}
+
+	if (!Parameters.IsEmpty())
+	{
+		return;
+	}
+
+	if (!CooldownParamClass)
+	{
+		return;
+	}
+
 	FSetByCallerMetaData DefaultCooldowns;
 	DefaultCooldowns.Magnitude = 10.f;
 	DefaultCooldowns.ScalingGroup = FGameplayTag::RequestGameplayTag(TEXT("Gameplay.Effect.ScalingGroups.Cooldown"));
 	DefaultCooldowns.DisplayType = ESetByCallerMagnitudeDisplayType::Flat;
+	DefaultCooldowns.MagnitudeRange = FFloatRange(0.1f, BIG_NUMBER);
 
-	SetByCallerMagnitudes.Add(TAG_UtilityPrimaryCooldown, DefaultCooldowns);
-	SetByCallerMagnitudes.Add(TAG_UtilitySecondaryCooldown, DefaultCooldowns);
+	UCardParameter* PrimaryCooldownParam = NewObject<UCardParameter>(this, CooldownParamClass, TEXT("PrimaryUtilityCooldownParam"));
+	PrimaryCooldownParam->ParameterTag = TAG_UtilityPrimaryCooldown;
+	PrimaryCooldownParam->MetaData = DefaultCooldowns;
+
+	UCardParameter* SecondaryCooldownParam = NewObject<UCardParameter>(this, CooldownParamClass, TEXT("SecondaryUtilityCooldownParam"));
+	SecondaryCooldownParam->ParameterTag = TAG_UtilitySecondaryCooldown;
+	SecondaryCooldownParam->MetaData = DefaultCooldowns;
+
+
+	Parameters.Add(PrimaryCooldownParam);
+	Parameters.Add(SecondaryCooldownParam);
 }
 
 FText UCardEffectFragment_Utility::GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const

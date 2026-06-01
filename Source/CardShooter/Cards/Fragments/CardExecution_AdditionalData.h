@@ -31,6 +31,9 @@ public:
 	float Magnitude = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FFloatRange MagnitudeRange = FFloatRange(-BIG_NUMBER, BIG_NUMBER);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag ScalingGroup;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

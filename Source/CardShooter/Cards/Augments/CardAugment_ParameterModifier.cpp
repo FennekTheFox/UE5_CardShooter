@@ -85,8 +85,8 @@ void UCardAugment_ParameterModifier::ApplyAugment(FCardExecution_AdditionalData&
 
 			switch ((EModifyOperationType)KVPair.Value.VariantOption)
 			{
-			case EModifyOperationType::Add: MagnitudePtr += AugmentMagnitude; break;
-			case EModifyOperationType::Multiply: MagnitudePtr *= AugmentMagnitude; break;
+			case EModifyOperationType::Add: MagnitudePtr = FMath::Clamp(MagnitudePtr += AugmentMagnitude, DataRef.MagnitudeRange.GetLowerBound().GetValue(), DataRef.MagnitudeRange.GetUpperBound().GetValue()); break;
+			case EModifyOperationType::Multiply:  MagnitudePtr = FMath::Clamp(MagnitudePtr *= AugmentMagnitude, DataRef.MagnitudeRange.GetLowerBound().GetValue(), DataRef.MagnitudeRange.GetUpperBound().GetValue()); break;
 			}
 		}
 	}

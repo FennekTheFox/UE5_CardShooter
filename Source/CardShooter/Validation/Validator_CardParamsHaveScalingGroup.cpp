@@ -81,10 +81,14 @@ void UValidator_CardParamsHaveScalingGroup::ValidateExecutionRecursive(
     if (const UCardEffectFragment_Execution_WithParameters* WithParams =
         Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
     {
-        for (const auto& KVPair : WithParams->SetByCallerMagnitudes)
+        for (const UCardParameter* Param : WithParams->Parameters)
         {
-            const FGameplayTag& Tag = KVPair.Key;
-            const FSetByCallerMetaData& MetaData = KVPair.Value;
+            if (!Param)
+            {
+                continue;
+            }
+            const FGameplayTag& Tag = Param->ParameterTag;
+            const FSetByCallerMetaData& MetaData = Param->MetaData;
             const FString SGAsString = MetaData.ScalingGroup.ToString();
 
             if (!MetaData.ScalingGroup.IsValid() || !SGAsString.StartsWith(TEXT("Gameplay.Effect.ScalingGroups.")))

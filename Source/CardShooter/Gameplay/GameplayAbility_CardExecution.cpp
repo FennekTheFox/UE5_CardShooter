@@ -20,6 +20,8 @@ UGameplayAbility_CardExecution::UGameplayAbility_CardExecution()
 
 float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) const
 {
+	//TODO: is this really working as intended???
+
 	//See if this was directly executed. then we dont need to look through the context
 	int32 Index = AdditionalData.SetByCallerMetaDataTags.Find(Tag);
 
@@ -32,7 +34,8 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) cons
 	//an ability execution if applied via an effect that was applied via an ability (yes i know its confusing). Either way we need
 	//to retrieve the set by caller data from the _WithParameters fragment
 
-	TMap<FGameplayTag, FSetByCallerMetaData>* SetByCallerData = nullptr;
+	//
+	TArray<UCardParameter*>* Parameters = nullptr;
 	UCardEffectFragment_Execution_WithParameters* WithParams = nullptr;
 
 	FGameplayEffectContextHandle Context = GetGrantedByEffectContext();
@@ -65,12 +68,18 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) cons
 
 	if (WithParams)
 	{
-		SetByCallerData = &(WithParams->SetByCallerMagnitudes);
+		Parameters = &(WithParams->Parameters);
 	}
 
-	if (SetByCallerData)
+	if (Parameters)
 	{
-		FSetByCallerMetaData* Data = WithParams->SetByCallerMagnitudes.Find(Tag);
+		FSetByCallerMetaData* Data = &(*Parameters->FindByPredicate([Tag](const UCardParameter* Param) {
+			if (!Param)
+			{
+				return false;
+			}
+			return Param->ParameterTag == Tag;
+			}))->MetaData;
 
 		if (Data)
 		{
@@ -84,8 +93,8 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) cons
 
 		float Value = Spec.GetSetByCallerMagnitude(
 			Tag,
-			false,  
-			-1.f   
+			false,
+			-1.f
 		);
 
 		return Value;

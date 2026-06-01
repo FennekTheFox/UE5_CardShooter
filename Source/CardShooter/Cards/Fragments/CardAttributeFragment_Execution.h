@@ -75,8 +75,8 @@ class UCardEffectFragment_Execution_WithParameters : public UCardEffectFragment_
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SetByCallerParameters")
-	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
+	TArray<UCardParameter*> Parameters;
 
 	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
 

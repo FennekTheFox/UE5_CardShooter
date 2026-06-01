@@ -369,10 +369,13 @@ TArray<FGameplayTag> UCardShooterUtilityLibrary::GetCardSetByCallerTags(const FC
 			if (const UCardEffectFragment_Execution_WithParameters* ParamExecution =
 				Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
 			{
-				for (const TPair<FGameplayTag, FSetByCallerMetaData>& Pair
-					: ParamExecution->SetByCallerMagnitudes)
+				for (const UCardParameter* Param : ParamExecution->Parameters)
 				{
-					UniqueTags.Add(Pair.Key);
+					if (!Param)
+					{
+						continue;
+					}
+					UniqueTags.Add(Param->ParameterTag);
 				}
 			}
 
@@ -444,19 +447,19 @@ FText UCardShooterUtilityLibrary::FormatTextForDisplay(const FText& Text)
 		Matches.Add(Matcher.GetCaptureGroup(0));
 	}
 
-	for (const FString& Match : Matches)
-	{
-		const FString Replacement = FString::Printf(
-			TEXT("<SetByCallerValue>%s</>"),
-			*Match
-		);
+	//for (const FString& Match : Matches)
+	//{
+	//	const FString Replacement = FString::Printf(
+	//		TEXT("<SetByCallerValue>%s</>"),
+	//		*Match
+	//	);
 
-		Result.ReplaceInline(
-			*Match,
-			*Replacement,
-			ESearchCase::CaseSensitive
-		);
-	}
+	//	Result.ReplaceInline(
+	//		*Match,
+	//		*Replacement,
+	//		ESearchCase::CaseSensitive
+	//	);
+	//}
 
 
 	return FText::FromString(Result);

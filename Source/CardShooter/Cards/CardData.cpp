@@ -142,9 +142,14 @@ void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<F
 {
 	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
 	{
-		for (auto&& KVPair : AsCEF_E_WP->SetByCallerMagnitudes)
+		for (const UCardParameter* Param : AsCEF_E_WP->Parameters)
 		{
-			OutParameters.AddUnique(KVPair.Key);
+			if (!Param)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param->ParameterTag);
 		}
 	}
 	else if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
@@ -161,9 +166,14 @@ void GatherScalingGroupsFromExecution(UCardEffectFragment_Execution* Exec, TArra
 {
 	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
 	{
-		for (auto&& KVPair : AsCEF_E_WP->SetByCallerMagnitudes)
+		for (const UCardParameter* Param : AsCEF_E_WP->Parameters)
 		{
-			OutParameters.AddUnique(KVPair.Value.ScalingGroup);
+			if (!Param)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param->MetaData.ScalingGroup);
 		}
 	}
 	else if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
@@ -188,9 +198,14 @@ void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const
 
 	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
 	{
-		for (auto&& KVPair : Attribute->SetByCallerMagnitudes)
+		for (UCardParameter* Param : Attribute->Parameters)
 		{
-			OutParameters.AddUnique(KVPair.Key);
+			if (!Param)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param->ParameterTag);
 		}
 	}
 }
@@ -208,9 +223,14 @@ void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) 
 
 	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
 	{
-		for (auto&& KVPair : Attribute->SetByCallerMagnitudes)
+		for (UCardParameter* Param : Attribute->Parameters)
 		{
-			OutScalingGroups.AddUnique(KVPair.Value.ScalingGroup);
+			if (!Param)
+			{
+				continue;
+			}
+
+			OutScalingGroups.AddUnique(Param->MetaData.ScalingGroup);
 		}
 	}
 }

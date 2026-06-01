@@ -81,10 +81,15 @@ UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCar
 	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance>(this, ExecInstanceClass);
 
 	FCardExecution_AdditionalData PostModificationData = AdditionalData;
-	for (auto&& KVPair : SetByCallerMagnitudes)
+	for (const UCardParameter* Param : Parameters)
 	{
-		PostModificationData.SetByCallerMetaDataTags.Add(KVPair.Key);
-		PostModificationData.SetByCallerMetaDataValues.Add(KVPair.Value);
+		if (!Param)
+		{
+			continue;
+		}
+
+		PostModificationData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
+		PostModificationData.SetByCallerMetaDataValues.Add(Param->MetaData);
 	}
 
 	for (FCardAugmentData AugmentData : AdditionalData.AugmentData)
@@ -112,10 +117,15 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;
 
-	for (auto&& KVPair : SetByCallerMagnitudes)
+	for (const UCardParameter* Param : Parameters)
 	{
-		tempAddData.SetByCallerMetaDataTags.Add(KVPair.Key);
-		tempAddData.SetByCallerMetaDataValues.Add(KVPair.Value);
+		if (!Param)
+		{
+			continue;
+		}
+
+		tempAddData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
+		tempAddData.SetByCallerMetaDataValues.Add(Param->MetaData);
 	}
 
 	//apply the card augments
@@ -140,7 +150,8 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 	{
 		const FSetByCallerMetaData& MetaData = tempAddData.SetByCallerMetaDataValues[i];
 
-		FString TagString = tempAddData.SetByCallerMetaDataTags[i].ToString();
+		FGameplayTag Tag = tempAddData.SetByCallerMetaDataTags[i];
+		FString TagString = Tag.ToString();
 
 		FString Left;
 		FString Right;
@@ -157,9 +168,28 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 			LastPart = Right;
 		}
 
+		UCardParameter** Param = Parameters.FindByPredicate([Tag](const UCardParameter* A)
+			{
+				if (!A)
+				{
+					return false;
+				}
+				return A->ParameterTag == Tag;
+			});
+
+		if (!Param)
+		{
+			continue;
+		}
+
 		Args.Add(
 			LastPart + "Magnitude",
-			MetaData.GetDisplayText()
+			FText::Format(LOCTEXT("CardParameterHoverFormat",
+				"<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"HoverContent_Param\">{3}</>"),
+				FText::FromString((*Param)->GetPathName()),
+				FText::FromString(this->GetPathName()),
+				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
+				MetaData.GetDisplayText())
 		);
 
 		Args.Add(

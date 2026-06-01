@@ -2,6 +2,7 @@
 
 #include "Cards/CardIdentity.h"
 #include "CardExecution_AdditionalData.h"
+#include "UI/RichTextHoverDecorator.h"
 #include "CardAttributeFragment_Base.generated.h"
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
@@ -35,6 +36,29 @@ class UCardEffectFragment_Root : public UCardEffectFragment_Base
 public:
 };
 
+UCLASS(Blueprintable, Abstract, EditInlineNew)
+class UCardParameter : public UObject,
+	public IHoverableContext
+{
+	GENERATED_BODY()
+
+public: 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag ParameterTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FSetByCallerMetaData MetaData;
+
+	UPROPERTY(EditAnywhere)
+	TMap<FGameplayTag, FText> ScalingGroupNames;
+
+public:
+	//BEGIN IHoverableContext
+	void GetHoverText_Implementation(FText& OutText) const override;
+	void GetHoverContentTitle_Implementation(FText& OutText) const override;
+	void GetHoverContent_Implementation(FText& OutText) const override;
+	//END IHoverableContext
+};
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
 class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
@@ -42,8 +66,8 @@ class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SetByCallerParameters")
-	TMap<FGameplayTag, FSetByCallerMetaData> SetByCallerMagnitudes;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
+	TArray<UCardParameter*> Parameters;
 
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
 

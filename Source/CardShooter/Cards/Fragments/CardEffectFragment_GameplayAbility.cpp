@@ -158,7 +158,7 @@ void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArgument
 		}
 
 		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
-			"<hover id=\"{0}\" relatedExec=\"{1\" cardidentityhandle=\"{2}\" style=\"HoverContent\">{3}</>"),
+			"<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"HoverContent\">{3}</>"),
 			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
 			FText::FromString(this->GetPathName()),
 			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),

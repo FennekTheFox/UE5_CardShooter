@@ -1,136 +1,155 @@
 #include "AnimModifier_SyncMarkerCueNotifies.h"
 
+
+#include "Animation/AnimNotifies/AnimNotify.h"
 #include "Animation/AnimSequence.h"
-#include "Animation/AnimTypes.h"
+#include "AnimationBlueprintLibrary.h"
 
-void UAnimModifier_SyncMarkerCueNotifies::OnApply_Implementation(UAnimSequence* AnimationSequence)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(AnimModifier_SyncMarkerCueNotifies)
+
+UAnimModifier_SyncMarkerCueNotifies::UAnimModifier_SyncMarkerCueNotifies()
+	: Super()
 {
-	if (!AnimationSequence)
+	NotifyTrackName = TEXT("Sync Marker Cues");
+	bShouldRemovePreExistingNotifiesOnTrack = false;
+	bGeneratedNotifyTrack = false;
+}
+
+void UAnimModifier_SyncMarkerCueNotifies::OnApply_Implementation(UAnimSequence* InAnimation)
+{
+	Super::OnApply_Implementation(InAnimation);
+
+	if (!InAnimation)
 	{
+		UE_LOG(LogAnimation, Error, TEXT("SyncMarkerCueNotifies failed. Reason: Invalid Animation"));
 		return;
 	}
 
-	AnimationSequence->Modify();
-
-	if (bClearExistingGeneratedNotifies)
+	if (NotifyTrackName.IsNone())
 	{
-		RemoveGeneratedNotifies(AnimationSequence);
+		UE_LOG(LogAnimation, Error, TEXT("SyncMarkerCueNotifies failed. Reason: Invalid NotifyTrackName"));
+		return;
 	}
 
-	const int32 TrackIndex = FindOrAddNotifyTrack(AnimationSequence);
+	ValidateNotifyTrack(InAnimation);
 
-	for (const FAnimSyncMarker& SyncMarker : AnimationSequence->AuthoredSyncMarkers)
+	const float SequenceLength = InAnimation->GetPlayLength();
+
+	for (const FSyncMarkerCueNotifyMapping& Mapping : SyncMarkerNotifyMappings)
 	{
-		const FSyncMarkerCueNotifyMapping* Mapping = FindMapping(SyncMarker.MarkerName);
-
-		if (!Mapping || !Mapping->NotifyClass)
+		if (Mapping.SyncMarkerName.IsNone())
 		{
+			UE_LOG(LogAnimation, Warning, TEXT("SyncMarkerCueNotifies skipped mapping. Reason: Invalid SyncMarkerName"));
 			continue;
 		}
 
-		const float MarkerTime = SyncMarker.Time;
-		const UClass* DesiredNotifyClass = Mapping->NotifyClass.Get();
+		if (!Mapping.NotifyClass)
+		{
+			UE_LOG(LogAnimation, Warning, TEXT("SyncMarkerCueNotifies skipped mapping for marker '%s'. Reason: Invalid NotifyClass"),
+				*Mapping.SyncMarkerName.ToString());
+			continue;
+		}
 
-		const bool bAlreadyExists = AnimationSequence->Notifies.ContainsByPredicate(
-			[MarkerTime, DesiredNotifyClass, this](const FAnimNotifyEvent& ExistingEvent)
+		for (const FSyncMarkerCueNotifyMapping& SyncMarkerMapping : SyncMarkerNotifyMappings)
+		{
+			if (SyncMarkerMapping.SyncMarkerName.IsNone() || !SyncMarkerMapping.NotifyClass)
 			{
-				return ExistingEvent.Notify
-					&& ExistingEvent.Notify->GetClass() == DesiredNotifyClass
-					&& FMath::Abs(ExistingEvent.GetTime() - MarkerTime) <= DuplicateTimeTolerance;
-			});
+				continue;
+			}
 
-		if (bAlreadyExists)
-		{
-			continue;
+			for (const FAnimSyncMarker& SyncMarker : InAnimation->AuthoredSyncMarkers)
+			{
+				if (SyncMarker.MarkerName != SyncMarkerMapping.SyncMarkerName)
+				{
+					continue;
+				}
+
+				const float NotifyTime = FMath::Clamp(
+					SyncMarker.Time + SyncMarkerMapping.TimeOffset,
+					0.0f,
+					SequenceLength
+				);
+
+				UAnimationBlueprintLibrary::AddAnimationNotifyEvent(
+					InAnimation,
+					NotifyTrackName,
+					NotifyTime,
+					SyncMarkerMapping.NotifyClass
+				);
+			}
 		}
-
-		UAnimNotify* NewNotify = NewObject<UAnimNotify>(
-			AnimationSequence,
-			DesiredNotifyClass,
-			NAME_None,
-			RF_Transactional
-		);
-
-		const FString NotifyNameString = FString::Printf(
-			TEXT("%s%s_%s"),
-			*GeneratedNotifyNamePrefix,
-			*Mapping->FootDefinition.ToString(),
-			*SyncMarker.MarkerName.ToString()
-		);
-
-		FAnimNotifyEvent NewEvent;
-		NewEvent.Notify = NewNotify;
-		NewEvent.NotifyName = FName(*NotifyNameString);
-		NewEvent.TrackIndex = TrackIndex;
-
-		NewEvent.Link(AnimationSequence, MarkerTime);
-		NewEvent.TriggerTimeOffset =
-			GetTriggerTimeOffsetForType(AnimationSequence->CalculateOffsetForNotify(MarkerTime));
-
-		AnimationSequence->Notifies.Add(NewEvent);
 	}
-
-	AnimationSequence->RefreshCacheData();
-	AnimationSequence->MarkPackageDirty();
 }
 
-void UAnimModifier_SyncMarkerCueNotifies::OnRevert_Implementation(UAnimSequence* AnimationSequence)
+void UAnimModifier_SyncMarkerCueNotifies::OnRevert_Implementation(UAnimSequence* InAnimation)
 {
-	if (!AnimationSequence)
+	Super::OnRevert_Implementation(InAnimation);
+
+	if (!InAnimation)
 	{
 		return;
 	}
 
-	AnimationSequence->Modify();
-
-	RemoveGeneratedNotifies(AnimationSequence);
-
-	AnimationSequence->RefreshCacheData();
-	AnimationSequence->MarkPackageDirty();
-}
-
-const FSyncMarkerCueNotifyMapping* UAnimModifier_SyncMarkerCueNotifies::FindMapping(FName SyncMarkerLabel) const
-{
-	return MarkerMappings.FindByPredicate(
-		[SyncMarkerLabel](const FSyncMarkerCueNotifyMapping& Mapping)
-		{
-			return Mapping.SyncMarkerLabel == SyncMarkerLabel;
-		});
-}
-
-void UAnimModifier_SyncMarkerCueNotifies::RemoveGeneratedNotifies(UAnimSequence* AnimationSequence) const
-{
-	if (!AnimationSequence)
+	if (bGeneratedNotifyTrack)
 	{
-		return;
+		UAnimationBlueprintLibrary::RemoveAnimationNotifyTrack(InAnimation, NotifyTrackName);
+	}
+	else if (UAnimationBlueprintLibrary::IsValidAnimNotifyTrackName(InAnimation, NotifyTrackName))
+	{
+		for (const FSyncMarkerCueNotifyMapping& Mapping : SyncMarkerNotifyMappings)
+		{
+			if (!Mapping.NotifyClass)
+			{
+				continue;
+			}
+
+			const UAnimNotify* NotifyCDO = Cast<UAnimNotify>(Mapping.NotifyClass->GetDefaultObject());
+
+			if (!NotifyCDO)
+			{
+				UE_LOG(LogAnimation, Error, TEXT("SyncMarkerCueNotifies failed to revert. Reason: Invalid UAnimNotify class"));
+				continue;
+			}
+
+			UAnimationBlueprintLibrary::RemoveAnimationNotifyEventsByName(
+				InAnimation,
+				FName(NotifyCDO->GetNotifyName())
+			);
+		}
 	}
 
-	AnimationSequence->Notifies.RemoveAll(
-		[this](const FAnimNotifyEvent& Event)
-		{
-			return Event.Notify
-				&& Event.NotifyName.ToString().StartsWith(GeneratedNotifyNamePrefix);
-		});
+	bGeneratedNotifyTrack = false;
 }
 
-int32 UAnimModifier_SyncMarkerCueNotifies::FindOrAddNotifyTrack(UAnimSequence* AnimationSequence) const
+void UAnimModifier_SyncMarkerCueNotifies::ValidateNotifyTrack(UAnimSequence* InAnimation)
 {
-	check(AnimationSequence);
+	check(InAnimation);
 
-	const int32 ExistingTrackIndex = AnimationSequence->AnimNotifyTracks.IndexOfByPredicate(
-		[this](const FAnimNotifyTrack& Track)
-		{
-			return Track.TrackName == NotifyTrackName;
-		});
+	bGeneratedNotifyTrack = false;
 
-	if (ExistingTrackIndex != INDEX_NONE)
+	PrepareNotifyTrack(InAnimation);
+}
+
+void UAnimModifier_SyncMarkerCueNotifies::PrepareNotifyTrack(UAnimSequence* InAnimation)
+{
+	const bool bDoesTrackAlreadyExist =
+		UAnimationBlueprintLibrary::IsValidAnimNotifyTrackName(InAnimation, NotifyTrackName);
+
+	if (!bDoesTrackAlreadyExist)
 	{
-		return ExistingTrackIndex;
+		UAnimationBlueprintLibrary::AddAnimationNotifyTrack(
+			InAnimation,
+			NotifyTrackName,
+			FLinearColor::MakeRandomColor()
+		);
+
+		bGeneratedNotifyTrack = true;
 	}
-
-	FAnimNotifyTrack NewTrack;
-	NewTrack.TrackName = NotifyTrackName;
-	NewTrack.TrackColor = FLinearColor(0.05f, 0.35f, 1.0f).ToFColor(true);
-
-	return AnimationSequence->AnimNotifyTracks.Add(NewTrack);
+	else if (bShouldRemovePreExistingNotifiesOnTrack)
+	{
+		UAnimationBlueprintLibrary::RemoveAnimationNotifyEventsByTrack(
+			InAnimation,
+			NotifyTrackName
+		);
+	}
 }

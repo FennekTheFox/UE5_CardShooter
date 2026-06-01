@@ -3,6 +3,8 @@
 #include "CardExecution_AdditionalData.h"
 #include "Cards/Augments/CardAugment.h"
 
+#define LOCTEXT_NAMESPACE "CardEffectFragment"
+
 bool UCardEffectFragment_Base::GetShouldShowInDescription()
 {
 	return bShowInDescription;
@@ -28,10 +30,15 @@ void UCardEffectFragment_Attribute::GetFormattingArgs(FFormatNamedArguments& Arg
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;
 
-	for (auto&& KVPair : SetByCallerMagnitudes)
+	for (const UCardParameter* Param : Parameters)
 	{
-		tempAddData.SetByCallerMetaDataTags.Add(KVPair.Key);
-		tempAddData.SetByCallerMetaDataValues.Add(KVPair.Value);
+		if (!Param)
+		{
+			continue;
+		}
+
+		tempAddData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
+		tempAddData.SetByCallerMetaDataValues.Add(Param->MetaData);
 	}
 
 	//apply the card augments
@@ -90,10 +97,14 @@ bool UCardEffectFragment_Attribute::GetParameterValue(FGameplayTag ParamTag, flo
 	//Empty data, we just care about our few values
 	FCardExecution_AdditionalData PostModificationData;
 
-	for (auto&& KVPair : SetByCallerMagnitudes)
+	for (const UCardParameter* Param : Parameters)
 	{
-		PostModificationData.SetByCallerMetaDataTags.Add(KVPair.Key);
-		PostModificationData.SetByCallerMetaDataValues.Add(KVPair.Value);
+		if (!Param)
+		{
+			continue;
+		}
+		PostModificationData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
+		PostModificationData.SetByCallerMetaDataValues.Add(Param->MetaData);
 	}
 
 	int32 ParamIndex = PostModificationData.SetByCallerMetaDataTags.Find(ParamTag);
@@ -123,3 +134,33 @@ bool UCardEffectFragment_Attribute::GetParameterValue(FGameplayTag ParamTag, flo
 
 	return true;
 }
+
+void UCardParameter::GetHoverText_Implementation(FText& OutText) const
+{
+	OutText = FText::GetEmpty();
+}
+
+void UCardParameter::GetHoverContentTitle_Implementation(FText& OutText) const
+{
+	OutText = FText::Format(LOCTEXT("CardParam_Title", "Card Parameter: {0}"), MetaData.ParameterName);
+}
+
+void UCardParameter::GetHoverContent_Implementation(FText& OutText) const
+{
+	OutText = FText::GetEmpty();
+
+	TArray<FText> Segments;
+	Segments.Add(FText::Format(LOCTEXT("CardParam_BaseValue", "Base Value: {0}"), MetaData.Magnitude));
+	if(MetaData.MagnitudeRange.GetLowerBound().GetValue() != -BIG_NUMBER) Segments.Add(FText::Format(LOCTEXT("CardParam_LowerBound", "Lower Bound: {0}"), MetaData.MagnitudeRange.GetLowerBound().GetValue()));
+	if(MetaData.MagnitudeRange.GetUpperBound().GetValue() != BIG_NUMBER) Segments.Add(FText::Format(LOCTEXT("CardParam_UpperBound", "Upper Bound: {0}"), MetaData.MagnitudeRange.GetUpperBound().GetValue()));
+
+	const FText* SGName = ScalingGroupNames.Find(MetaData.ScalingGroup);
+	if (ensure(SGName))
+	{
+		Segments.Add(FText::Format(LOCTEXT("CardParam_ScalingGroup", "Parameter Type: {0}"), *SGName));
+	}
+
+	OutText = FText::Join(FText::FromString("\n"), Segments);
+}
+
+#undef LOCTEXT_NAMESPACE

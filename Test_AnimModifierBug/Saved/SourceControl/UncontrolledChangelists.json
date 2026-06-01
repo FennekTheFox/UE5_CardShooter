@@ -1,0 +1,15 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"G:/Epic/UnrealWorkspace/UE5_CardShooter/Test_AnimModifierBug/Content/BP_TestFootstepModifier.uasset",
+				"G:/Epic/UnrealWorkspace/UE5_CardShooter/Test_AnimModifierBug/Content/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Fwd_Right.uasset",
+				"G:/Epic/UnrealWorkspace/UE5_CardShooter/Test_AnimModifierBug/Content/BP_TestNotifyClass.uasset",
+				"G:/Epic/UnrealWorkspace/UE5_CardShooter/Test_AnimModifierBug/Content/BP_TestNotifyClass_Cue.uasset"
+			]
+		}
+	]
+}
