@@ -73,17 +73,17 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) cons
 
 	if (Parameters)
 	{
-		FSetByCallerMetaData* Data = &(*Parameters->FindByPredicate([Tag](const UCardParameter* Param) {
+		UCardParameter** Data = Parameters->FindByPredicate([Tag](const UCardParameter* Param) {
 			if (!Param)
 			{
 				return false;
 			}
 			return Param->ParameterTag == Tag;
-			}))->MetaData;
+			});
 
 		if (Data)
 		{
-			return Data->Magnitude;
+			return (*Data)->MetaData.Magnitude;
 		}
 	}
 

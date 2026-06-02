@@ -71,6 +71,11 @@ FText UCardData::GetRawDescription(const FCardIdentity& CardIdentity)
 	return FText::Join(FText::FromString("\n\n"), Sections);
 }
 
+void UCardData::GetDedications(FText& OutText) const
+{
+	OutText = FText::Join(FText::FromString(", "), Dedications);
+}
+
 FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 {
 	// Gather Attribute Descriptions

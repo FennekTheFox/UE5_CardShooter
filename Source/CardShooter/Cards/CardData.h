@@ -35,6 +35,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> CardTexture;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FText> Dedications;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TArray<TObjectPtr<UCardEffectFragment_Attribute>> CardAttributes;
 
@@ -56,6 +59,8 @@ public:
 	FText GetDescription(const FCardIdentity& CardIdentity);
 	//Helper function mostly to separate out the parameter magnitudes for data validation
 	FText GetRawDescription(const FCardIdentity& CardIdentity);
+	UFUNCTION(BlueprintPure)
+	void GetDedications(FText& OutText) const;
 
 	UFUNCTION(BlueprintPure)
 	FText GetAttributesDescription(const FCardIdentity& CardIdentity);
