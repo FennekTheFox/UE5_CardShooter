@@ -116,8 +116,11 @@ class UItem_CardAugment : public UItem
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame)
 	FCardAugmentData AugmentData;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame)
+	FCardIdentityHandle UsedByCard;
 
 	void GetItemBrush_Implementation(FSlateBrush& OutBrush) override;
 	bool SameItem_Implementation(const UItem* Other) const override;

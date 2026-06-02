@@ -7,6 +7,8 @@
 #include "Fragments/CardAttributeFragment_Execution.h"
 #include "CardIdentity.h"
 #include "Util/CardShooterUtility.h"
+#include "SaveGame/CardShooterSaveGameSubsystem.h"
+#include "SaveGame/CardShooterSaveData.h"
 
 #define LOCTEXT_NAMESPACE "CardData"
 
@@ -215,7 +217,7 @@ void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const
 	}
 }
 
-void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) const 
+void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) const
 {
 	if (ensure(PrimaryExecution))
 	{
@@ -236,6 +238,83 @@ void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) 
 			}
 
 			OutScalingGroups.AddUnique(Param->MetaData.ScalingGroup);
+		}
+	}
+}
+
+void UCardData::GetAugments(const FCardIdentity& CardIdentity, TArray<UItem_CardAugment*>& OutAugments)
+{
+	OutAugments.Empty();
+
+	int32 i = 0;
+	for (const FGuid& Guid : CardIdentity.Augments)
+	{
+		OutAugments.Add(UCardData::GetAugmentFromGuid(Guid));
+	}
+}
+
+UItem_CardAugment* UCardData::GetAugmentFromGuid(FGuid Guid)
+{
+	for (TObjectIterator<UItem_CardAugment> It; It; ++It)
+	{
+		UItem_CardAugment* Augment = *It;
+
+		if (!IsValid(Augment) || Augment->HasAnyFlags(RF_ClassDefaultObject | RF_ArchetypeObject))
+		{
+			continue;
+		}
+
+		if (Guid == Augment->ItemGuid)
+		{
+			return Augment;
+		}
+	}
+	return nullptr;
+}
+
+void UCardData::SetAugmentGUIDAtIndex(const FCardIdentityHandle& CardHandle, APlayerController* PC, UItem_CardAugment* CardAugment, int32 Index)
+{
+	if (!ensure(PC))
+	{
+		return;
+	}
+
+	UCardShooterSaveGameSubsystem* CSSS = PC->GetLocalPlayer()->GetSubsystem<UCardShooterSaveGameSubsystem>();
+
+	if (ensure(CSSS))
+	{
+		FCardIdentity CardIdentity;
+		if (ensure(UCardIdentityHandleLibrary::GetCardIdentityFromHandle(CardHandle, CardIdentity, PC))) {
+
+			UCardShooterSaveData* SaveData = CSSS->GetLocalPlayerSaveData();
+
+			if (CardIdentity.Augments.Num() <= Index)
+			{
+				CardIdentity.Augments.SetNum(Index + 1);
+			}
+
+			//Before assigning the new augment to the card guids, we need to remove the previous ones reference
+			FGuid PreviousAugmentGuid = CardIdentity.Augments[Index];
+			if (PreviousAugmentGuid.IsValid())			
+			{
+				UItem_CardAugment* PrevCardAugment = UCardData::GetAugmentFromGuid(PreviousAugmentGuid);
+				if (PrevCardAugment)
+				{
+					PrevCardAugment->UsedByCard = FCardIdentityHandle::Invalid;
+				}
+			}
+
+			if (CardAugment)
+			{
+				CardIdentity.Augments[Index] = CardAugment->ItemGuid;
+				CardAugment->UsedByCard = CardHandle;
+			}
+			else
+			{
+				CardIdentity.Augments[Index] = FGuid(0, 0, 0, 0);
+			}
+
+			SaveData->ModifyCardInCollection(PC, CardHandle, CardIdentity);
 		}
 	}
 }

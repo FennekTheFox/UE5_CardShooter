@@ -34,7 +34,7 @@ public:
 	TMap<FGameplayTag, FModifierRange> MultiplicativeRanges;
 
 	UFUNCTION()
-	bool CalculateMagnitude(const FGameplayTag& ScalingGroup, const FCardAugmentParameter& Parameter, float& OutMagnitude) const;
+	bool CalculateMagnitude(const FCardAugmentParameter& Parameter, float& OutMagnitude) const;
 };
 
 UCLASS(Blueprintable)

@@ -1,5 +1,15 @@
 #include "Item.h"
 
+void UItem::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	if (!ItemGuid.IsValid())
+	{
+		ItemGuid = FGuid::NewGuid();
+	}
+}
+
 void UItem::GetItemBrush_Implementation(FSlateBrush& OutBrush)
 {
 

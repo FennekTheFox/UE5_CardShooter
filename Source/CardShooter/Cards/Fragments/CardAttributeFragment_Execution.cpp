@@ -6,6 +6,7 @@
 #include "Gameplay/GameplayAbility_CardExecution.h"
 #include "Gameplay/GameplayEffect_CardExecution.h"
 #include "Cards/Augments/CardAugment.h"
+#include "Cards/CardData.h"
 
 #define LOCTEXT_NAMESPACE "CardEffectFragment"
 
@@ -129,8 +130,16 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 	}
 
 	//apply the card augments
-	for (FCardAugmentData AugmentData : CardIdentity.Augments)
+	//apply the card augments
+	TArray<UItem_CardAugment*> Augments;
+	UCardData::GetAugments(CardIdentity, Augments);
+	for (UItem_CardAugment* AugmentItem : Augments)
 	{
+		if (!AugmentItem)
+		{
+			continue;
+		}
+		FCardAugmentData AugmentData = AugmentItem->AugmentData;
 		UCardAugment* AugmentCDO = nullptr;
 
 		if (UClass* AugmentClass =

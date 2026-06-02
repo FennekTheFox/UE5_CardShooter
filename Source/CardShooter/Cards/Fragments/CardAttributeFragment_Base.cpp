@@ -2,6 +2,7 @@
 
 #include "CardExecution_AdditionalData.h"
 #include "Cards/Augments/CardAugment.h"
+#include "Cards/CardData.h"
 
 #define LOCTEXT_NAMESPACE "CardEffectFragment"
 
@@ -42,8 +43,15 @@ void UCardEffectFragment_Attribute::GetFormattingArgs(FFormatNamedArguments& Arg
 	}
 
 	//apply the card augments
-	for (FCardAugmentData AugmentData : CardIdentity.Augments)
+	TArray<UItem_CardAugment*> Augments;
+	UCardData::GetAugments(CardIdentity, Augments);
+	for (UItem_CardAugment* AugmentItem : Augments)
 	{
+		if (!AugmentItem)
+		{
+			continue;
+		}
+		FCardAugmentData AugmentData = AugmentItem->AugmentData;
 		UCardAugment* AugmentCDO = nullptr;
 
 		if (UClass* AugmentClass =
@@ -114,8 +122,17 @@ bool UCardEffectFragment_Attribute::GetParameterValue(FGameplayTag ParamTag, flo
 		return false;
 	}
 
-	for (FCardAugmentData AugmentData : CardIdentity.Augments)
+	//apply the card augments
+	TArray<UItem_CardAugment*> Augments;
+	UCardData::GetAugments(CardIdentity, Augments);
+	for (UItem_CardAugment* AugmentItem : Augments)
 	{
+		if (!AugmentItem)
+		{
+			continue;
+		}
+
+		FCardAugmentData AugmentData = AugmentItem->AugmentData;
 		UCardAugment* AugmentCDO = nullptr;
 
 		if (UClass* AugmentClass =

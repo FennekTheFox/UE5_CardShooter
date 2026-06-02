@@ -12,6 +12,9 @@ struct FCardAugmentParameter
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
+	FGameplayTag ParameterTag;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
 	float Magnitude = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
@@ -20,11 +23,17 @@ public:
 	bool operator== (const FCardAugmentParameter& Other) const
 	{
 		return FMath::IsNearlyEqual(Magnitude, Other.Magnitude)
-			&& VariantOption == Other.VariantOption;
+			&& VariantOption == Other.VariantOption
+			&& ParameterTag == Other.ParameterTag;
 	}
 
 	bool operator<(const FCardAugmentParameter& Other) const
 	{
+		if (ParameterTag != Other.ParameterTag)
+		{
+			return ParameterTag.ToString() < Other.ParameterTag.ToString();
+		}
+
 		if (!FMath::IsNearlyEqual(Magnitude, Other.Magnitude))
 		{
 			return Magnitude < Other.Magnitude;
@@ -38,6 +47,7 @@ FORCEINLINE uint32 GetTypeHash(const FCardAugmentParameter& Param)
 {
 	uint32 Hash = GetTypeHash(Param.VariantOption);
 	Hash = HashCombine(Hash, GetTypeHash(Param.Magnitude));
+	Hash = HashCombine(Hash, GetTypeHash(Param.ParameterTag));
 	return Hash;
 }
 
@@ -54,7 +64,7 @@ public:
 	FSoftClassPath AugmentClass;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
-	TMap<FGameplayTag, FCardAugmentParameter> AugmentParameters;
+	TArray<FCardAugmentParameter> AugmentParameters;
 
 	bool operator== (const FCardAugmentData& Other) const
 	{
@@ -73,12 +83,12 @@ public:
 			return false;
 		}
 
-		for (const TPair<FGameplayTag, FCardAugmentParameter>& Pair : AugmentParameters)
+		for (int i = 0; i < AugmentParameters.Num(); i++)
 		{
-			const FCardAugmentParameter* OtherValue =
-				Other.AugmentParameters.Find(Pair.Key);
+			const FCardAugmentParameter& AugmentParam = AugmentParameters[i];
+			const FCardAugmentParameter& OtherAugmentParam = Other.AugmentParameters[i];
 
-			if (!OtherValue || !(Pair.Value == *OtherValue))
+			if (AugmentParam != OtherAugmentParam)
 			{
 				return false;
 			}
@@ -107,34 +117,11 @@ public:
 			return AugmentParameters.Num() < Other.AugmentParameters.Num();
 		}
 
-		// Deterministic compare for TMap
-		TArray<FGameplayTag> KeysA;
-		TArray<FGameplayTag> KeysB;
-
-		AugmentParameters.GetKeys(KeysA);
-		Other.AugmentParameters.GetKeys(KeysB);
-
-		KeysA.Sort([](const FGameplayTag& A, const FGameplayTag& B)
-			{
-				return A.ToString() < B.ToString();
-			});
-
-		KeysB.Sort([](const FGameplayTag& A, const FGameplayTag& B)
-			{
-				return A.ToString() < B.ToString();
-			});
-
-		for (int32 i = 0; i < KeysA.Num(); ++i)
+		for (int32 i = 0; i < AugmentParameters.Num(); ++i)
 		{
-			// Compare keys
-			if (KeysA[i] != KeysB[i])
-			{
-				return KeysA[i].ToString() < KeysB[i].ToString();
-			}
-
 			// Compare values
-			const FCardAugmentParameter& ValueA = AugmentParameters[KeysA[i]];
-			const FCardAugmentParameter& ValueB = Other.AugmentParameters[KeysB[i]];
+			const FCardAugmentParameter& ValueA = AugmentParameters[i];
+			const FCardAugmentParameter& ValueB = Other.AugmentParameters[i];
 
 			if (!(ValueA == ValueB))
 			{
@@ -151,10 +138,9 @@ FORCEINLINE uint32 GetTypeHash(const FCardAugmentData& Data)
 	uint32 Hash = GetTypeHash(Data.AugmentClass);
 	//Hash = HashCombine(Hash, GetTypeHash(Data.AugmentClass));
 
-	for (const auto& Pair : Data.AugmentParameters)
+	for (const FCardAugmentParameter& Parameter : Data.AugmentParameters)
 	{
-		Hash = HashCombine(Hash, GetTypeHash(Pair.Key));
-		Hash = HashCombine(Hash, GetTypeHash(Pair.Value));
+		Hash = HashCombine(Hash, GetTypeHash(Parameter));
 	}
 
 	return Hash;

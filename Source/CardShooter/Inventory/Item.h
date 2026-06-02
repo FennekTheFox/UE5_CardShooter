@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+
 #include "Item.generated.h"
+
 
 USTRUCT()
 struct FItemSaveData
@@ -31,6 +33,11 @@ class UItem : public UObject
     GENERATED_BODY()
 
 public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame)
+    FGuid ItemGuid;
+
+    void PostInitProperties() override;
+
     UFUNCTION(BlueprintPure, BlueprintNativeEvent)
     void GetItemBrush(FSlateBrush& OutBrush);
 
@@ -42,7 +49,7 @@ public:
     UFUNCTION(BlueprintPure, BlueprintNativeEvent)
     FText GetItemDescription();
 
-    virtual bool SortAmongSames(const UItem* Other) const { return ensure(false); };
+    virtual bool SortAmongSames(const UItem* Other) const { return false; };
 
     UFUNCTION(BlueprintCallable)
     static TArray<UItem*> SortItems(const TArray<UItem*> InItems);

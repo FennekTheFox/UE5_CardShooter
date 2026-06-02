@@ -45,7 +45,7 @@ public:
 	int32 NumAugmentSockets = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
-	TArray<FCardAugmentData> Augments;
+	TArray<FGuid> Augments;
 
 
 	bool operator== (const FCardIdentity& Other) const
@@ -91,13 +91,13 @@ struct FCardIdentityHandle
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, SaveGame)
 	int32 Index = INDEX_NONE;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, SaveGame)
 	ECardIdentityStorageLocation StorageLocation = ECardIdentityStorageLocation::Invalid;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, SaveGame)
 	FSoftObjectPath PrebuiltPath;
 
 	bool IsValid() const
@@ -111,6 +111,8 @@ public:
 			StorageLocation == Other.StorageLocation &&
 			PrebuiltPath == Other.PrebuiltPath;
 	}
+
+	static FCardIdentityHandle Invalid;
 };
 
 FORCEINLINE uint32 GetTypeHash(const FCardIdentityHandle& Handle)

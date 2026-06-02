@@ -73,4 +73,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters) const;
+
+
+	UFUNCTION(BlueprintPure)
+	static void GetAugments(const FCardIdentity& CardIdentity, TArray<UItem_CardAugment*>& OutAugments);
+	UFUNCTION(BlueprintPure)
+	static UItem_CardAugment* GetAugmentFromGuid(FGuid Guid);
+
+	UFUNCTION(BlueprintCallable)
+	static void SetAugmentGUIDAtIndex(const FCardIdentityHandle& CardHandle, APlayerController* PC, UItem_CardAugment* CardAugment, int32 Index);
 };

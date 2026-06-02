@@ -63,9 +63,9 @@ void UCardAugment_ParameterModifier::ApplyAugment(FCardExecution_AdditionalData&
 		return;
 	}
 
-	for (auto&& KVPair : AugmentData.AugmentParameters)
+	for (const FCardAugmentParameter& Parameter : AugmentData.AugmentParameters)
 	{
-		if (!ensure(KVPair.Value.VariantOption >= 0 && KVPair.Value.VariantOption <= 1))
+		if (!ensure(Parameter.VariantOption >= 0 && Parameter.VariantOption <= 1))
 		{
 			continue;
 		}
@@ -73,7 +73,7 @@ void UCardAugment_ParameterModifier::ApplyAugment(FCardExecution_AdditionalData&
 
 		for (FSetByCallerMetaData& DataRef : DataToModify.SetByCallerMetaDataValues)
 		{
-			if (DataRef.ScalingGroup != KVPair.Key)
+			if (DataRef.ScalingGroup != Parameter.ParameterTag)
 			{
 				continue;
 			}
@@ -81,9 +81,9 @@ void UCardAugment_ParameterModifier::ApplyAugment(FCardExecution_AdditionalData&
 			float& MagnitudePtr = DataRef.Magnitude;
 
 			float AugmentMagnitude = 0.f;
-			MagnitudeCalculation->CalculateMagnitude(KVPair.Key, KVPair.Value, AugmentMagnitude);
+			MagnitudeCalculation->CalculateMagnitude(Parameter, AugmentMagnitude);
 
-			switch ((EModifyOperationType)KVPair.Value.VariantOption)
+			switch ((EModifyOperationType)Parameter.VariantOption)
 			{
 			case EModifyOperationType::Add: MagnitudePtr = FMath::Clamp(MagnitudePtr += AugmentMagnitude, DataRef.MagnitudeRange.GetLowerBound().GetValue(), DataRef.MagnitudeRange.GetUpperBound().GetValue()); break;
 			case EModifyOperationType::Multiply:  MagnitudePtr = FMath::Clamp(MagnitudePtr *= AugmentMagnitude, DataRef.MagnitudeRange.GetLowerBound().GetValue(), DataRef.MagnitudeRange.GetUpperBound().GetValue()); break;
@@ -101,9 +101,9 @@ FText UCardAugmentNameGenerator_ModifyParameter::GenerateText(const FCardAugment
 		return FText::FromString(TEXT("TODO: Generate Name for Modify Parameter augments with more than 1 parameter"));
 	}
 
-	for (auto&& KVPair : AugmentData.AugmentParameters)
+	for (const FCardAugmentParameter& Parameter : AugmentData.AugmentParameters)
 	{
-		const FText* SuffixPtr = SuffixMapping.Find(KVPair.Key);
+		const FText* SuffixPtr = SuffixMapping.Find(Parameter.ParameterTag);
 
 		if (!ensure(SuffixPtr))
 		{
@@ -112,11 +112,11 @@ FText UCardAugmentNameGenerator_ModifyParameter::GenerateText(const FCardAugment
 
 		FText Prefix = LOCTEXT("Augment_ModParam_MisingPrefix", "MISSING PARAM PREFIX");
 
-		if (FMath::IsNearlyEqual(KVPair.Value.Magnitude, 1.0f, 0.01f))
+		if (FMath::IsNearlyEqual(Parameter.Magnitude, 1.0f, 0.01f))
 		{
 			Prefix = LOCTEXT("Augment_ModParam_Perfect", "Perfect");
 		}
-		else if (FMath::IsNearlyEqual(KVPair.Value.Magnitude, 0.0f, 0.01f))
+		else if (FMath::IsNearlyEqual(Parameter.Magnitude, 0.0f, 0.01f))
 		{
 			Prefix = LOCTEXT("Augment_ModParam_PerfectInverse", "Perfect Inverse");
 		}
@@ -124,7 +124,7 @@ FText UCardAugmentNameGenerator_ModifyParameter::GenerateText(const FCardAugment
 		{
 			for (auto&& Entry : PrefixMapping)
 			{
-				if (FMath::IsNearlyEqual(Entry.Key, KVPair.Value.Magnitude, 0.125))
+				if (FMath::IsNearlyEqual(Entry.Key, Parameter.Magnitude, 0.125))
 				{
 					Prefix = Entry.Value;
 					break;
@@ -132,7 +132,7 @@ FText UCardAugmentNameGenerator_ModifyParameter::GenerateText(const FCardAugment
 			}
 		}
 
-		FText TypePrefix = (KVPair.Value.VariantOption == 0 ?
+		FText TypePrefix = (Parameter.VariantOption == 0 ?
 			LOCTEXT("ParamShard_AddiditePrefix", "Flux") :
 			LOCTEXT("ParamShard_MultiplicativePrefix", "Cascade")
 			);
@@ -151,9 +151,9 @@ FText UCardAugmentDescriptionGenerator_ModifyParameter::GenerateText(const FCard
 {
 	FText FormatingBase = LOCTEXT("AugmentShardDescFormat", "Type: {0} - Effect: {1}");
 
-	for (auto&& KVPair : AugmentData.AugmentParameters)
+	for (const FCardAugmentParameter& Parameter : AugmentData.AugmentParameters)
 	{
-		const FText* TypeText = ScalingGroupNames.Find(KVPair.Key);
+		const FText* TypeText = ScalingGroupNames.Find(Parameter.ParameterTag);
 
 		if (!ensure(TypeText))
 		{
@@ -166,12 +166,12 @@ FText UCardAugmentDescriptionGenerator_ModifyParameter::GenerateText(const FCard
 		{
 			FSetByCallerMetaData TempMetaData;
 			FModifierRange* ModRange = nullptr;
-			if (KVPair.Value.VariantOption == 0) ModRange = AugmentCDO->MagnitudeCalculation->AdditiveRanges.Find(KVPair.Key);
-			if (KVPair.Value.VariantOption == 1) ModRange = AugmentCDO->MagnitudeCalculation->MultiplicativeRanges.Find(KVPair.Key);
+			if (Parameter.VariantOption == 0) ModRange = AugmentCDO->MagnitudeCalculation->AdditiveRanges.Find(Parameter.ParameterTag);
+			if (Parameter.VariantOption == 1) ModRange = AugmentCDO->MagnitudeCalculation->MultiplicativeRanges.Find(Parameter.ParameterTag);
 
 			if (ensure(ModRange))
 			{
-				AugmentCDO->MagnitudeCalculation->CalculateMagnitude(KVPair.Key, KVPair.Value, TempMetaData.Magnitude);
+				AugmentCDO->MagnitudeCalculation->CalculateMagnitude(Parameter, TempMetaData.Magnitude);
 				TempMetaData.DisplayType = ModRange->DisplayType;
 
 				FText EffectText = TempMetaData.GetDisplayText();
@@ -242,7 +242,7 @@ FText UCardAugmentShardDescGenerator_ModifyParameter::Generate(const FCardAugmen
 		FText::AsNumber((ShardData.ShardMagnitude - FMath::Sign(ShardData.ShardMagnitude)) * 100.f));
 }
 
-bool UMagnitudeCalculation_ParameterModifier::CalculateMagnitude(const FGameplayTag& ScalingGroup, const FCardAugmentParameter& Parameter, float& OutMagnitude) const
+bool UMagnitudeCalculation_ParameterModifier::CalculateMagnitude(const FCardAugmentParameter& Parameter, float& OutMagnitude) const
 {
 	const TMap<FGameplayTag, FModifierRange>* RangeMap = nullptr;
 
@@ -260,7 +260,7 @@ bool UMagnitudeCalculation_ParameterModifier::CalculateMagnitude(const FGameplay
 		return false;
 	}
 
-	const FModifierRange* ModRange = RangeMap->Find(ScalingGroup);
+	const FModifierRange* ModRange = RangeMap->Find(Parameter.ParameterTag);
 
 	if (!ensure(ModRange))
 	{

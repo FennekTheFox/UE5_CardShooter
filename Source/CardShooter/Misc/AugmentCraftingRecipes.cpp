@@ -96,10 +96,11 @@ UItem* UAugmentRecipe_ParameterModifier::Craft_Implementation(const TArray<UItem
 	float MappedAlpha = DistributionCurve->GetFloatValue(RawAlpha);
 
 	FCardAugmentParameter NewParameter;
+	NewParameter.ParameterTag = Neutral->ShardData.ShardProperty;
 	NewParameter.Magnitude = MappedAlpha;
 	NewParameter.VariantOption = Option;
 
-	NewAugment.AugmentParameters.Add(Neutral->ShardData.ShardProperty, NewParameter);
+	NewAugment.AugmentParameters.Add(NewParameter);
 
 	UItem_CardAugment* NewAugmentItem = NewObject<UItem_CardAugment>(Outer);
 	NewAugmentItem->AugmentData = NewAugment;

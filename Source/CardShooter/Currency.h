@@ -6,6 +6,16 @@
 
 
 UCLASS(BlueprintType, Blueprintable)
+class UCurrencyCategory : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FText CategoryName;
+};
+
+UCLASS(BlueprintType, Blueprintable)
 class UCurrencyDef : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -13,6 +23,9 @@ class UCurrencyDef : public UPrimaryDataAsset
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag CurrencyTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TObjectPtr<UCurrencyCategory> Category;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText CurrencyName;

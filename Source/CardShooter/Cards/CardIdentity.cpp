@@ -3,6 +3,8 @@
 #include "SaveGame/CardShooterSaveGameSubsystem.h"
 #include "SaveGame/CardShooterSaveData.h"
 
+FCardIdentityHandle FCardIdentityHandle::Invalid = FCardIdentityHandle();
+
 bool FCardIdentity::operator<(const FCardIdentity& Other) const
 
 {
