@@ -178,6 +178,14 @@ bool UCardShooterSaveData::RemoveCardFromCollection(UObject* WorldContext, const
 		Deck.CardHandles.Remove(HandleToRemove);
 	}
 
+	for (FGuid AugmentGuid : CardIdentity.Augments)
+	{
+		if (UItem_CardAugment* Aug = UCardData::GetAugmentFromGuid(AugmentGuid))
+		{
+			Aug->UsedByCard = FCardIdentityHandle::Invalid;
+		}
+	}
+
 	FCardIdentity FixedIdentity = CardIdentity;
 	ValidateAndFix(FixedIdentity);
 	CallAnyCardChangedNextTick(WorldContext);

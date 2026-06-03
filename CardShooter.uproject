@@ -42,6 +42,10 @@
 		{
 			"Name": "RuntimeTests",
 			"Enabled": true
+		},
+		{
+			"Name": "ModelViewViewModelPreview",
+			"Enabled": true
 		}
 	]
 }
