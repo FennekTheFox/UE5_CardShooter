@@ -21,7 +21,7 @@ void UCardExecutionInstance_Sequence::ProcessExecutionInstance()
 
 		if (ensure(Exec))
 		{
-			UCardExecutionInstance* Inst = NextExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+			UCardExecutionInstance* Inst = NextExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData, Exec);
 			RunningSubInstances.Add(Inst);
 			FDelegateHandle OnExecutionCompletedHandle;
 

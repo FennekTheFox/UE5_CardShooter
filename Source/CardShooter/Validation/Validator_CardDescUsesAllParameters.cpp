@@ -177,9 +177,12 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 		FString EffectDesc = "";
 		if (AsCEF_AETO)
 		{
-			if (auto* AsGE_CE = Cast<UGameplayEffect_CardExecution>(AsCEF_AETO->GameplayEffect->GetDefaultObject()))
+			if (AsCEF_AETO->GameplayEffect)
 			{
-				EffectDesc = AsGE_CE->EffectDesc.ToString();
+				if (auto* AsGE_CE = Cast<UGameplayEffect_CardExecution>(AsCEF_AETO->GameplayEffect->GetDefaultObject()))
+				{
+					EffectDesc = AsGE_CE->EffectDesc.ToString();
+				}
 			}
 		}
 		UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(WithParameters);

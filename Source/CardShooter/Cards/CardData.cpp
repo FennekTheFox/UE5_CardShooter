@@ -159,7 +159,8 @@ void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<F
 			OutParameters.AddUnique(Param->ParameterTag);
 		}
 	}
-	else if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
+
+	if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
 	{
 		for (UCardEffectFragment_Execution* CompExec : AsCEF_E_C->Executions)
 		{
@@ -183,7 +184,8 @@ void GatherScalingGroupsFromExecution(UCardEffectFragment_Execution* Exec, TArra
 			OutParameters.AddUnique(Param->MetaData.ScalingGroup);
 		}
 	}
-	else if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
+	
+	if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
 	{
 		for (UCardEffectFragment_Execution* CompExec : AsCEF_E_C->Executions)
 		{

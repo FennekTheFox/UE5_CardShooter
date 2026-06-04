@@ -19,7 +19,7 @@ void UCardExecutionInstance_ComboSequence::ProcessExecutionInstance()
 	{
 		if (UCardEffectFragment_Execution* ComboExec = AsComboSeq->Executions[0])
 		{
-			RunningSubInstances.Add(ComboExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData));
+			RunningSubInstances.Add(ComboExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData, Exec));
 		}
 
 		OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
@@ -34,7 +34,7 @@ void UCardExecutionInstance_ComboSequence::ProcessExecutionInstance()
 
 	if (UCardEffectFragment_Execution* ComboExec = AsComboSeq->Executions[AdditionalData.ComboIndex])
 	{
-		RunningSubInstances.Add(ComboExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData));
+		RunningSubInstances.Add(ComboExec->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData, Exec));
 	}
 }
 

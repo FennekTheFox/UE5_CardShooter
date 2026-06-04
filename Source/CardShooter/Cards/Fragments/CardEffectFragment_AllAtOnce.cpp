@@ -22,7 +22,7 @@ void UCardExecutionInstance_AllAtOnce::ProcessExecutionInstance()
 		{
 			bValidExecutionFound = true;
 
-			UCardExecutionInstance* NewInstance = ExecIt->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData);
+			UCardExecutionInstance* NewInstance = ExecIt->ExecuteCardEffect_Implementation(ExecutingPawn, AdditionalData, Exec);
 			NewInstance->OnExecutionCompleted.AddLambda([this, NewInstance](APawn* P, const FCardExecution_AdditionalData& A, UCardEffectFragment_Execution* E) {
 				RunningSubInstances.Remove(NewInstance);
 				if (RunningSubInstances.IsEmpty())

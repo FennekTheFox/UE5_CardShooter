@@ -50,7 +50,7 @@ void UCardEffectFragment_Execution::Server_ExecuteCardEffect_Delayed_Implementat
 		Delay, false);
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+UCardExecutionInstance* UCardEffectFragment_Execution::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution /*= nullptr*/)
 {
 	if (!ensure(ExecInstanceClass))
 	{
@@ -77,11 +77,21 @@ void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassO
 	}
 }
 
-UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData)
+void UCardEffectFragment_Execution_Compound::PostLoad()
 {
-	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance>(this, ExecInstanceClass);
+	Super::PostLoad();
 
-	FCardExecution_AdditionalData PostModificationData = AdditionalData;
+	for (UCardEffectFragment_Execution* Execution : Executions)
+	{
+		if (Execution)
+		{
+			Execution->ParentCompound = this;
+		}
+	}
+}
+
+void UCardEffectFragment_Execution_WithParameters::GatherParameters(FCardExecution_AdditionalData& OutData) const
+{
 	for (const UCardParameter* Param : Parameters)
 	{
 		if (!Param)
@@ -89,9 +99,18 @@ UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCar
 			continue;
 		}
 
-		PostModificationData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
-		PostModificationData.SetByCallerMetaDataValues.Add(Param->MetaData);
+		OutData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
+		OutData.SetByCallerMetaDataValues.Add(Param->MetaData);
 	}
+}
+
+UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution /*= nullptr*/)
+{
+	UCardExecutionInstance* NewInstance = NewObject<UCardExecutionInstance>(this, ExecInstanceClass);
+
+	FCardExecution_AdditionalData PostModificationData = AdditionalData;
+
+	GatherParameters(PostModificationData);
 
 	for (FCardAugmentData AugmentData : AdditionalData.AugmentData)
 	{
@@ -115,6 +134,11 @@ UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCar
 
 void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
 {
+	if (UCardEffectFragment_Execution_WithParameters* ParentWithParams = Cast<UCardEffectFragment_Execution_WithParameters>(ParentCompound))
+	{
+		ParentWithParams->GetFormattingArgs(Args, CardIdentity);
+	}
+
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;
 

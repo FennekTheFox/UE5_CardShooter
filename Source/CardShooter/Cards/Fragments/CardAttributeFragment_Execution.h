@@ -52,7 +52,10 @@ public:
 	void Server_ExecuteCardEffect_Delayed(APawn* ExecutingPawn, const FCardExecution_AdditionalData Data, float Delay = 1.f);
 
 	UFUNCTION(BlueprintNativeEvent)
-	UCardExecutionInstance* ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData);
+	UCardExecutionInstance* ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution = nullptr);
+
+	UPROPERTY(Transient)
+	TObjectPtr<UCardEffectFragment_Execution_Compound> ParentCompound;
 
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 	{
@@ -65,6 +68,9 @@ protected:
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UCardExecutionInstance>> RunningInstances;
+
+	UPROPERTY()
+	TObjectPtr<UCardEffectFragment_Execution> ParentExec = nullptr;
 };
 
 
@@ -78,9 +84,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
 	TArray<UCardParameter*> Parameters;
 
-	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData) override;
+	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution) override;
 
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
+	virtual void GatherParameters(FCardExecution_AdditionalData& OutData) const;
 };
 
 UCLASS()
@@ -95,7 +102,7 @@ protected:
 
 
 UCLASS(BlueprintType, Blueprintable, Abstract, meta = (DisplayName = "Activate Gameplay Ability"))
-class UCardEffectFragment_Execution_Compound : public UCardEffectFragment_Execution
+class UCardEffectFragment_Execution_Compound : public UCardEffectFragment_Execution_WithParameters
 {
 	GENERATED_BODY()
 
@@ -107,4 +114,5 @@ public:
 	void FindSubExecutionsOfClass(TSubclassOf<UCardEffectFragment_Execution> Class, TArray<UCardEffectFragment_Execution*>& OutArray);
 
 protected:
+	virtual void PostLoad();
 };
