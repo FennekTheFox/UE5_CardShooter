@@ -8,7 +8,6 @@
 #include "Framework/Text/ITextDecorator.h"
 #include "Components/RichTextBlockDecorator.h"
 #include "Engine/DataTable.h"
-#include "VREditorInteractor.h"
 
 #include "RichTextHoverDecorator.generated.h"
 
@@ -17,12 +16,12 @@ class UInputAction;
 class URichTextBlock;
 
 UINTERFACE(BlueprintType)
-class UHoverableContext : public UInterface
+class CARDSHOOTER_API UHoverableContext : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class IHoverableContext
+class CARDSHOOTER_API IHoverableContext
 {
 	GENERATED_BODY()
 

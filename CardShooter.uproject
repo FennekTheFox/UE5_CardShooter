@@ -13,6 +13,13 @@
 				"AIModule",
 				"UMG"
 			]
+		},
+		{
+			"Name": "NeonEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"AdditionalDependencies": [
+			]
 		}
 	],
 	"Plugins": [
@@ -61,6 +68,22 @@
 		},
 		{
 			"Name": "OnlineServicesEOS",
+			"Enabled": true
+		},
+		{
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineServices",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineServicesEOSGS",
+			"Enabled": true
+		},
+		{
+			"Name": "EOSShared",
 			"Enabled": true
 		}
 	]

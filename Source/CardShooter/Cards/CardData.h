@@ -13,7 +13,7 @@ class UCardEffectFragment_Attribute;
 class UCardEffectFragment_Execution;
 
 UCLASS(BlueprintType, Blueprintable)
-class UCardData : public UPrimaryDataAsset
+class CARDSHOOTER_API UCardData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 

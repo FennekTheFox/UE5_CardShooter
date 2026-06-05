@@ -5,7 +5,7 @@
 #include "PoseAssetActionUtility.generated.h"
 
 UCLASS()
-class CARDSHOOTER_API UPoseAssetActionsUtility : public UAssetActionUtility
+class UPoseAssetActionsUtility : public UAssetActionUtility
 {
 	GENERATED_BODY()
 

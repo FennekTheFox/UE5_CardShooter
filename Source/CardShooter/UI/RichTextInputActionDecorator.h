@@ -8,7 +8,6 @@
 #include "Framework/Text/ITextDecorator.h"
 #include "Components/RichTextBlockDecorator.h"
 #include "Engine/DataTable.h"
-#include "VREditorInteractor.h"
 
 #include "RichTextInputActionDecorator.generated.h"
 

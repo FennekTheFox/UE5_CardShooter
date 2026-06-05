@@ -26,16 +26,19 @@ public class CardShooter : ModuleRules
             "GameplayAbilities",
             "GameplayTasks",
             "ProjectAbilitySystem_Plugin",
-            "AnimationModifiers",
-            "AnimationBlueprintLibrary"
+            "OnlineSubsystem",
+            "OnlineSubsystemUtils",
+            "OnlineSubsystemEOS",
+            "CoreOnline"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {
-            "UnrealEd",
-            "DataValidation",
-            "Blutility",
-            "EditorScriptingUtilities"
+            "OnlineServicesInterface",
+            "OnlineServicesCommon",
+            "OnlineServicesEOS",
+            "OnlineServicesEOSGS",
+            "EOSShared"
         });
 
         PublicIncludePaths.AddRange(new string[] {

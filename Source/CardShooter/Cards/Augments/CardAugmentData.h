@@ -4,7 +4,6 @@
 
 #include "CardAugmentData.generated.h"
 
-
 USTRUCT(BlueprintType)
 struct FCardAugmentParameter
 {
