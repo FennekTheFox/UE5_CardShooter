@@ -113,6 +113,8 @@ private:
 
 		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
 		{
+			IHoverableContext::Execute_GetHoverContent(HoverObject, Content);
+
 			if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP =
 				Cast<UCardEffectFragment_Execution_WithParameters>(relatedExecFrag))
 			{
@@ -127,7 +129,24 @@ private:
 		return Content;
 	}
 
-	void PushDataIntoTooltipWidget(UUserWidget* Widget, const FText& Content)
+	FText BuildTooltipTitle() const 
+	{
+		FText Content = FText::FromString(TEXT("Couldn't parse context path."));
+
+		if (!HoverObject)
+		{
+			return Content;
+		}
+
+		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
+		{
+			IHoverableContext::Execute_GetHoverContentTitle(HoverObject, Content);
+		}
+
+		return Content;
+	}
+
+	void PushDataIntoTooltipWidget(UUserWidget* Widget, const FText& Title, const FText& Content)
 	{
 		if (!Widget)
 		{
@@ -138,6 +157,12 @@ private:
 			FindFProperty<FTextProperty>(Widget->GetClass(), TEXT("Content")))
 		{
 			ContentProp->SetPropertyValue_InContainer(Widget, Content);
+		}
+
+		if (FTextProperty* TitleProp =
+			FindFProperty<FTextProperty>(Widget->GetClass(), TEXT("Title")))
+		{
+			TitleProp->SetPropertyValue_InContainer(Widget, Title);
 		}
 
 		if (FObjectProperty* HoverObjectProp =
@@ -184,9 +209,7 @@ private:
 		}
 	}
 
-	void EnsureTooltipCreated(
-		const FGeometry& MyGeometry,
-		const FVector2D& ScreenPosition)
+	void EnsureTooltipCreated(const FGeometry& MyGeometry, const FVector2D& ScreenPosition)
 	{
 		ClearDeadTooltipReference();
 
@@ -215,16 +238,15 @@ private:
 		TooltipUserWidget = Widget;
 
 		const FText Content = BuildTooltipContent();
-		PushDataIntoTooltipWidget(Widget, Content);
+		const FText Title = BuildTooltipTitle();
+		PushDataIntoTooltipWidget(Widget, Title, Content);
 
 		Widget->AddToPlayerScreen(9999);
 
 		UpdateTooltipPosition(MyGeometry, ScreenPosition);
 	}
 
-	void UpdateTooltipPosition(
-		const FGeometry& MyGeometry,
-		const FVector2D& ScreenPosition)
+	void UpdateTooltipPosition(const FGeometry& MyGeometry, const FVector2D& ScreenPosition)
 	{
 		ClearDeadTooltipReference();
 
@@ -261,17 +283,14 @@ private:
 	}
 
 private:
-	virtual void OnMouseEnter(
-		const FGeometry& MyGeometry,
-		const FPointerEvent& MouseEvent) override
+	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override
 	{
 		EnsureTooltipCreated(
 			MyGeometry,
 			MouseEvent.GetScreenSpacePosition());
 	}
 
-	virtual void OnMouseLeave(
-		const FPointerEvent& MouseEvent) override
+	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override
 	{
 		ClearDeadTooltipReference();
 
@@ -281,9 +300,7 @@ private:
 		}
 	}
 
-	virtual FReply OnMouseMove(
-		const FGeometry& MyGeometry,
-		const FPointerEvent& MouseEvent) override
+	virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override
 	{
 		ClearDeadTooltipReference();
 
@@ -301,9 +318,7 @@ private:
 		return FReply::Unhandled();
 	}
 
-	virtual FReply OnMouseButtonDown(
-		const FGeometry& MyGeometry,
-		const FPointerEvent& MouseEvent) override
+	virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override
 	{
 		if (MouseEvent.GetEffectingButton() != EKeys::LeftMouseButton)
 		{

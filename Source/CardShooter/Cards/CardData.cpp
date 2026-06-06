@@ -12,6 +12,17 @@
 
 #define LOCTEXT_NAMESPACE "CardData"
 
+
+void UDedicationData::GetHoverContentTitle_Implementation(FText& OutText) const
+{
+	OutText = DedicationTitle;
+}
+
+void UDedicationData::GetHoverContent_Implementation(FText& OutText) const
+{
+	OutText = DedicationText;
+}
+
 void UCardData::GetIdentity(FCardIdentity& Identity)
 {
 	Identity.AssetTag = AssetTag;
@@ -75,7 +86,22 @@ FText UCardData::GetRawDescription(const FCardIdentity& CardIdentity)
 
 void UCardData::GetDedications(FText& OutText) const
 {
-	OutText = FText::Join(FText::FromString(", "), Dedications);
+	TArray<FText> DedicationParts;
+
+	for (UDedicationData* Data : Dedications)
+	{
+		if (!ensure(Data))
+		{
+			continue;
+		}
+
+		DedicationParts.Add(FText::Format(
+			FText::FromString(TEXT("<hover id=\"{0}\" style=\"HoverDedication\">{1}</>")),
+			FText::FromString(Data->GetPathName()),
+			Data->DedicatedTo));
+	}
+
+	OutText = FText::Join(FText::FromString(", "), DedicationParts);
 }
 
 FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
@@ -322,3 +348,5 @@ void UCardData::SetAugmentGUIDAtIndex(const FCardIdentityHandle& CardHandle, APl
 }
 
 #undef LOCTEXT_NAMESPACE
+
+

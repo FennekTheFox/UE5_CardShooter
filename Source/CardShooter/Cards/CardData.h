@@ -4,6 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "Augments/CardAugment.h"
 #include "CardIdentity.h"
+#include "../UI/RichTextHoverDecorator.h"
 
 #include "CardData.generated.h"
 
@@ -11,6 +12,28 @@ class UTexture2D;
 
 class UCardEffectFragment_Attribute;
 class UCardEffectFragment_Execution;
+
+UCLASS()
+class UDedicationData : public UPrimaryDataAsset,
+	public IHoverableContext
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FText DedicatedTo = FText::GetEmpty();
+
+	UPROPERTY(EditDefaultsOnly)
+	FText DedicationTitle = FText::GetEmpty();
+
+	UPROPERTY(EditDefaultsOnly, meta = (MultiLine = "true"))
+	FText DedicationText = FText::GetEmpty();
+
+	//BEGIN IHoverableContext
+	void GetHoverContentTitle_Implementation(FText& OutText) const override;
+	void GetHoverContent_Implementation(FText& OutText) const override;
+	//END IHoverableContext
+};
 
 UCLASS(BlueprintType, Blueprintable)
 class CARDSHOOTER_API UCardData : public UPrimaryDataAsset
@@ -36,7 +59,7 @@ public:
 	TObjectPtr<UTexture2D> CardTexture;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FText> Dedications;
+	TArray<UDedicationData*> Dedications;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TArray<TObjectPtr<UCardEffectFragment_Attribute>> CardAttributes;
