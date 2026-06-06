@@ -35,8 +35,42 @@ void UNeonGameInstance::Init()
 
 	SessionUpdatedHandle = Sessions->OnSessionUpdated().Add([this](const FSessionUpdated& Event) {HandleSessionUpdated(Event);});
 	SessionCreatedHandle = Sessions->OnSessionCreated().Add([this](const FSessionCreated& Event) {OnSessionStateChanged.Broadcast();});
-	SessionJoinedHandle = Sessions->OnSessionJoined().Add([this](const FSessionJoined& Event) {OnSessionStateChanged.Broadcast();});
-	SessionLeftHandle = Sessions->OnSessionLeft().Add([this](const FSessionLeft& Event) {OnSessionStateChanged.Broadcast();});
+	SessionJoinedHandle = Sessions->OnSessionJoined().Add([this](const FSessionJoined& Event) {HandleSessionJoined(Event);});
+	SessionLeftHandle = Sessions->OnSessionLeft().Add([this](const FSessionLeft& Event) {HandleSessionLeft(Event);});
+}
+
+bool UNeonGameInstance::IsSessionHost()
+{
+	auto Services = GetServices();
+	if (!Services)
+	{
+		return false;
+	}
+
+	auto Sessions = Services->GetSessionsInterface();
+	if (!Sessions)
+	{
+		return false;
+	}
+
+	FGetSessionByName::Params GetParams;
+	GetParams.LocalName = GAME_SESSION_NAME;
+
+	auto SessionResult = Sessions->GetSessionByName(MoveTemp(GetParams));
+
+	if (SessionResult.IsError())
+	{
+		return false;
+	}
+
+	const auto& Session = SessionResult.GetOkValue().Session;
+
+	if (Session->GetOwnerAccountId() != LocalHostAccountId)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void UNeonGameInstance::HandleSessionUpdated(const FSessionUpdated& Event)
@@ -111,6 +145,98 @@ void UNeonGameInstance::HandleSessionUpdated(const FSessionUpdated& Event)
 
 			UE_LOG(LogTemp, Warning, TEXT("Session Player Count Updated"));
 		});
+}
+
+void UNeonGameInstance::UpdateCurrentPlayerCount(int32 Delta)
+{
+	using namespace UE::Online;
+
+	auto Services = GetServices();
+	if (!Services)
+	{
+		return;
+	}
+
+	auto Sessions = Services->GetSessionsInterface();
+	if (!Sessions)
+	{
+		return;
+	}
+
+	FGetSessionByName::Params GetParams;
+	GetParams.LocalName = TEXT("GameSession");
+
+	auto SessionResult = Sessions->GetSessionByName(MoveTemp(GetParams));
+
+	if (SessionResult.IsError())
+	{
+		return;
+	}
+
+	const auto& Session = SessionResult.GetOkValue().Session;
+
+	int32 CurrentCount = 0;
+
+	if (const FCustomSessionSetting* CountSetting = Session->GetSessionSettings().CustomSettings.Find(FSchemaAttributeId(SESSIONATTRIBUTENAME_CURRENTPLAYERCOUNT)))
+	{
+		CurrentCount = CountSetting->Data.GetInt64();
+	}
+
+	CurrentCount = FMath::Max(0, CurrentCount + Delta);
+
+	FSessionSettingsUpdate Update;
+
+	FCustomSessionSetting NewCountSetting;
+	NewCountSetting.Data = (int64)CurrentCount;
+	NewCountSetting.Visibility = ESchemaAttributeVisibility::Public;
+	NewCountSetting.ID = 0;
+
+	Update.UpdatedCustomSettings.Add(FSchemaAttributeId(SESSIONATTRIBUTENAME_CURRENTPLAYERCOUNT), NewCountSetting);
+
+	FUpdateSessionSettings::Params UpdateParams;
+	UpdateParams.SessionName = TEXT("GameSession");
+	UpdateParams.Mutations = MoveTemp(Update);
+
+	// You need the owner account id here
+	UpdateParams.LocalAccountId = Session->GetOwnerAccountId();
+
+	Sessions->UpdateSessionSettings(MoveTemp(UpdateParams))
+		.OnComplete(
+			[CurrentCount](const TOnlineResult<FUpdateSessionSettings>& Result)
+			{
+				if (Result.IsError())
+				{
+					UE_LOG(LogTemp, Error,
+						TEXT("Failed to update player count"));
+					return;
+				}
+
+				UE_LOG(LogTemp, Warning,
+					TEXT("Player count updated to %d"),
+					CurrentCount);
+			});
+}
+
+void UNeonGameInstance::HandleSessionJoined(const UE::Online::FSessionJoined& Event)
+{
+	if (!IsSessionHost())
+	{
+		return;
+	}
+
+	UpdateCurrentPlayerCount(+1);
+	OnSessionStateChanged.Broadcast();
+}
+
+void UNeonGameInstance::HandleSessionLeft(const UE::Online::FSessionLeft& Event)
+{
+	if (!IsSessionHost())
+	{
+		return;
+	}
+
+	UpdateCurrentPlayerCount(-1);
+	OnSessionStateChanged.Broadcast();
 }
 
 void UNeonGameInstance::Shutdown()

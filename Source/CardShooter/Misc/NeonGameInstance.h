@@ -126,6 +126,10 @@ public:
 
 private:
 	void HandleSessionUpdated(const UE::Online::FSessionUpdated& Event);
+	void UpdateCurrentPlayerCount(int32 Delta);
+	bool IsSessionHost();
+	void HandleSessionJoined(const UE::Online::FSessionJoined& Event);
+	void HandleSessionLeft(const UE::Online::FSessionLeft& Event);
 
 	FString CurrentSessionPassword;
 	UE::Online::FAccountId LocalHostAccountId;
