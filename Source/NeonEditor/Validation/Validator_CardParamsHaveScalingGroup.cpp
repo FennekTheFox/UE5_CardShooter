@@ -5,109 +5,109 @@
 #include "Misc/DataValidation.h"
 
 bool UValidator_CardParamsHaveScalingGroup::CanValidateAsset_Implementation(
-    const FAssetData& InAssetData,
-    UObject* InObject,
-    FDataValidationContext& InContext
+	const FAssetData& InAssetData,
+	UObject* InObject,
+	FDataValidationContext& InContext
 ) const
 {
-    return InObject && InObject->IsA<UCardData>();
+	return InObject && InObject->IsA<UCardData>();
 }
 
 EDataValidationResult UValidator_CardParamsHaveScalingGroup::ValidateLoadedAsset_Implementation(
-    const FAssetData& InAssetData,
-    UObject* InAsset,
-    FDataValidationContext& Context
+	const FAssetData& InAssetData,
+	UObject* InAsset,
+	FDataValidationContext& Context
 )
 {
-    UCardData* CardData = Cast<UCardData>(InAsset);
-    if (!CardData)
-    {
-        return EDataValidationResult::NotValidated;
-    }
+	UCardData* CardData = Cast<UCardData>(InAsset);
+	if (!CardData)
+	{
+		return EDataValidationResult::NotValidated;
+	}
 
-    bool bIsValid = true;
+	bool bIsValid = true;
 
-    ValidateExecutionRecursive(
-        CardData,
-        CardData->PrimaryExecution,
-        TEXT("PrimaryExecution"),
-        Context,
-        bIsValid
-    );
+	ValidateExecutionRecursive(
+		CardData,
+		CardData->PrimaryExecution,
+		TEXT("PrimaryExecution"),
+		Context,
+		bIsValid
+	);
 
-    ValidateExecutionRecursive(
-        CardData,
-        CardData->SecondaryExecution,
-        TEXT("SecondaryExecution"),
-        Context,
-        bIsValid
-    );
+	ValidateExecutionRecursive(
+		CardData,
+		CardData->SecondaryExecution,
+		TEXT("SecondaryExecution"),
+		Context,
+		bIsValid
+	);
 
-    return bIsValid
-        ? EDataValidationResult::Valid
-        : EDataValidationResult::Invalid;
+	return bIsValid
+		? EDataValidationResult::Valid
+		: EDataValidationResult::Invalid;
+}
+
+
+UValidator_CardParamsHaveScalingGroup::UValidator_CardParamsHaveScalingGroup()
+{
+	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.DamageType.DamageType1"));
+	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.DamageType.DamageType2"));
 }
 
 void UValidator_CardParamsHaveScalingGroup::ValidateExecutionRecursive(
-    const UCardData* CardData,
-    const UCardEffectFragment_Execution* Execution,
-    const FString& Path,
-    FDataValidationContext& Context,
-    bool& bIsValid
-)
+	const UCardData* CardData,
+	const UCardEffectFragment_Execution* Execution,
+	const FString& Path,
+	FDataValidationContext& Context,
+	bool& bIsValid
+) const
 {
-    if (!Execution)
-    {
-        return;
-    }
+	if (!Execution)
+	{
+		return;
+	}
 
-    if (const UCardEffectFragment_Execution_Compound* Compound =
-        Cast<UCardEffectFragment_Execution_Compound>(Execution))
-    {
-        for (int32 Index = 0; Index < Compound->Executions.Num(); ++Index)
-        {
-            ValidateExecutionRecursive(
-                CardData,
-                Compound->Executions[Index],
-                FString::Printf(TEXT("%s.Executions[%d]"), *Path, Index),
-                Context,
-                bIsValid
-            );
-        }
+	if (const UCardEffectFragment_Execution_Compound* Compound = Cast<UCardEffectFragment_Execution_Compound>(Execution))
+	{
+		for (int32 Index = 0; Index < Compound->Executions.Num(); ++Index)
+		{
+			ValidateExecutionRecursive(CardData, Compound->Executions[Index], FString::Printf(TEXT("%s.Executions[%d]"), *Path, Index),
+				Context, bIsValid);
+		}
 
-        return;
-    }
+		return;
+	}
 
-    if (const UCardEffectFragment_Execution_WithParameters* WithParams =
-        Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
-    {
-        for (const UCardParameter* Param : WithParams->Parameters)
-        {
-            if (!Param)
-            {
-                continue;
-            }
-            const FGameplayTag& Tag = Param->ParameterTag;
-            const FSetByCallerMetaData& MetaData = Param->MetaData;
-            const FString SGAsString = MetaData.ScalingGroup.ToString();
+	if (const UCardEffectFragment_Execution_WithParameters* WithParams = Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
+	{
+		for (const UCardParameter* Param : WithParams->Parameters)
+		{
+			if (!Param)
+			{
+				continue;
+			}
+			const FGameplayTag& Tag = Param->ParameterTag;
+			const FSetByCallerMetaData& MetaData = Param->MetaData;
+			const FString SGAsString = MetaData.ScalingGroup.ToString();
 
-            if (!MetaData.ScalingGroup.IsValid() || !SGAsString.StartsWith(TEXT("Gameplay.Effect.ScalingGroups.")))
-            {
-                bIsValid = false;
+			if ((!MetaData.ScalingGroup.IsValid() || !SGAsString.StartsWith(TEXT("Gameplay.Effect.ScalingGroups."))) && !Exceptions.Contains(Param->ParameterTag))
+			{
+				bIsValid = false;
 
-                Context.AddError(
-                    FText::Format(
-                        NSLOCTEXT(
-                            "CardValidation",
-                            "MissingScalingGroup",
-                            "{0}: {1} → SetByCaller '{2}' has no or invalid ScalingGroup"
-                        ),
-                        FText::FromString(GetNameSafe(CardData)),
-                        FText::FromString(Path),
-                        FText::FromName(Tag.GetTagName())
-                    )
-                );
-            }
-        }
-    }
+				Context.AddError(
+					FText::Format(
+						NSLOCTEXT(
+							"CardValidation",
+							"MissingScalingGroup",
+							"{0}: {1} → SetByCaller '{2}' has no or invalid ScalingGroup"
+						),
+						FText::FromString(GetNameSafe(CardData)),
+						FText::FromString(Path),
+						FText::FromName(Tag.GetTagName())
+					)
+				);
+			}
+		}
+	}
 }

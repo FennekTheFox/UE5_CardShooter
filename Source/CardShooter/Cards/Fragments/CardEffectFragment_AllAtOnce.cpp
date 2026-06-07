@@ -40,7 +40,7 @@ void UCardExecutionInstance_AllAtOnce::ProcessExecutionInstance()
 	}
 }
 
-FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_AllAtOnce::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	TArray<FText> ExecDescs;
 

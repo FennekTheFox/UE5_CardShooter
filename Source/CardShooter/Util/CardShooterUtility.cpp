@@ -407,45 +407,45 @@ FText UCardShooterUtilityLibrary::FormatTextForDisplay(const FText& Text)
 	//DamageTypes
 	FString Result = Text.ToString();
 
-	const TSet<FString> ValidDamageTypes =
-	{
-		TEXT("Poison"),
-		TEXT("Fire"),
-		TEXT("Cold"),
-		TEXT("Lightning"),
-		TEXT("Physical")
-	};
+	//const TSet<FString> ValidDamageTypes =
+	//{
+	//	TEXT("Poison"),
+	//	TEXT("Fire"),
+	//	TEXT("Cold"),
+	//	TEXT("Lightning"),
+	//	TEXT("Physical")
+	//};
 
-	for (const FString& DamageType : ValidDamageTypes)
-	{
-		const FString Token = FString::Printf(
-			TEXT("<%s>"),
-			*DamageType
-		);
+	//for (const FString& DamageType : ValidDamageTypes)
+	//{
+	//	const FString Token = FString::Printf(
+	//		TEXT("<%s>"),
+	//		*DamageType
+	//	);
 
-		const FString Replacement = FString::Printf(
-			TEXT("<img id=\"%s\"/> <DamageType%s>%s</>"),
-			*DamageType,
-			*DamageType,
-			*DamageType
-		);
+	//	const FString Replacement = FString::Printf(
+	//		TEXT("<img id=\"%s\"/> <DamageType%s>%s</>"),
+	//		*DamageType,
+	//		*DamageType,
+	//		*DamageType
+	//	);
 
-		Result.ReplaceInline(
-			*Token,
-			*Replacement,
-			ESearchCase::CaseSensitive
-		);
-	}
+	//	Result.ReplaceInline(
+	//		*Token,
+	//		*Replacement,
+	//		ESearchCase::CaseSensitive
+	//	);
+	//}
 
-	const FRegexPattern Pattern(TEXT(R"(\{[^}]*Magnitude\})"));
-	FRegexMatcher Matcher(Pattern, Result);
+	//const FRegexPattern Pattern(TEXT(R"(\{[^}]*Magnitude\})"));
+	//FRegexMatcher Matcher(Pattern, Result);
 
-	TArray<FString> Matches;
+	//TArray<FString> Matches;
 
-	while (Matcher.FindNext())
-	{
-		Matches.Add(Matcher.GetCaptureGroup(0));
-	}
+	//while (Matcher.FindNext())
+	//{
+	//	Matches.Add(Matcher.GetCaptureGroup(0));
+	//}
 
 	//for (const FString& Match : Matches)
 	//{
@@ -547,5 +547,5 @@ void UCardShooterUtilityLibrary::DuplicateSpec(class UAbilitySystemComponent* AS
 	NewSpec->SetDuration(InSpec.GetDuration(), true);
 
 	// Optional depending on your needs:
-	NewSpec->StackCount = InSpec.StackCount;
+	NewSpec->SetStackCount(InSpec.GetStackCount());
 }

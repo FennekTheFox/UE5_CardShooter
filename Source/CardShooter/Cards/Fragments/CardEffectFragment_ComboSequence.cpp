@@ -38,7 +38,7 @@ void UCardExecutionInstance_ComboSequence::ProcessExecutionInstance()
 	}
 }
 
-FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_ComboSequence::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	if (Executions.IsEmpty())
 	{

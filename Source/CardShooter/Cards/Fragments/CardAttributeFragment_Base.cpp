@@ -16,7 +16,7 @@ FText UCardEffectFragment_Base::GetLocalizableName_Implementation(const FCardIde
 	return FText::GetEmpty();
 }
 
-FText UCardEffectFragment_Base::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Base::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return FText::GetEmpty();
 }
@@ -26,7 +26,8 @@ FText UCardEffectFragment_Base::GetRawLocalizableDescription(const FCardIdentity
 	return FText::GetEmpty();
 }
 
-void UCardEffectFragment_Attribute::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
+
+void UCardEffectFragment_Attribute::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const
 {
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;
@@ -154,15 +155,15 @@ bool UCardEffectFragment_Attribute::GetParameterValue(FGameplayTag ParamTag, flo
 
 void UCardParameter::GetHoverText_Implementation(FText& OutText) const
 {
-	OutText = FText::GetEmpty();
+	OutText = LOCTEXT("CardParameterHoverFormat", "<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"{3}\">{4}</>");
 }
 
-void UCardParameter::GetHoverContentTitle_Implementation(FText& OutText) const
+void UCardParameter_ScalingGroupParameter::GetHoverContentTitle_Implementation(FText& OutText) const
 {
-	OutText = FText::Format(LOCTEXT("CardParam_Title", "Card Parameter: {0}"), MetaData.ParameterName);
+	OutText = FText::Format(LOCTEXT("CardParam_SGParam_Title", "Card Parameter: {0}"), MetaData.ParameterName);
 }
 
-void UCardParameter::GetHoverContent_Implementation(FText& OutText) const
+void UCardParameter_ScalingGroupParameter::GetHoverContent_Implementation(FText& OutText) const
 {
 	OutText = FText::GetEmpty();
 
@@ -178,6 +179,59 @@ void UCardParameter::GetHoverContent_Implementation(FText& OutText) const
 	}
 
 	OutText = FText::Join(FText::FromString("\n"), Segments);
+}
+
+FText UCardParameter_ScalingGroupParameter::GetStyle(const FSetByCallerMetaData& InMetaData)
+{
+	return FText::FromString("HoverContent_Param");
+}
+
+void UCardParameter_DamageType::GetHoverContentTitle_Implementation(FText& OutText) const
+{
+	//FString DamageType;
+	//ParameterTag.ToString().Split(TEXT("."), nullptr, &DamageType, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+
+	//const FString MagnitudeName = FString::Printf(TEXT("{%sMagnitude}"), *DamageType);
+
+	//OutText = FText::Format(
+	//	LOCTEXT("CardParam_DamageType_Title", "Damage Type: {0}"),
+	//	FText::FromString(MagnitudeName)
+	//);
+
+	OutText = FText::Format(LOCTEXT("CardParam_DamageType_Title", "Damage Type: {0}"), MetaData.GetDisplayText());
+}
+
+void UCardParameter_DamageType::GetHoverContent_Implementation(FText& OutText) const
+{
+	OutText = FText::Format(LOCTEXT("CardParam_DamageType_Desc", "Default Type: {0}"), MetaData.GetDisplayText());
+}
+
+FText UCardParameter_DamageType::GetStyle(const FSetByCallerMetaData& InMetaData)
+{
+	const float& Magnitude = MetaData.Magnitude;
+
+	TSubclassOf<UNeonDamageType> DamageTypeClass = nullptr;
+
+	for(auto&& KVPair : DamageTypeMap)
+	{
+		if (FMath::IsNearlyEqual(Magnitude, KVPair.Key, 0.05))
+		{
+			DamageTypeClass = KVPair.Value;
+			break;
+		}
+	}
+
+	if (ensure(DamageTypeClass))
+	{
+		UNeonDamageType* CDO = DamageTypeClass->GetDefaultObject<UNeonDamageType>();
+
+		if (ensure(CDO))
+		{
+			return CDO->RichStyle;
+		}
+	}
+
+	return FText::FromString("HoverContent_Param");
 }
 
 #undef LOCTEXT_NAMESPACE

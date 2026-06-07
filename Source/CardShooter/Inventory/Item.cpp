@@ -10,7 +10,7 @@ void UItem::PostInitProperties()
 	}
 }
 
-void UItem::GetItemBrush_Implementation(FSlateBrush& OutBrush)
+void UItem::GetItemBrush_Implementation(const UObject* WorldContextObject, FSlateBrush& OutBrush)
 {
 
 }

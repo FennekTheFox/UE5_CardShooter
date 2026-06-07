@@ -270,6 +270,76 @@ void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) 
 	}
 }
 
+void GatherParametersFromExecutionByPredicate(
+	UCardEffectFragment_Execution* Exec,
+	TArray<UCardParameter*>& OutParameters,
+	TFunctionRef<bool(const UCardParameter*)> Predicate)
+{
+	if (!Exec)
+	{
+		return;
+	}
+
+	if (const UCardEffectFragment_Execution_WithParameters* WithParams =
+		Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
+	{
+		for (UCardParameter* Param : WithParams->Parameters)
+		{
+			if (Param && Predicate(Param))
+			{
+				OutParameters.AddUnique(Param);
+			}
+		}
+	}
+
+	if (const UCardEffectFragment_Execution_Compound* Compound =
+		Cast<UCardEffectFragment_Execution_Compound>(Exec))
+	{
+		for (UCardEffectFragment_Execution* ChildExec : Compound->Executions)
+		{
+			GatherParametersFromExecutionByPredicate(
+				ChildExec,
+				OutParameters,
+				Predicate);
+		}
+	}
+}
+
+void UCardData::GetParametersByPredicate(TArray<UCardParameter*>& OutParameters, TFunctionRef<bool(const UCardParameter*)> Predicate) const
+{
+	if (PrimaryExecution)
+	{
+		GatherParametersFromExecutionByPredicate(
+			PrimaryExecution,
+			OutParameters,
+			Predicate);
+	}
+
+	if (SecondaryExecution)
+	{
+		GatherParametersFromExecutionByPredicate(
+			SecondaryExecution,
+			OutParameters,
+			Predicate);
+	}
+
+	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
+	{
+		if (!Attribute)
+		{
+			continue;
+		}
+
+		for (UCardParameter* Param : Attribute->Parameters)
+		{
+			if (Param && Predicate(Param))
+			{
+				OutParameters.AddUnique(Param);
+			}
+		}
+	}
+}
+
 void UCardData::GetAugments(const FCardIdentity& CardIdentity, TArray<UItem_CardAugment*>& OutAugments)
 {
 	OutAugments.Empty();

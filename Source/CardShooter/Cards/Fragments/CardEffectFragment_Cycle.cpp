@@ -42,7 +42,7 @@ void UCardExecutionInstance_Cycle::ProcessExecutionInstance()
 	}
 }
 
-FText UCardEffectFragment_Execution_Cycle::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_Cycle::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	TArray<FText> ExecDescs;
 	ExecDescs.Add(LOCTEXT("CycleName", "Cycle"));

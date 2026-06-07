@@ -22,7 +22,7 @@ bool UCardEffectFragment_Gregarious::Verify(const FCardDeck_DataOnly& Deck, TArr
 	return bSuccess;
 }
 
-FText UCardEffectFragment_Gregarious::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Gregarious::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return FText::Format(LOCTEXT("GregariousAttrDesc", "This card can only be part of decks with at least {0} cards."), FText::AsNumber(MinimumDeckSize));
 }

@@ -33,10 +33,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag TargetDataID;
 	//~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const override;
 	FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 
-	void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) override;
+	void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const override;
 
 };

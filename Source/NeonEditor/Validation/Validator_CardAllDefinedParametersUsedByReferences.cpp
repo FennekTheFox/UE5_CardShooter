@@ -6,6 +6,31 @@
 #include "Cards/CardData.h"
 #include "GameplayTagContainer.h"
 #include "UObject/UnrealType.h"
+#include "Cards/Fragments/CardAttributeFragment_Base.h"
+
+namespace
+{
+	bool IsCardParameterAsset(UObject* Asset)
+	{
+		if (!Asset)
+		{
+			return false;
+		}
+
+		if (Asset->IsA(UCardParameter::StaticClass()))
+		{
+			return true;
+		}
+
+		if (const UBlueprint* Blueprint = Cast<UBlueprint>(Asset))
+		{
+			return Blueprint->GeneratedClass &&
+				Blueprint->GeneratedClass->IsChildOf(UCardParameter::StaticClass());
+		}
+
+		return false;
+	}
+}
 
 bool UValidator_CardAllDefinedParametersUsedByReferences::CanValidateAsset_Implementation(
 	const FAssetData& InAssetData,
@@ -52,11 +77,23 @@ EDataValidationResult UValidator_CardAllDefinedParametersUsedByReferences::Valid
 
 	for (const FAssetData& AssetData : ReferencedAssets)
 	{
+		UObject* ReferencedAsset = AssetData.GetAsset();
+
+		if (IsCardParameterAsset(ReferencedAsset))
+		{
+			UE_LOG(
+				LogTemp,
+				Verbose,
+				TEXT("Skipping parameter asset: %s"),
+				*GetNameSafe(ReferencedAsset));
+
+			continue;
+		}
+
 		CollectParameterTagsFromSearchableNames(
 			AssetData.PackageName,
 			ReferencedParameterTags);
 
-		UObject* ReferencedAsset = AssetData.GetAsset();
 		if (ReferencedAsset)
 		{
 			CollectParameterTagsFromObject(
@@ -99,10 +136,7 @@ UValidator_CardAllDefinedParametersUsedByReferences::UValidator_CardAllDefinedPa
 	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.SecondaryUtilityCooldown"));
 }
 
-void UValidator_CardAllDefinedParametersUsedByReferences::CollectRecursiveDependencies(
-	const FName& RootPackageName,
-	TSet<FName>& VisitedPackages,
-	TArray<FAssetData>& OutAssets)
+void UValidator_CardAllDefinedParametersUsedByReferences::CollectRecursiveDependencies(const FName& RootPackageName, TSet<FName>& VisitedPackages, TArray<FAssetData>& OutAssets)
 {
 	if (VisitedPackages.Contains(RootPackageName))
 	{
@@ -205,6 +239,11 @@ void UValidator_CardAllDefinedParametersUsedByReferences::CollectParameterTagsFr
 	TSet<FGameplayTag>& OutTags)
 {
 	if (!Object)
+	{
+		return;
+	}
+
+	if (Object->IsA(UCardParameter::StaticClass()))
 	{
 		return;
 	}

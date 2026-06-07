@@ -20,6 +20,6 @@ public:
 
 	//~UCardEffectFragment
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;
-	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const override;
 	//~UCardEffectFragment
 };

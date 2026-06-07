@@ -21,7 +21,7 @@ void UCardExecutionInstance_DebugPrint::ProcessExecutionInstance()
 	OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 }
 
-FText UCardEffectFragment_Execution_DebugPrint::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_DebugPrint::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return FText::Format(
 		LOCTEXT("DebugPrintName", "Prints Debug Message: {0}"),

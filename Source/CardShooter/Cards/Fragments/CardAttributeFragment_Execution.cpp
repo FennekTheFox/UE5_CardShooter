@@ -132,7 +132,7 @@ UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCar
 	return NewInstance;
 }
 
-void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
+void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const
 {
 	if (UCardEffectFragment_Execution_WithParameters* ParentWithParams = Cast<UCardEffectFragment_Execution_WithParameters>(ParentCompound))
 	{
@@ -141,7 +141,6 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;
-
 	for (const UCardParameter* Param : Parameters)
 	{
 		if (!Param)
@@ -154,7 +153,6 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 	}
 
 	//apply the card augments
-	//apply the card augments
 	TArray<UItem_CardAugment*> Augments;
 	UCardData::GetAugments(CardIdentity, Augments);
 	for (UItem_CardAugment* AugmentItem : Augments)
@@ -166,8 +164,7 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 		FCardAugmentData AugmentData = AugmentItem->AugmentData;
 		UCardAugment* AugmentCDO = nullptr;
 
-		if (UClass* AugmentClass =
-			AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		if (UClass* AugmentClass =AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
 		{
 			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
 		}
@@ -201,7 +198,7 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 			LastPart = Right;
 		}
 
-		UCardParameter** Param = Parameters.FindByPredicate([Tag](const UCardParameter* A)
+		UCardParameter* const* Param = Parameters.FindByPredicate([Tag](const UCardParameter* A)
 			{
 				if (!A)
 				{
@@ -215,13 +212,16 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 			continue;
 		}
 
+		FText FormatingBase = FText::GetEmpty();
+		IHoverableContext::Execute_GetHoverText(*Param, FormatingBase);
+
 		Args.Add(
 			LastPart + "Magnitude",
-			FText::Format(LOCTEXT("CardParameterHoverFormat",
-				"<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"HoverContent_Param\">{3}</>"),
+			FText::Format(FormatingBase,
 				FText::FromString((*Param)->GetPathName()),
 				FText::FromString(this->GetPathName()),
 				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
+				(*Param)->GetStyle(MetaData),
 				MetaData.GetDisplayText())
 		);
 

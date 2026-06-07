@@ -89,21 +89,18 @@ private:
 			return Content;
 		}
 
-		if (UCardEffectFragment_Attribute* AsCEF_A =
-			Cast<UCardEffectFragment_Attribute>(HoverObject))
+		if (UCardEffectFragment_Attribute* AsCEF_A = Cast<UCardEffectFragment_Attribute>(HoverObject))
 		{
 			return AsCEF_A->GetLocalizableDescription(CardIdentity.Get());
 		}
 
 		if (UGameplayEffect_CardExecution* AsGA_CE = Cast<UGameplayEffect_CardExecution>(HoverObject))
 		{
-			if (UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO =
-				Cast<UCardEffectFragment_ApplyEffectToOwner>(relatedExecFrag))
+			if (UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(relatedExecFrag))
 			{
 				return AsGA_CE->GetDescription(CardIdentity.Get(), AsCEF_AETO);
 			}
-			else if (UCardEffectFragment_GameplayAbility* AsCEF_GA =
-				Cast<UCardEffectFragment_GameplayAbility>(relatedExecFrag))
+			else if (UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(relatedExecFrag))
 			{
 				return AsGA_CE->GetDescription(CardIdentity.Get(), AsCEF_GA);
 			}
@@ -129,21 +126,27 @@ private:
 		return Content;
 	}
 
-	FText BuildTooltipTitle() const 
+	FText BuildTooltipTitle() const
 	{
-		FText Content = FText::FromString(TEXT("Couldn't parse context path."));
+		FText Title = FText::FromString(TEXT("Couldn't parse context path."));
 
 		if (!HoverObject)
 		{
-			return Content;
+			return Title;
 		}
 
 		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
 		{
-			IHoverableContext::Execute_GetHoverContentTitle(HoverObject, Content);
+			IHoverableContext::Execute_GetHoverContentTitle(HoverObject, Title);
 		}
 
-		return Content;
+		if (UCardEffectFragment_Base* AsCEF_B = Cast<UCardEffectFragment_Base>(HoverObject))
+		{
+			return AsCEF_B->GetLocalizableName(CardIdentity.Get());
+		}
+
+
+		return Title;
 	}
 
 	void PushDataIntoTooltipWidget(UUserWidget* Widget, const FText& Title, const FText& Content)
@@ -258,17 +261,39 @@ private:
 		FVector2D PixelPosition;
 		FVector2D ViewportPosition;
 
-		USlateBlueprintLibrary::AbsoluteToViewport(
-			World.Get(),
-			ScreenPosition,
-			PixelPosition,
-			ViewportPosition
-		);
+		USlateBlueprintLibrary::AbsoluteToViewport(World.Get(), ScreenPosition, PixelPosition, ViewportPosition);
 
-		TooltipUserWidget->SetPositionInViewport(
-			ViewportPosition + FVector2D(25.f, 25.f),
-			false
-		);
+		const FVector2D CursorOffset(25.f, 25.f);
+
+		// Desired tooltip position
+		FVector2D TooltipPosition = ViewportPosition + CursorOffset;
+
+		// Viewport size
+		FVector2D ViewportSize;
+		if (GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+		}
+
+		// Tooltip size
+		const FVector2D TooltipSize = TooltipUserWidget->GetDesiredSize();
+
+		// If tooltip would go off the right edge, place it to the left of the cursor
+		if (TooltipPosition.X + TooltipSize.X > ViewportSize.X)
+		{
+			TooltipPosition.X = ViewportPosition.X - TooltipSize.X - CursorOffset.X;
+		}
+
+		// If tooltip would go off the bottom edge, place it above the cursor
+		if (TooltipPosition.Y + TooltipSize.Y > ViewportSize.Y)
+		{
+			TooltipPosition.Y = ViewportPosition.Y - TooltipSize.Y - CursorOffset.Y;
+		}
+
+		// Safety clamp in case tooltip is larger than available space
+		TooltipPosition.X = FMath::Clamp(TooltipPosition.X, 0.f, FMath::Max(0.f, ViewportSize.X - TooltipSize.X));
+		TooltipPosition.Y = FMath::Clamp(TooltipPosition.Y, 0.f, FMath::Max(0.f, ViewportSize.Y - TooltipSize.Y));
+		TooltipUserWidget->SetPositionInViewport(TooltipPosition, false);
 	}
 
 	void RemoveTooltip()

@@ -28,6 +28,6 @@ public:
 	int32 Count = 1;
 
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 };

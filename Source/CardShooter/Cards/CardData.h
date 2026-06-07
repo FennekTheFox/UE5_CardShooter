@@ -97,6 +97,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters) const;
 
+	void GetParametersByPredicate(TArray<class UCardParameter*>& OutParameters, TFunctionRef<bool(const UCardParameter*)> Predicate) const;
 
 	UFUNCTION(BlueprintPure)
 	static void GetAugments(const FCardIdentity& CardIdentity, TArray<UItem_CardAugment*>& OutAugments);

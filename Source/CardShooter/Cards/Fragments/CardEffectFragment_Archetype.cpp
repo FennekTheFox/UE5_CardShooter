@@ -50,7 +50,7 @@ bool UCardEffectFragment_Archetype::Verify(const FCardDeck_DataOnly& Deck, TArra
 	return true;
 }
 
-FText UCardEffectFragment_Archetype::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Archetype::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return LOCTEXT("ArchetypeAttrDesc", "Your deck can only contain cards of one archetype.");
 }

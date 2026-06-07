@@ -1,11 +1,13 @@
 #pragma once
 
 #include "GameplayEffect.h"
+#include "UI/RichTextHoverDecorator.h"
 
 #include "GameplayEffect_CardExecution.generated.h"
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
-class UGameplayEffect_CardExecution : public UGameplayEffect
+class UGameplayEffect_CardExecution : public UGameplayEffect,
+	public IHoverableContext
 {
 	GENERATED_BODY()
 
@@ -47,5 +49,8 @@ public:
 	{
 		return EffectIcon;
 	}
+
+
+	void GetHoverContentTitle_Implementation(FText& OutText) const override;
 
 };

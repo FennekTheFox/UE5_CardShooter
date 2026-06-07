@@ -26,7 +26,7 @@ void UCardExecutionInstance_RemoveAttributeFromNextCards::ProcessExecutionInstan
 }
 
 
-FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_RemoveAttributeFromNextCards::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	if (!ensure(AttributeClass))
 	{

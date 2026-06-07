@@ -19,6 +19,7 @@ enum class ESetByCallerMagnitudeDisplayType : uint8
 	XOver100,
 	Rotation,
 	PercentXMinusOne,
+	DamageType,
 };
 
 USTRUCT(BlueprintType)

@@ -75,17 +75,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static FText FormatTextForDisplay(const FText& Text);
 
-	UFUNCTION(BlueprintCallable, Category = "Utilities|Object",	meta = (DeterminesOutputType = "Class",	DynamicOutputParam = "OutObjects")
-	)
-	static void FilterObjectsByClass(
-		const TArray<UObject*>& Objects,
-		TSubclassOf<UObject> Class,
-		TArray<UObject*>& OutObjects
-	);
+	UFUNCTION(BlueprintCallable, Category = "Utilities|Object", meta = (DeterminesOutputType = "Class", DynamicOutputParam = "OutObjects"))
+	static void FilterObjectsByClass(const TArray<UObject*>& Objects, TSubclassOf<UObject> Class, TArray<UObject*>& OutObjects);
 
 	UFUNCTION(BlueprintPure)
 	static bool GetSpecFromActiveEffect(const FActiveGameplayEffectHandle ActiveEffect, class UAbilitySystemComponent* OwningASC, FGameplayEffectSpec& OutSpec);
 
 	UFUNCTION(BlueprintPure)
-	static void DuplicateSpec(class UAbilitySystemComponent* ASC,const FGameplayEffectSpec& InSpec, FGameplayEffectSpecHandle& OutSpec);
+	static void DuplicateSpec(class UAbilitySystemComponent* ASC, const FGameplayEffectSpec& InSpec, FGameplayEffectSpecHandle& OutSpec);
 };

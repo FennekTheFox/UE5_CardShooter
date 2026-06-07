@@ -23,6 +23,6 @@ class UCardEffectFragment_Execution_ComboSequence : public UCardEffectFragment_E
 
 public:
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 };

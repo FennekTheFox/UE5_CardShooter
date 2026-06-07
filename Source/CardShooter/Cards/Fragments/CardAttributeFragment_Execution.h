@@ -86,7 +86,7 @@ public:
 
 	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution) override;
 
-	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
+	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;
 	virtual void GatherParameters(FCardExecution_AdditionalData& OutData) const;
 };
 

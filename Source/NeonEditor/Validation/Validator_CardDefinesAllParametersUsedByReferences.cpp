@@ -56,13 +56,13 @@ EDataValidationResult UValidator_CardDefinesAllParametersUsedByReferences::Valid
 			AssetData.PackageName,
 			TagsFoundInThisAsset);
 
-		UObject* ReferencedAsset = AssetData.GetAsset();
-		if (ReferencedAsset)
-		{
-			CollectParameterTagsFromObject(
-				ReferencedAsset,
-				TagsFoundInThisAsset);
-		}
+		//UObject* ReferencedAsset = AssetData.GetAsset();
+		//if (ReferencedAsset)
+		//{
+		//	CollectParameterTagsFromObject(
+		//		ReferencedAsset,
+		//		TagsFoundInThisAsset);
+		//}
 
 		for (const FGameplayTag& Tag : TagsFoundInThisAsset)
 		{

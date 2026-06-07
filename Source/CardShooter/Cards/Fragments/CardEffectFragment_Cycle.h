@@ -25,6 +25,6 @@ class UCardEffectFragment_Execution_Cycle : public UCardEffectFragment_Execution
 
 public:
 	 //~UCardEffectFragment
-	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) override;
+	FText GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const override;
 	 //~UCardEffectFragment
 };

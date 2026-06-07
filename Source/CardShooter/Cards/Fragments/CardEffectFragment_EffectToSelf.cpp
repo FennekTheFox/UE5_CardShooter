@@ -65,7 +65,7 @@ void UCardExecutionInstance_ApplyEffectToOwner::ProcessExecutionInstance()
 	}
 }
 
-FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_ApplyEffectToOwner::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	FFormatNamedArguments Args;
 	GetFormattingArgs(Args, CardIdentity);

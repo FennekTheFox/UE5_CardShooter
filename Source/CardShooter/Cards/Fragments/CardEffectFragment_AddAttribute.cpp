@@ -23,7 +23,7 @@ void UCardExecutionInstance_AddAttributeToNextCards::ProcessExecutionInstance()
 	OnExecutionCompleted.Broadcast(ExecutingPawn, AdditionalData, Exec);
 }
 
-FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_AddAttributeToNextCards::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	if (!ensure(Attribute))
 	{

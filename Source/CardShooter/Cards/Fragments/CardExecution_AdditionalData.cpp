@@ -32,6 +32,14 @@ FText FSetByCallerMetaData::GetDisplayText() const
 		if (EffectiveMagnitude < 0.f) return FText::Format(LOCTEXT("SetByCallerRotation_DegLeft", " {0}° to the left"), FText::AsNumber(FMath::Abs(EffectiveMagnitude)));
 		if (EffectiveMagnitude > 0.f) return FText::Format(LOCTEXT("SetByCallerRotation_DegRight", " {0}° to the right"), FText::AsNumber(EffectiveMagnitude));
 	}
+	case ESetByCallerMagnitudeDisplayType::DamageType:
+	{
+		if (FMath::IsNearlyEqual(Magnitude, 0.f)) return LOCTEXT("SetByCallerDamageType_Physical", "Physical");
+		if (FMath::IsNearlyEqual(Magnitude, 1.f)) return LOCTEXT("SetByCallerDamageType_Fire", "Fire");
+		if (FMath::IsNearlyEqual(Magnitude, 2.f)) return LOCTEXT("SetByCallerDamageType_Cold", "Cold");
+		if (FMath::IsNearlyEqual(Magnitude, 3.f)) return LOCTEXT("SetByCallerDamageType_Lightning", "Lightning");
+		if (FMath::IsNearlyEqual(Magnitude, 4.f)) return LOCTEXT("SetByCallerDamageType_Poison", "Poison");
+	}
 	}
 
 	ensure(false);

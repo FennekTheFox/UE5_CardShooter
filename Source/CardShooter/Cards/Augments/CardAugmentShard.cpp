@@ -36,9 +36,9 @@ bool UItem_Stackable_CardAugmentShard::SameItem_Implementation(const UItem* Othe
 	return false;
 }
 	
-void UItem_Stackable_CardAugmentShard::GetItemBrush_Implementation(FSlateBrush& OutBrush)
+void UItem_Stackable_CardAugmentShard::GetItemBrush_Implementation(const UObject* WorldContextObject, FSlateBrush& OutBrush)
 {
-	UCardAugment::GetShardStyleData(ShardData, OutBrush);
+	UCardAugment::GetShardStyleData(WorldContextObject, ShardData, OutBrush);
 }
 
 FText UItem_Stackable_CardAugmentShard::GetItemName_Implementation()

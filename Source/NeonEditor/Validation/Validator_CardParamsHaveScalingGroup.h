@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "EditorValidatorBase.h"
+#include "GameplayTagContainer.h"
 
 #include "Validator_CardParamsHaveScalingGroup.generated.h"
 
@@ -13,7 +14,11 @@ class UValidator_CardParamsHaveScalingGroup : public UEditorValidatorBase
 {
     GENERATED_BODY()
 
+    UValidator_CardParamsHaveScalingGroup();
+
 public:
+    UPROPERTY()
+    TArray<FGameplayTag> Exceptions;
 
     virtual bool CanValidateAsset_Implementation(
         const FAssetData& InAssetData,
@@ -28,11 +33,11 @@ public:
 
 private:
 
-    static void ValidateExecutionRecursive(
+    void ValidateExecutionRecursive(
         const UCardData* CardData,
         const UCardEffectFragment_Execution* Execution,
         const FString& Path,
         FDataValidationContext& Context,
         bool& bIsValid
-    );
+    ) const;
 };

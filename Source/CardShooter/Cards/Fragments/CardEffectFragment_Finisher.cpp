@@ -7,7 +7,7 @@ FText UCardEffectFragment_Finisher::GetLocalizableName_Implementation(const FCar
 	return LOCTEXT("FinisherAttrName", "Finisher");
 }
 
-FText UCardEffectFragment_Finisher::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Finisher::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return LOCTEXT("FinisherAttrDesc", "This card always shuffles to the back of your deck.");
 }

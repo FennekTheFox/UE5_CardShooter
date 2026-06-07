@@ -43,7 +43,7 @@ void UCardExecutionInstance_Sequence::ProcessExecutionInstance()
 	}
 }
 
-FText UCardEffectFragment_Execution_Sequence::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Execution_Sequence::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	TArray<FText> ExecDescs;
 	ExecDescs.Add(LOCTEXT("SequenceName", "Sequence"));

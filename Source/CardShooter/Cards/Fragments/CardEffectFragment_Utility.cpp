@@ -10,7 +10,7 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_UtilitySecondaryCooldown, "Gameplay.Effect.Parameters
 UCardEffectFragment_Utility::UCardEffectFragment_Utility()
 {
 	static ConstructorHelpers::FClassFinder<UCardParameter> BPCardParamClassFinder(
-		TEXT("/Game/Blueprint/Misc/CardParameters/BP_CardParameterBase"));
+		TEXT("/Game/Blueprint/Misc/CardParameters/SGParams/BP_CardParameter_SG_Base"));
 
 
 	if (ensure(BPCardParamClassFinder.Succeeded()))
@@ -104,7 +104,7 @@ FText UCardEffectFragment_Utility::GetLocalizableName_Implementation(const FCard
 	return FText::GetEmpty();
 }
 
-FText UCardEffectFragment_Utility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Utility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 
 	FFormatNamedArguments Args;

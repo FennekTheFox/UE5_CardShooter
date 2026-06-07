@@ -1,6 +1,6 @@
 #include "CardAugment.h"
 
-void UCardAugment::GetAugmentStyleData(const FCardAugmentData& Data, FSlateBrush& OutBrush)
+void UCardAugment::GetAugmentStyleData(const UObject* WorldContextObject, const FCardAugmentData& Data, FSlateBrush& OutBrush)
 {
 	UClass* LoadedClass = Data.AugmentClass.TryLoadClass<UCardAugment>();
 	if (!LoadedClass)
@@ -12,7 +12,7 @@ void UCardAugment::GetAugmentStyleData(const FCardAugmentData& Data, FSlateBrush
 
 	if (CDO->AugmentBushGenerator)
 	{
-		CDO->AugmentBushGenerator->GenerateBrush(Data, OutBrush);
+		CDO->AugmentBushGenerator->GenerateBrush(WorldContextObject, Data, OutBrush);
 	}
 }
 
@@ -52,7 +52,7 @@ FText UCardAugment::GetAugmentDescription(const FCardAugmentData& Data)
 	return FText::GetEmpty();
 }
 
-void UCardAugment::GetShardStyleData(const FCardAugmentShard& Data, FSlateBrush& OutBrush)
+void UCardAugment::GetShardStyleData(const UObject* WorldContextObject, const FCardAugmentShard& Data, FSlateBrush& OutBrush)
 {
 	UClass* LoadedClass = Data.AugmentType.TryLoadClass<UCardAugment>();
 	if (!LoadedClass)
@@ -64,7 +64,7 @@ void UCardAugment::GetShardStyleData(const FCardAugmentShard& Data, FSlateBrush&
 
 	if (CDO->AugmentBushGenerator)
 	{
-		CDO->AugmentShardBrushGenerator->GenerateBrush(Data, OutBrush);
+		CDO->AugmentShardBrushGenerator->GenerateBrush(WorldContextObject, Data, OutBrush);
 	}
 }
 
@@ -106,9 +106,9 @@ FText UCardAugment::GetShardDescription(const FCardAugmentShard& Data)
 	return FText::GetEmpty();
 }
 
-void UItem_CardAugment::GetItemBrush_Implementation(FSlateBrush& OutBrush)
+void UItem_CardAugment::GetItemBrush_Implementation(const UObject* WorldContextObject, FSlateBrush& OutBrush)
 {
-	UCardAugment::GetAugmentStyleData(AugmentData, OutBrush);
+	UCardAugment::GetAugmentStyleData(WorldContextObject, AugmentData, OutBrush);
 }
 
 bool UItem_CardAugment::SameItem_Implementation(const UItem* Other) const

@@ -10,7 +10,7 @@ FText UCardEffectFragment_Combo::GetLocalizableName_Implementation(const FCardId
 		FText::AsNumber(ComboWindow));
 }
 
-FText UCardEffectFragment_Combo::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Combo::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return FText::Format(LOCTEXT("ComboAttrDesc", "This card can be activated up to {0} times within {1} seconds."),
 		FText::AsNumber(ComboCount),

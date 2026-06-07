@@ -100,7 +100,7 @@ void UCardExecutionInstance_GameplayAbility::ProcessExecutionInstance()
 			}));
 }
 
-FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_GameplayAbility::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	FFormatNamedArguments Args;
 	GetFormattingArgs(Args, CardIdentity);
@@ -132,7 +132,7 @@ FText UCardEffectFragment_GameplayAbility::GetRawLocalizableDescription(const FC
 	return FText::GetEmpty();
 }
 
-void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity)
+void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const
 {
 	Super::GetFormattingArgs(Args, CardIdentity);
 

@@ -20,3 +20,8 @@ FText UGameplayEffect_CardExecution::GetDescription(const FCardIdentity& CardIde
 {
 	return UCardShooterUtilityLibrary::FormatTextForDisplay(EffectDesc);
 }
+
+void UGameplayEffect_CardExecution::GetHoverContentTitle_Implementation(FText& OutText) const
+{
+	OutText = FText::Format(NSLOCTEXT("CardAttributes", "GameplayEffectHowerTitle", "Effect: {0}"), GetSimpleLocalizableName());
+}

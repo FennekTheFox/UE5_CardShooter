@@ -16,7 +16,7 @@ class UCardAugmentBrushGenerator : public UPrimaryDataAsset
 
 public:
 	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
-	void GenerateBrush(const FCardAugmentData& AugmentData, FSlateBrush& OutBrush) const;
+	void GenerateBrush(const UObject* WorldContextObject, const FCardAugmentData& AugmentData, FSlateBrush& OutBrush) const;
 };
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
@@ -26,7 +26,7 @@ class UCardAugmentShardBrushGenerator : public UPrimaryDataAsset
 
 public:
 	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
-	void GenerateBrush(const FCardAugmentShard& AugmentData, FSlateBrush& OutBrush) const;
+	void GenerateBrush(const UObject* WorldContextObject, const FCardAugmentShard& AugmentData, FSlateBrush& OutBrush) const;
 };
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
@@ -92,7 +92,7 @@ public:
 	TObjectPtr<UCardAugmentShardTextGenerator> ShardDescriptionGenerator = nullptr;
 
 	UFUNCTION(BlueprintPure)
-	static void GetAugmentStyleData(const FCardAugmentData& Data, FSlateBrush& OutBrush);
+	static void GetAugmentStyleData(const UObject* WorldContextObject, const FCardAugmentData& Data, FSlateBrush& OutBrush);
 
 	UFUNCTION(BlueprintPure)
 	static FText GetAugmentName(const FCardAugmentData& Data);
@@ -101,7 +101,7 @@ public:
 	static FText GetAugmentDescription(const FCardAugmentData& Data);
 
 	UFUNCTION(BlueprintPure)
-	static void GetShardStyleData(const FCardAugmentShard& Data, FSlateBrush& OutBrush);
+	static void GetShardStyleData(const UObject* WorldContextObject, const FCardAugmentShard& Data, FSlateBrush& OutBrush);
 
 	UFUNCTION(BlueprintPure)
 	static FText GetShardName(const FCardAugmentShard& Data);
@@ -122,7 +122,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame)
 	FCardIdentityHandle UsedByCard;
 
-	void GetItemBrush_Implementation(FSlateBrush& OutBrush) override;
+	void GetItemBrush_Implementation(const UObject* WorldContextObject, FSlateBrush& OutBrush) override;
 	bool SameItem_Implementation(const UItem* Other) const override;
 	FText GetItemName_Implementation() override;
 	FText GetItemDescription_Implementation() override;

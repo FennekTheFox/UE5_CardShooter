@@ -114,7 +114,7 @@ public:
 	FCardAugmentShard ShardData;
 
 	bool SameItem_Implementation(const UItem* Other) const override;
-	void GetItemBrush_Implementation(FSlateBrush& OutBrush) override;
+	void GetItemBrush_Implementation(const UObject* WorldContextObject, FSlateBrush& OutBrush) override;
 	FText GetItemName_Implementation() override;
 	FText GetItemDescription_Implementation() override;
 

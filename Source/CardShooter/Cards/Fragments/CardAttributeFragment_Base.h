@@ -3,6 +3,7 @@
 #include "Cards/CardIdentity.h"
 #include "CardExecution_AdditionalData.h"
 #include "UI/RichTextHoverDecorator.h"
+#include "Misc/NeonDamageType.h"
 #include "CardAttributeFragment_Base.generated.h"
 
 UCLASS(BlueprintType, EditInlineNew, Abstract)
@@ -18,7 +19,7 @@ public:
 	FText GetLocalizableName(const FCardIdentity& CardIdentity);	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
-	FText GetLocalizableDescription(const FCardIdentity& CardIdentity);
+	FText GetLocalizableDescription(const FCardIdentity& CardIdentity) const;
 	virtual FText GetRawLocalizableDescription(const FCardIdentity& CardIdentity) const;
 
 protected:
@@ -49,15 +50,44 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FSetByCallerMetaData MetaData;
 
+	//BEGIN IHoverableContext
+	void GetHoverText_Implementation(FText& OutText) const override;
+	//END IHoverableContext
+
+	virtual FText GetStyle(const FSetByCallerMetaData& InMetaData) { return FText::GetEmpty(); }
+};
+
+UCLASS(Blueprintable, Abstract, EditInlineNew)
+class UCardParameter_ScalingGroupParameter : public UCardParameter
+{
+	GENERATED_BODY()
+public:
 	UPROPERTY(EditAnywhere)
 	TMap<FGameplayTag, FText> ScalingGroupNames;
 
-public:
 	//BEGIN IHoverableContext
-	void GetHoverText_Implementation(FText& OutText) const override;
 	void GetHoverContentTitle_Implementation(FText& OutText) const override;
 	void GetHoverContent_Implementation(FText& OutText) const override;
 	//END IHoverableContext
+
+	FText GetStyle(const FSetByCallerMetaData& InMetaData) override;
+
+};
+
+UCLASS(Blueprintable, Abstract, EditInlineNew)
+class UCardParameter_DamageType : public UCardParameter
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<int32, TSubclassOf<UNeonDamageType>> DamageTypeMap;
+
+	//BEGIN IHoverableContext
+	void GetHoverContentTitle_Implementation(FText& OutText) const override;
+	void GetHoverContent_Implementation(FText& OutText) const override;
+	//END IHoverableContext
+
+	FText GetStyle(const FSetByCallerMetaData& InMetaData) override;
 };
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
@@ -69,7 +99,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
 	TArray<UCardParameter*> Parameters;
 
-	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity);
+	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;
 
 	UFUNCTION(BlueprintPure)
 	bool GetParameterValue(FGameplayTag ParamTag, float& OutValue, const FCardIdentity& CardIdentity) const;

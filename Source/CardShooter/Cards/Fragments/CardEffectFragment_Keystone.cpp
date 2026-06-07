@@ -18,7 +18,7 @@ FText UCardEffectFragment_Keystone::GetLocalizableName_Implementation(const FCar
 	return FText::Format(LOCTEXT("KeystoneAttrName", "Keystone({0})"), FText::AsNumber(KeystoneLimit));
 }
 
-FText UCardEffectFragment_Keystone::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity)
+FText UCardEffectFragment_Keystone::GetLocalizableDescription_Implementation(const FCardIdentity& CardIdentity) const
 {
 	return FText::Format(LOCTEXT("KeystoneAttrDesc", "A deck with this card can only contain {0} cards with the Keystone attribute."), FText::AsNumber(KeystoneLimit));
 }

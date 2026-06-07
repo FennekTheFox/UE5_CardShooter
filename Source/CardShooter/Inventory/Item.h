@@ -39,7 +39,7 @@ public:
     void PostInitProperties() override;
 
     UFUNCTION(BlueprintPure, BlueprintNativeEvent)
-    void GetItemBrush(FSlateBrush& OutBrush);
+    void GetItemBrush(const UObject* WorldContextObject, FSlateBrush& OutBrush);
 
     UFUNCTION(BlueprintPure, BlueprintNativeEvent)
     bool SameItem(const UItem* Other) const;
