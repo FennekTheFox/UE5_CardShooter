@@ -116,8 +116,7 @@ UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCar
 	{
 		UCardAugment* AugmentCDO = nullptr;
 
-		if (UClass* AugmentClass =
-			AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		if (UClass* AugmentClass =	AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
 		{
 			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
 		}

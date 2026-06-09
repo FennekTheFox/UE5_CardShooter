@@ -34,6 +34,19 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) cons
 	//an ability execution if applied via an effect that was applied via an ability (yes i know its confusing). Either way we need
 	//to retrieve the set by caller data from the _WithParameters fragment
 
+
+	if (GetCurrentAbilitySpec()->GameplayEffectHandle.IsValid())
+	{
+		const FGameplayEffectSpec Spec = GetAbilitySystemComponentFromActorInfo()->GetActiveGameplayEffect(GetCurrentAbilitySpec()->GameplayEffectHandle)->Spec;
+
+		float Value = Spec.GetSetByCallerMagnitude(
+			Tag,
+			false,
+			-1.f
+		);
+
+		return Value;
+	}
 	//
 	TArray<UCardParameter*>* Parameters = nullptr;
 	UCardEffectFragment_Execution_WithParameters* WithParams = nullptr;
@@ -85,19 +98,6 @@ float UGameplayAbility_CardExecution::GetSetByCallerValue(FGameplayTag Tag) cons
 		{
 			return (*Data)->MetaData.Magnitude;
 		}
-	}
-
-	if (GetCurrentAbilitySpec()->GameplayEffectHandle.IsValid())
-	{
-		const FGameplayEffectSpec Spec = GetAbilitySystemComponentFromActorInfo()->GetActiveGameplayEffect(GetCurrentAbilitySpec()->GameplayEffectHandle)->Spec;
-
-		float Value = Spec.GetSetByCallerMagnitude(
-			Tag,
-			false,
-			-1.f
-		);
-
-		return Value;
 	}
 
 	ensure(false);

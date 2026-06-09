@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+
 
 using UnrealBuildTool;
 
@@ -29,7 +29,11 @@ public class CardShooter : ModuleRules
             "OnlineSubsystem",
             "OnlineSubsystemUtils",
             "OnlineSubsystemEOS",
-            "CoreOnline"
+            "CoreOnline",
+            "ModularGameplay",
+            "ModularGameplayActors",
+            "GameFeatures",
+            "LyraGame"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]

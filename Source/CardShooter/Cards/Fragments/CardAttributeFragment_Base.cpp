@@ -210,26 +210,11 @@ FText UCardParameter_DamageType::GetStyle(const FSetByCallerMetaData& InMetaData
 {
 	const float& Magnitude = MetaData.Magnitude;
 
-	TSubclassOf<UNeonDamageType> DamageTypeClass = nullptr;
-
-	for(auto&& KVPair : DamageTypeMap)
-	{
-		if (FMath::IsNearlyEqual(Magnitude, KVPair.Key, 0.05))
-		{
-			DamageTypeClass = KVPair.Value;
-			break;
-		}
-	}
-
-	if (ensure(DamageTypeClass))
-	{
-		UNeonDamageType* CDO = DamageTypeClass->GetDefaultObject<UNeonDamageType>();
-
-		if (ensure(CDO))
-		{
-			return CDO->RichStyle;
-		}
-	}
+	if (FMath::IsNearlyEqual(InMetaData.Magnitude, 0, 0.05f)) return FText::FromString("damagetypephysical");
+	if (FMath::IsNearlyEqual(InMetaData.Magnitude, 1, 0.05f)) return FText::FromString("damagetypefire");
+	if (FMath::IsNearlyEqual(InMetaData.Magnitude, 2, 0.05f)) return FText::FromString("damagetypecold");
+	if (FMath::IsNearlyEqual(InMetaData.Magnitude, 3, 0.05f)) return FText::FromString("damagetypelightning");
+	if (FMath::IsNearlyEqual(InMetaData.Magnitude, 4, 0.05f)) return FText::FromString("damagetypepoison");
 
 	return FText::FromString("HoverContent_Param");
 }

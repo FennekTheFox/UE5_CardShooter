@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+
 
 #include "CardShooterCharacter.h"
 #include "Animation/AnimInstance.h"
