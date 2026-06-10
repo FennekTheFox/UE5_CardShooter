@@ -108,6 +108,7 @@ FCardIdentityHandle UCardShooterSaveData::GetFirstCardHandle(const FCardIdentity
 	FCardIdentityHandle NewHandle;
 	NewHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
 	NewHandle.Index = Index;
+	NewHandle.StoragePath = FSoftObjectPath(this);
 
 	return NewHandle;
 }
@@ -123,6 +124,7 @@ void UCardShooterSaveData::GetAllCardHandles(const FCardIdentity& CardIdentity, 
 			FCardIdentityHandle NewHandle;
 			NewHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
 			NewHandle.Index = i;
+			NewHandle.StoragePath = FSoftObjectPath(this);
 
 			CardHandles.Add(NewHandle);
 		}
@@ -151,13 +153,15 @@ void UCardShooterSaveData::ModifyCardInCollection(UObject* WorldContext, const F
 	CallOnCollectionCardModifiedCallback(Handle);
 }
 
-void UCardShooterSaveData::AddCardToCollection(UObject* WorldContext, const FCardIdentity& CardIdentity)
+void UCardShooterSaveData::AddCardToCollection(UObject* WorldContext, const FCardIdentity& CardIdentity, FCardIdentityHandle& OutHandle)
 {
 	FCardIdentity FixedIdentity = CardIdentity;
 	ValidateAndFix(FixedIdentity);
 	CallAnyCardChangedNextTick(WorldContext);
 
-	Collection.Cards.Add(FixedIdentity);
+	OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
+	OutHandle.Index = Collection.Cards.Add(FixedIdentity);
+	OutHandle.StoragePath = FSoftObjectPath(this);
 }
 
 bool UCardShooterSaveData::RemoveCardFromCollection(UObject* WorldContext, const FCardIdentity& CardIdentity)
@@ -175,6 +179,7 @@ bool UCardShooterSaveData::RemoveCardFromCollection(UObject* WorldContext, const
 		FCardIdentityHandle HandleToRemove;
 		HandleToRemove.StorageLocation = ECardIdentityStorageLocation::Collection;
 		HandleToRemove.Index = Index;
+		HandleToRemove.StoragePath = FSoftObjectPath(this);
 		Deck.CardHandles.Remove(HandleToRemove);
 	}
 
@@ -282,6 +287,7 @@ bool UCardShooterSaveData::DeleteDeckAtIndex(UObject* WorldContext, int32 DeckHa
 				FCardIdentityHandle OutHandle;
 				OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
 				OutHandle.Index = CardIndex;
+				OutHandle.StoragePath = FSoftObjectPath(this);
 
 				UnassignCardFromDeck(WorldContext, OutHandle, AssignedDeck);
 				i--;
@@ -292,6 +298,7 @@ bool UCardShooterSaveData::DeleteDeckAtIndex(UObject* WorldContext, int32 DeckHa
 				FCardIdentityHandle OutHandle;
 				OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
 				OutHandle.Index = CardIndex;
+				OutHandle.StoragePath = FSoftObjectPath(this);
 
 				AssignCardToDeck(WorldContext, OutHandle, AssignedDeck - 1);
 				i++;

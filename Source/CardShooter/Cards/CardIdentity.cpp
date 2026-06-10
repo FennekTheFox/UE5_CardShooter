@@ -97,6 +97,15 @@ bool UCardIdentityHandleLibrary::GetCardIdentityFromHandle(
 	case ECardIdentityStorageLocation::Cache: return GetCachedCardIdentityFromIndex(Handle.Index, OutIdentity);
 	case ECardIdentityStorageLocation::Collection:
 	{
+		UCardShooterSaveData* SaveData = Cast<UCardShooterSaveData>(Handle.StoragePath.TryLoad());
+		if (SaveData)
+		{
+			SaveData->GetCardFromCollection(Handle, OutIdentity);
+			return true;
+		}
+
+		//if the StoragePath cannot be loaded, it is assumed the data was the persistent save data, not transient game mode data
+
 		if (ensure(PC))
 		{
 			ULocalPlayer* LP = PC->GetLocalPlayer();
@@ -104,13 +113,15 @@ bool UCardIdentityHandleLibrary::GetCardIdentityFromHandle(
 			{
 				return LP->GetSubsystem<UCardShooterSaveGameSubsystem>()->GetLocalPlayerSaveData()->GetCardFromCollection(Handle, OutIdentity);
 			}
+			return SaveData->GetCardFromCollection(Handle, OutIdentity);
 		}
+
+
 		return false;
 	}
 	}
 
-	UPrebuiltDeck* PrebuiltDeck =
-		Cast<UPrebuiltDeck>(Handle.PrebuiltPath.TryLoad());
+	UPrebuiltDeck* PrebuiltDeck = Cast<UPrebuiltDeck>(Handle.StoragePath.TryLoad());
 
 	switch (Handle.StorageLocation)
 	{

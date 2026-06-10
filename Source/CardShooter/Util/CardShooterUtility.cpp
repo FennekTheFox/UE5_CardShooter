@@ -75,20 +75,6 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, APlayerContro
 		return false;
 	}
 
-	UCardShooterSaveGameSubsystem* SGSS = PlayerController->GetLocalPlayer()->GetSubsystem<UCardShooterSaveGameSubsystem>();
-
-	if (!ensure(SGSS))
-	{
-		return false;
-	}
-
-	UCardShooterSaveData* SaveData = SGSS->GetLocalPlayerSaveData();
-
-	if (!ensure(SaveData))
-	{
-		return false;
-	}
-
 	bool bSuccess = true;
 
 	FCardDeck_DataOnly DataOnlyDeck;
@@ -97,7 +83,12 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, APlayerContro
 	{
 		FCardIdentity Identity;
 		//no ensure here bc utility cards may have invalid handles
-		if (!(SaveData->GetCardFromCollection(CardHandle, Identity)))
+		if (CardHandle == FCardIdentityHandle::Invalid)
+		{
+			continue;
+		}
+
+		if (!(UCardIdentityHandleLibrary::GetCardIdentityFromHandle(CardHandle, Identity, PlayerController)))
 		{
 			continue;
 		}
@@ -107,7 +98,7 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, APlayerContro
 	for (const FCardIdentityHandle& CardHandle : Deck.CardHandles)
 	{
 		FCardIdentity Identity;
-		if (!ensure(SaveData->GetCardFromCollection(CardHandle, Identity)))
+		if (!(UCardIdentityHandleLibrary::GetCardIdentityFromHandle(CardHandle, Identity, PlayerController)))
 		{
 			return false;
 		}

@@ -7,6 +7,17 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCardPack, Log, Log)
 
+UCLASS(Blueprintable, BlueprintType)
+class UCardIdentityModifier : public UPrimaryDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void ModifyCard(UPARAM(ref) FCardIdentity& CardToModify) const;
+};
+
+
 UCLASS(BlueprintType)
 class UOpenableCardContainerInstance : public UObject
 {
@@ -24,6 +35,9 @@ struct FCardDrawProperties
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<int32> CardPools;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<UCardIdentityModifier*> Modifiers;
 };
 
 USTRUCT(BlueprintType)

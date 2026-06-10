@@ -15,7 +15,7 @@ void UPrebuiltDeck::GetDeck(FCardDeck& OutDeck)
 		FCardIdentityHandle Handle;
 		Handle.StorageLocation = ECardIdentityStorageLocation::PrebuiltUtilityList;
 		Handle.Index = i;
-		Handle.PrebuiltPath = FSoftObjectPath(this);
+		Handle.StoragePath = FSoftObjectPath(this);
 
 		OutDeck.UtilityCards.Add(Handle);
 	}
@@ -27,7 +27,7 @@ void UPrebuiltDeck::GetDeck(FCardDeck& OutDeck)
 		FCardIdentityHandle Handle;
 		Handle.StorageLocation = ECardIdentityStorageLocation::PrebuiltCardList;
 		Handle.Index = i;
-		Handle.PrebuiltPath = FSoftObjectPath(this);
+		Handle.StoragePath = FSoftObjectPath(this);
 
 		OutDeck.CardHandles.Add(Handle);
 	}

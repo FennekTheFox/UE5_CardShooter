@@ -60,7 +60,17 @@ UOpenableCardContainerInstance* UOpenableCardContainerDefinition::GenerateInstan
 					if (TargetValue <= 0.f)
 					{
 						UE_LOG(LogCardPack, Log, TEXT(" ========== > Card Added."));
-						NewInst->Cards.Add(Row->Card);
+
+						FCardIdentity NewCard = Row->Card;
+						for (UCardIdentityModifier* Mod : Draw.Modifiers)
+						{
+							if (ensure(Mod))
+							{
+								Mod->ModifyCard(NewCard);
+							}
+						}
+
+						NewInst->Cards.Add(NewCard);
 					}
 				}
 			}

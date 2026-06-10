@@ -83,7 +83,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	void ModifyCardInCollection(UObject* WorldContext, const FCardIdentityHandle& Handle, const FCardIdentity& InCard);
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	void AddCardToCollection(UObject* WorldContext, const FCardIdentity& CardIdentity);
+	void AddCardToCollection(UObject* WorldContext, const FCardIdentity& CardIdentity, FCardIdentityHandle& OutHandle);
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	bool RemoveCardFromCollection(UObject* WorldContext, const FCardIdentity& CardIdentity);
 	UFUNCTION(BlueprintCallable)

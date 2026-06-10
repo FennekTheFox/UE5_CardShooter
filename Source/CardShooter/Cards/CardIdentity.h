@@ -34,10 +34,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Data")
 	TArray<int32> UsedInDecksWithIndices;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, SaveGame, Category = "Appearance")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame, Category = "Appearance")
 	ECardRarity CardRarity = ECardRarity::Common;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, SaveGame, Category = "Appearance")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, SaveGame, Category = "Appearance")
 	bool bFullArt = false;
 
 	//States the number of augments that can be socketed in this specific card
@@ -98,7 +98,7 @@ public:
 	ECardIdentityStorageLocation StorageLocation = ECardIdentityStorageLocation::Invalid;
 
 	UPROPERTY(BlueprintReadWrite, SaveGame)
-	FSoftObjectPath PrebuiltPath;
+	FSoftObjectPath StoragePath;
 
 	bool IsValid() const
 	{
@@ -109,7 +109,7 @@ public:
 	{
 		return Index == Other.Index &&
 			StorageLocation == Other.StorageLocation &&
-			PrebuiltPath == Other.PrebuiltPath;
+			StoragePath == Other.StoragePath;
 	}
 
 	static FCardIdentityHandle Invalid;
@@ -119,7 +119,7 @@ FORCEINLINE uint32 GetTypeHash(const FCardIdentityHandle& Handle)
 {
 	uint32 Hash = GetTypeHash(Handle.Index);
 	Hash = HashCombine(Hash, GetTypeHash(static_cast<uint8>(Handle.StorageLocation)));
-	Hash = HashCombine(Hash, GetTypeHash(Handle.PrebuiltPath));
+	Hash = HashCombine(Hash, GetTypeHash(Handle.StoragePath));
 	return Hash;
 }
 
