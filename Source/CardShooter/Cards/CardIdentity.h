@@ -47,6 +47,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame, Category = "Augments")
 	TArray<FGuid> Augments;
 
+	UPROPERTY(BlueprintReadWrite, SaveGame, Category = "Visual Sorting")
+	float DominantHue = -1.f;
+
 
 	bool operator== (const FCardIdentity& Other) const
 	{

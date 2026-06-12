@@ -88,7 +88,12 @@ public:
 	bool RemoveCardFromCollection(UObject* WorldContext, const FCardIdentity& CardIdentity);
 	UFUNCTION(BlueprintCallable)
 	void GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards) const;
-
+	UFUNCTION(BlueprintCallable)
+	void GetCardCollectionGroupIdentities(TArray<FCardIdentity>& OutCards) const;
+	UFUNCTION(BlueprintCallable)
+	void GetCardsInCollectionWithAssetTag(const FGameplayTag& Tag, TArray<FCardIdentity>& OutCards) const;
+	UFUNCTION(BlueprintCallable)
+	void GetUniqueCardsInCollectionWithAssetTag(const FGameplayTag& Tag, TArray<FCardIdentity>& OutCards) const;
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	bool AssignCardToDeck(UObject* WorldContext, const FCardIdentityHandle& CardHandle, int32 DeckHandle);
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))

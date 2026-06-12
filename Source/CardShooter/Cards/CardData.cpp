@@ -417,6 +417,103 @@ void UCardData::SetAugmentGUIDAtIndex(const FCardIdentityHandle& CardHandle, APl
 	}
 }
 
+void UCardData::PostLoad()
+{
+	Super::PostLoad();
+	RecalculateDominantHue();
+}
+
+void UCardData::RecalculateDominantHue()
+{
+	DominantHue = 0.f;
+
+	UTexture2D* Texture = CardTexture.LoadSynchronous();
+
+	if (!Texture)
+	{
+		return;
+	}
+
+	FTextureSource& Source = Texture->Source;
+
+	if (!Source.IsValid())
+	{
+		return;
+	}
+
+	const int32 Width = Source.GetSizeX();
+	const int32 Height = Source.GetSizeY();
+
+	if (Width <= 0 || Height <= 0)
+	{
+		return;
+	}
+
+	TArray64<uint8> RawData;
+
+	if (!Source.GetMipData(RawData, 0))
+	{
+		return;
+	}
+
+	const FColor* Pixels =
+		reinterpret_cast<const FColor*>(RawData.GetData());
+
+	TArray<int32> HueHistogram;
+	HueHistogram.Init(0, 360);
+
+	const int32 PixelCount = Width * Height;
+
+	for (int32 PixelIndex = 0; PixelIndex < PixelCount; ++PixelIndex)
+	{
+		const FLinearColor LinearColor =
+			Pixels[PixelIndex].ReinterpretAsLinear();
+
+		FLinearColor HSV = LinearColor.LinearRGBToHSV();
+
+		const float Hue = HSV.R;
+		const float Saturation = HSV.G;
+		const float Value = HSV.B;
+
+		// Ignore black pixels
+		if (Value < 0.15f)
+		{
+			continue;
+		}
+
+		// Ignore gray pixels
+		if (Saturation < 0.15f)
+		{
+			continue;
+		}
+
+		const int32 HueBin =
+			FMath::Clamp(
+				FMath::RoundToInt(Hue),
+				0,
+				359);
+
+		++HueHistogram[HueBin];
+	}
+
+	int32 BestBin = 0;
+	int32 BestCount = 0;
+
+	for (int32 BinIndex = 0; BinIndex < HueHistogram.Num(); ++BinIndex)
+	{
+		if (HueHistogram[BinIndex] > BestCount)
+		{
+			BestCount = HueHistogram[BinIndex];
+			BestBin = BinIndex;
+		}
+	}
+
+	DominantHue = static_cast<float>(BestBin);
+#if WITH_EDITOR
+	Modify();
+#endif
+}
+
 #undef LOCTEXT_NAMESPACE
 
 

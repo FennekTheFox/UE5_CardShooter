@@ -18,14 +18,30 @@ bool FCardIdentity::operator<(const FCardIdentity& Other) const
 		return CardDataPath.ToString() < Other.CardDataPath.ToString();
 	}
 
+	//full art status superceeds card rarity
+	if (bFullArt != Other.bFullArt)
+	{
+		return bFullArt < Other.bFullArt;
+	}
+
+	//visual rarity superceeds augments
 	if (CardRarity != Other.CardRarity)
 	{
 		return static_cast<uint8>(CardRarity) < static_cast<uint8>(Other.CardRarity);
 	}
 
-	if (bFullArt != Other.bFullArt)
+	//Deck assignment superceeds visual rarity
+	if (UsedInDecksWithIndices.Num() != Other.UsedInDecksWithIndices.Num())
 	{
-		return bFullArt < Other.bFullArt;
+		return Augments.Num() < Other.Augments.Num();
+	}
+
+	for (int32 i = 0; i < UsedInDecksWithIndices.Num(); ++i)
+	{
+		if (!(UsedInDecksWithIndices[i] == Other.UsedInDecksWithIndices[i]))
+		{
+			return UsedInDecksWithIndices[i] < Other.UsedInDecksWithIndices[i];
+		}
 	}
 
 	if (NumAugmentSockets != Other.NumAugmentSockets)
@@ -43,19 +59,6 @@ bool FCardIdentity::operator<(const FCardIdentity& Other) const
 		if (!(Augments[i] == Other.Augments[i]))
 		{
 			return Augments[i] < Other.Augments[i];
-		}
-	}
-
-	if (UsedInDecksWithIndices.Num() != Other.UsedInDecksWithIndices.Num())
-	{
-		return Augments.Num() < Other.Augments.Num();
-	}
-
-	for (int32 i = 0; i < UsedInDecksWithIndices.Num(); ++i)
-	{
-		if (!(UsedInDecksWithIndices[i] == Other.UsedInDecksWithIndices[i]))
-		{
-			return UsedInDecksWithIndices[i] < Other.UsedInDecksWithIndices[i];
 		}
 	}
 

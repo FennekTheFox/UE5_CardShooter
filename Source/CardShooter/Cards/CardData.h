@@ -49,26 +49,29 @@ public:
 	FGameplayTag AssetTag;
 
 	//This tag needs to be set in order for the utility functions to be able to load the card from the tag alone
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance")
 	FGameplayTagContainer CardTags;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance")
 	TSoftObjectPtr<UTexture2D> CardIcon;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance")
 	TSoftObjectPtr<UTexture2D> CardTexture;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance")
 	TArray<UDedicationData*> Dedications;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Functionality")
 	TArray<TObjectPtr<UCardEffectFragment_Attribute>> CardAttributes;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Functionality")
 	TObjectPtr<UCardEffectFragment_Execution> PrimaryExecution;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Functionality")
 	TObjectPtr<UCardEffectFragment_Execution> SecondaryExecution;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "HueSorting")
+	float DominantHue = -1.f;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -106,4 +109,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void SetAugmentGUIDAtIndex(const FCardIdentityHandle& CardHandle, APlayerController* PC, UItem_CardAugment* CardAugment, int32 Index);
+
+
+protected:
+#if WITH_EDITOR
+	virtual void PostLoad() override;
+	void RecalculateDominantHue();
+#endif
 };

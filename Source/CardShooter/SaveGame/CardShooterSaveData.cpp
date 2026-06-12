@@ -72,6 +72,11 @@ void UCardShooterSaveData::ValidateAndFix(FCardIdentity& CardIdentity)
 	{
 		CardIdentity.AssetTag = Data->AssetTag;
 	}
+
+	if (FMath::IsNearlyEqual(CardIdentity.DominantHue, -1.f))
+	{
+		CardIdentity.DominantHue = Data->DominantHue;
+	}
 }
 
 int32 UCardShooterSaveData::GetCardCount(const FCardIdentity& CardIdentity) const
@@ -205,6 +210,63 @@ void UCardShooterSaveData::GetSortedCardCollectionKeys(TArray<FCardIdentity>& Ou
 
 	OutCards.Sort([](const FCardIdentity& A, const FCardIdentity& B) {
 		return A < B;
+		});
+}
+
+void UCardShooterSaveData::GetCardCollectionGroupIdentities(TArray<FCardIdentity>& OutCards) const
+{
+	TSet<FCardIdentity> CardIDSet(Collection.Cards);
+	OutCards = CardIDSet.Array();
+
+	OutCards.RemoveAll([OutCards](const FCardIdentity& Card) {
+		for (const FCardIdentity& OtherCard : OutCards)
+		{
+			if (Card != OtherCard && Card.AssetTag == OtherCard.AssetTag)
+			{
+				if (Card < OtherCard)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+		});
+
+	//Sort by dominant hue hehe
+	OutCards.Sort([](const FCardIdentity& A, const FCardIdentity& B) {
+		return A.DominantHue < B.DominantHue;
+		});
+}
+
+void UCardShooterSaveData::GetCardsInCollectionWithAssetTag(const FGameplayTag& Tag, TArray<FCardIdentity>& OutCards) const
+{
+	OutCards.Empty();
+
+	for (const FCardIdentity& Card : Collection.Cards)
+	{
+		if (Card.AssetTag == Tag)
+		{
+			OutCards.Add(Card);
+		}
+	}
+}
+
+
+void UCardShooterSaveData::GetUniqueCardsInCollectionWithAssetTag(const FGameplayTag& Tag, TArray<FCardIdentity>& OutCards) const
+{
+	OutCards.Empty();
+
+	for (const FCardIdentity& Card : Collection.Cards)
+	{
+		if (Card.AssetTag == Tag)
+		{
+			OutCards.AddUnique(Card);
+		}
+	}
+
+	OutCards.Sort([](const FCardIdentity& A, const FCardIdentity& B) {
+		return !(A < B);
 		});
 }
 
@@ -553,6 +615,11 @@ void UCardShooterSaveData::AfterLoad()
 		Item->Serialize(Archive);
 
 		RuntimeItems.Add(Item);
+	}
+
+	for (FCardIdentity& Identity : Collection.Cards)
+	{
+		ValidateAndFix(Identity);
 	}
 }
 
