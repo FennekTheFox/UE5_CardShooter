@@ -53,10 +53,10 @@ public:
 	FGameplayTagContainer CardTags;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> CardIcon;
+	TSoftObjectPtr<UTexture2D> CardIcon;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> CardTexture;
+	TSoftObjectPtr<UTexture2D> CardTexture;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<UDedicationData*> Dedications;
