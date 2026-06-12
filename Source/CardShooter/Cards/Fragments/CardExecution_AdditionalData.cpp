@@ -40,6 +40,20 @@ FText FSetByCallerMetaData::GetDisplayText() const
 		if (FMath::IsNearlyEqual(Magnitude, 3.f)) return LOCTEXT("SetByCallerDamageType_Lightning", "Lightning");
 		if (FMath::IsNearlyEqual(Magnitude, 4.f)) return LOCTEXT("SetByCallerDamageType_Poison", "Poison");
 	}
+	case ESetByCallerMagnitudeDisplayType::Rotation_VerticalAlignment:
+	{
+		if (FMath::IsNearlyEqual(Magnitude, 0.f, 5.f) ||
+			FMath::IsNearlyEqual(Magnitude, 180.f, 5.f) ||
+			FMath::IsNearlyEqual(Magnitude, -180.f, 5.f)) return LOCTEXT("SetByCallerRotation_Vertical", "vertical");
+
+		if (FMath::IsNearlyEqual(Magnitude, 90.f, 5.f) ||
+			FMath::IsNearlyEqual(Magnitude, -90.f, 5.f)) return LOCTEXT("SetByCallerRotation_Horizontal", "horizontal");
+
+		float EffectiveMagnitude = ((int32)(Magnitude + 180.f) % 360) - 180.f;
+
+		if (Magnitude > 0) return FText::Format(LOCTEXT("SetByCallerRotation_DegCW", " {0}° clockwise"), FText::AsNumber(EffectiveMagnitude));
+		if (Magnitude < 0) return FText::Format(LOCTEXT("SetByCallerRotation_DegCCW", " {0}° counter clockwise"), FText::AsNumber(EffectiveMagnitude));
+	}
 	}
 
 	ensure(false);
