@@ -540,3 +540,95 @@ void UCardShooterUtilityLibrary::DuplicateSpec(class UAbilitySystemComponent* AS
 	// Optional depending on your needs:
 	NewSpec->SetStackCount(InSpec.GetStackCount());
 }
+
+UObject* UCardShooterUtilityLibrary::DuplicateObjectTyped(UObject* SourceObject, UObject* NewOuter)
+{
+	if (!SourceObject)
+		return nullptr;
+
+	if (!NewOuter)
+		NewOuter = GetTransientPackage();
+
+	return DuplicateObject(SourceObject, NewOuter);
+}
+
+
+DEFINE_FUNCTION(UCardShooterUtilityLibrary::execWeightedRandomMapIndex)
+{
+	Stack.StepCompiledIn<FMapProperty>(nullptr);
+
+	const FMapProperty* MapProperty = CastField<FMapProperty>(Stack.MostRecentProperty);
+
+	void* MapAddr = Stack.MostRecentPropertyAddress;
+
+	P_FINISH;
+
+	int32 Result = INDEX_NONE;
+
+	if (!MapProperty || !MapAddr)
+	{
+		*(int32*)RESULT_PARAM = Result;
+		return;
+	}
+
+	const FNumericProperty* NumericProp =
+		CastField<FNumericProperty>(MapProperty->ValueProp);
+
+	if (!NumericProp || !NumericProp->IsFloatingPoint())
+	{
+		*(int32*)RESULT_PARAM = Result;
+		return;
+	}
+
+	FScriptMapHelper MapHelper(MapProperty, MapAddr);
+
+	float TotalWeight = 0.f;
+
+	for (int32 Index = 0; Index < MapHelper.GetMaxIndex(); ++Index)
+	{
+		if (!MapHelper.IsValidIndex(Index))
+		{
+			continue;
+		}
+
+		const float Weight = static_cast<float>(
+			NumericProp->GetFloatingPointPropertyValue(
+				MapHelper.GetValuePtr(Index)));
+
+		TotalWeight += FMath::Max(0.f, Weight);
+	}
+
+	if (TotalWeight <= 0.f)
+	{
+		*(int32*)RESULT_PARAM = Result;
+		return;
+	}
+
+	float Roll = FMath::FRandRange(0.f, TotalWeight);
+
+	int32 EntryIndex = 0;
+
+	for (int32 Index = 0; Index < MapHelper.GetMaxIndex(); ++Index)
+	{
+		if (!MapHelper.IsValidIndex(Index))
+		{
+			continue;
+		}
+
+		const float Weight = static_cast<float>(
+			NumericProp->GetFloatingPointPropertyValue(
+				MapHelper.GetValuePtr(Index)));
+
+		Roll -= FMath::Max(0.f, Weight);
+
+		if (Roll <= 0.f)
+		{
+			Result = EntryIndex;
+			break;
+		}
+
+		++EntryIndex;
+	}
+
+	*(int32*)RESULT_PARAM = Result;
+}

@@ -41,7 +41,8 @@ public class ProjectAbilitySystem_Plugin : ModuleRules
                 "EnhancedInput",
                 "GameplayAbilities",
                 "GameplayTags",
-                "GameplayTasks"
+                "GameplayTasks",
+                "LyraGame"
 				// ... add private dependencies that you statically link with here ...	
 			}
             );

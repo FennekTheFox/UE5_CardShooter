@@ -83,4 +83,11 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static void DuplicateSpec(class UAbilitySystemComponent* ASC, const FGameplayEffectSpec& InSpec, FGameplayEffectSpecHandle& OutSpec);
+
+	UFUNCTION(BlueprintCallable, Category = "Utilities", meta = (DeterminesOutputType = "SourceObject", DynamicOutputParam = "ReturnValue"))
+	static UObject* DuplicateObjectTyped(UObject* SourceObject, UObject* NewOuter);
+
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "Random", meta = (MapParam = "Weights"))
+	static int32 WeightedRandomMapIndex(const TMap<int32, float>& Weights);
+	DECLARE_FUNCTION(execWeightedRandomMapIndex);
 };

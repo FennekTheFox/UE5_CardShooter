@@ -101,9 +101,10 @@ void ACardShooterCharacter::DoMove(float Right, float Forward)
 {
 	if (GetController())
 	{
+		FRotator Rotation = GetControlRotation();
 		// pass the move inputs
-		AddMovementInput(GetActorRightVector(), Right);
-		AddMovementInput(GetActorForwardVector(), Forward);
+		AddMovementInput(FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y), Right);
+		AddMovementInput(Rotation.Vector(), Forward);
 	}
 }
 

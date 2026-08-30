@@ -70,6 +70,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Functionality")
 	TObjectPtr<UCardEffectFragment_Execution> SecondaryExecution;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Functionality")
+	bool bGloballyEnabled = true;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "HueSorting")
 	float DominantHue = -1.f;
 

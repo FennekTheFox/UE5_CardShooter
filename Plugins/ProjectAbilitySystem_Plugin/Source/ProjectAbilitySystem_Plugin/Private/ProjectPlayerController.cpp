@@ -8,6 +8,11 @@ void AProjectPlayerController::PostProcessInput(const float DeltaTime, const boo
 		ProjectAbilitySystemComponent->ProcessAbilityInput(DeltaTime, bGamePaused);
 	}
 
+	if (UProjectAbilitySystemComponent* ProjectAbilitySystemComponent = FindComponentByClass<UProjectAbilitySystemComponent>())
+	{
+		ProjectAbilitySystemComponent->ProcessAbilityInput(DeltaTime, bGamePaused);
+	}
+
 	Super::PostProcessInput(DeltaTime, bGamePaused);
 }
 

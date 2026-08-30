@@ -243,6 +243,11 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 			{
 				for (auto&& KVPair : AsCEF_GA->HoverContextObjects)
 				{
+					if (!ensure(KVPair.Value))
+					{
+						continue;
+					}
+
 					UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
 
 					if (AsGE_CE&& AsGE_CE->EffectDesc.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))

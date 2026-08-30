@@ -101,6 +101,10 @@ void UProjectAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Ability
 			BindAbilityInputs(AbilitySpec, PC);
 		}
 	}
+	else if (APlayerController* PC = Cast<APlayerController>(GetAvatarActor()))
+	{
+		BindAbilityInputs(AbilitySpec, PC);
+	}
 
 	UProjectGameplayAbility* Ability = Cast<UProjectGameplayAbility>(AbilitySpec.Ability);
 

@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "InputAction.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "AbilitySystem/LyraAbilitySystemComponent.h"
 
 #include "ProjectAbilitySystemComponent.generated.h"
 
@@ -39,7 +40,7 @@ struct PROJECTABILITYSYSTEM_PLUGIN_API FAbilitySetApplicationData
 //Reason why im subclassing this is to be able to define some default initializations and custom
 //Ability activation policies that link EnhancedInput comfortably
 UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent))
-class PROJECTABILITYSYSTEM_PLUGIN_API UProjectAbilitySystemComponent : public UAbilitySystemComponent
+class PROJECTABILITYSYSTEM_PLUGIN_API UProjectAbilitySystemComponent : public ULyraAbilitySystemComponent
 {
 	GENERATED_BODY()
 
