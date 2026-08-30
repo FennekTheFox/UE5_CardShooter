@@ -461,6 +461,7 @@ void UCardData::SetAugmentGUIDAtIndex(const FCardIdentityHandle& CardHandle, APl
 	}
 }
 
+#if WITH_EDITOR
 void UCardData::PostLoad()
 {
 	Super::PostLoad();
@@ -557,6 +558,7 @@ void UCardData::RecalculateDominantHue()
 	Modify();
 #endif
 }
+#endif
 
 #undef LOCTEXT_NAMESPACE
 
