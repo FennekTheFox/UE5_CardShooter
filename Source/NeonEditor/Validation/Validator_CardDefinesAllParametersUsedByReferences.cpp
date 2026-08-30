@@ -29,7 +29,7 @@ EDataValidationResult UValidator_CardDefinesAllParametersUsedByReferences::Valid
 	}
 
 	TArray<FGameplayTag> UsedParametersArray;
-	CardData->GetAllUsedParameters(UsedParametersArray);
+	CardData->GetAllUsedParameterTags(UsedParametersArray);
 	UsedParametersArray.RemoveAll([this](const FGameplayTag& Tag)
 		{
 			return Exceptions.Contains(Tag);

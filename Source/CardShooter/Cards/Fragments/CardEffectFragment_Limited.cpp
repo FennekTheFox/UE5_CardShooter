@@ -15,6 +15,11 @@ FText UDeckLimitationViolation_Limit::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
+UCardEffectFragment_Limited::UCardEffectFragment_Limited()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Limited", "Limited");
+}
+
 bool UCardEffectFragment_Limited::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	int32 Count = 0;

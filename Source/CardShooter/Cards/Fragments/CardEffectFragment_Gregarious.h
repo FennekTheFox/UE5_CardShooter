@@ -19,6 +19,8 @@ class UCardEffectFragment_Gregarious : public UCardEffectFragment_DeckLimitation
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Gregarious();
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 MinimumDeckSize = 10;

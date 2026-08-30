@@ -10,6 +10,8 @@ class UCardEffectFragment_Persistent : public UCardEffectFragment_ExecutionAttri
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Persistent();
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag TrackingTag;

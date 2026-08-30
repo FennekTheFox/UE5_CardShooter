@@ -19,6 +19,8 @@ class UCardEffectFragment_Keystone : public UCardEffectFragment_DeckLimitation
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Keystone();
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 KeystoneLimit = 3;

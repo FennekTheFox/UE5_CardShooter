@@ -171,7 +171,7 @@ FText UCardData::GetExecutionsDescription(const FCardIdentity& CardIdentity)
 	return UCardShooterUtilityLibrary::FormatTextForDisplay((FText::Join(FText::FromString("\n\n"), Sections)));
 }
 
-void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<FGameplayTag>& OutParameters)
+void GatherParameterTagsFromExecution(UCardEffectFragment_Execution* Exec, TArray<FGameplayTag>& OutParameters)
 {
 	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
 	{
@@ -183,6 +183,30 @@ void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<F
 			}
 
 			OutParameters.AddUnique(Param->ParameterTag);
+		}
+	}
+
+	if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
+	{
+		for (UCardEffectFragment_Execution* CompExec : AsCEF_E_C->Executions)
+		{
+			GatherParameterTagsFromExecution(CompExec, OutParameters);
+		}
+	}
+}
+
+void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<UCardParameter*>& OutParameters)
+{
+	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
+	{
+		for (UCardParameter* Param : AsCEF_E_WP->Parameters)
+		{
+			if (!Param)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param);
 		}
 	}
 
@@ -220,7 +244,32 @@ void GatherScalingGroupsFromExecution(UCardEffectFragment_Execution* Exec, TArra
 	}
 }
 
-void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const
+void UCardData::GetAllUsedParameterTags(TArray<FGameplayTag>& OutParameters) const
+{
+	if (ensure(PrimaryExecution))
+	{
+		GatherParameterTagsFromExecution(PrimaryExecution, OutParameters);
+	}
+	if (SecondaryExecution)
+	{
+		GatherParameterTagsFromExecution(SecondaryExecution, OutParameters);
+	}
+
+	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
+	{
+		for (UCardParameter* Param : Attribute->Parameters)
+		{
+			if (!Param)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param->ParameterTag);
+		}
+	}
+}
+
+void UCardData::GetAllUsedParameters(TArray< UCardParameter*>& OutParameters) const
 {
 	if (ensure(PrimaryExecution))
 	{
@@ -235,12 +284,7 @@ void UCardData::GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const
 	{
 		for (UCardParameter* Param : Attribute->Parameters)
 		{
-			if (!Param)
-			{
-				continue;
-			}
-
-			OutParameters.AddUnique(Param->ParameterTag);
+			OutParameters.AddUnique(Param);
 		}
 	}
 }

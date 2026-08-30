@@ -16,6 +16,11 @@ FText UCardEffectFragment_Reclusive::GetLocalizableName_Implementation(const FCa
 	return FText::Format(LOCTEXT("ReclusiveAttrName", "Reclusive({0})"), FText::AsNumber(MaximumDeckSize));
 }
 
+UCardEffectFragment_Reclusive::UCardEffectFragment_Reclusive()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Reclusivee", "Reclusive");
+}
+
 bool UCardEffectFragment_Reclusive::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	bool bSuccess = Deck.CardList.Num() <= MaximumDeckSize;

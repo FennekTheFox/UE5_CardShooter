@@ -9,6 +9,8 @@ class UCardEffectFragment_Ethereal : public UCardEffectFragment_ExecutionAttribu
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Ethereal();
+
 public:
 	//~UCardEffectFragment
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;

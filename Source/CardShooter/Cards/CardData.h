@@ -4,7 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "Augments/CardAugment.h"
 #include "CardIdentity.h"
-#include "../UI/RichTextHoverDecorator.h"
+#include "UI/RichTextHoverDecorator.h"
 
 #include "CardData.generated.h"
 
@@ -12,6 +12,7 @@ class UTexture2D;
 
 class UCardEffectFragment_Attribute;
 class UCardEffectFragment_Execution;
+class UCardParameter;
 
 UCLASS()
 class UDedicationData : public UPrimaryDataAsset,
@@ -98,7 +99,10 @@ public:
 	FText GetExecutionsDescription(const FCardIdentity& CardIdentity);
 
 	UFUNCTION(BlueprintCallable)
-	void GetAllUsedParameters(TArray<FGameplayTag>& OutParameters) const;
+	void GetAllUsedParameterTags(TArray<FGameplayTag>& OutParameters) const;
+
+	UFUNCTION(BlueprintCallable)
+	void GetAllUsedParameters(TArray<UCardParameter*>& OutParameters) const;
 
 	UFUNCTION(BlueprintCallable)
 	void GetAllUsedScalingGroups(TArray<FGameplayTag>& OutParameters) const;

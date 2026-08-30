@@ -30,6 +30,8 @@ class UCardEffectFragment_Archetype : public UCardEffectFragment_DeckLimitation
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Archetype();
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	TObjectPtr<UCardArchetype> Archetype;

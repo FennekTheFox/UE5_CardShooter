@@ -9,6 +9,8 @@ class UCardEffectFragment_Finisher : public UCardEffectFragment_ShuffleAttribute
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Finisher();
+
 public:
 	 //~UCardEffectFragment
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;

@@ -11,6 +11,11 @@ FText UDeckLimitationViolation_Archetype::GetFailureReasonText()
 	return FText::Format(TextToFormat, FormatArgs);
 }
 
+UCardEffectFragment_Archetype::UCardEffectFragment_Archetype()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Archetype", "Archetype");
+}
+
 bool UCardEffectFragment_Archetype::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	for (UCardData* Card : Deck.UtilityCards)

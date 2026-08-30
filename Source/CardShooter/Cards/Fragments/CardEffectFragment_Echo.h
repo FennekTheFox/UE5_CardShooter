@@ -9,6 +9,8 @@ class UCardEffectFragment_Echo : public UCardEffectFragment_ExecutionAttribute
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Echo();
+
 public:
 	 //~UCardEffectFragment
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;

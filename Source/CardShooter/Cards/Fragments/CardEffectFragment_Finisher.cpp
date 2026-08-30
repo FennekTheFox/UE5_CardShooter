@@ -12,4 +12,9 @@ FText UCardEffectFragment_Finisher::GetLocalizableDescription_Implementation(con
 	return LOCTEXT("FinisherAttrDesc", "This card always shuffles to the back of your deck.");
 }
 
+UCardEffectFragment_Finisher::UCardEffectFragment_Finisher()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Finisher", "Finisher");
+}
+
 #undef LOCTEXT_NAMESPACE

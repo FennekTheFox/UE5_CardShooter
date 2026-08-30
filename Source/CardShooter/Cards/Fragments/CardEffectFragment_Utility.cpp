@@ -9,6 +9,8 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_UtilitySecondaryCooldown, "Gameplay.Effect.Parameters
 
 UCardEffectFragment_Utility::UCardEffectFragment_Utility()
 {
+	AttributeName = LOCTEXT("CardAttributes_Name_Utility", "Utility");
+
 	static ConstructorHelpers::FClassFinder<UCardParameter> BPCardParamClassFinder(
 		TEXT("/Game/Blueprint/Misc/CardParameters/SGParams/BP_CardParameter_SG_Base"));
 

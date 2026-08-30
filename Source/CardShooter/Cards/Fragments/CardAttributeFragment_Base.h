@@ -44,10 +44,10 @@ class UCardParameter : public UObject,
 	GENERATED_BODY()
 
 public: 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag ParameterTag;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FSetByCallerMetaData MetaData;
 
 	//BEGIN IHoverableContext
@@ -96,6 +96,11 @@ class UCardEffectFragment_Attribute : public UCardEffectFragment_Root
 	GENERATED_BODY()
 
 public:
+	UCardEffectFragment_Attribute();
+
+	UPROPERTY(BlueprintReadOnly)
+	FText AttributeName;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
 	TArray<UCardParameter*> Parameters;
 

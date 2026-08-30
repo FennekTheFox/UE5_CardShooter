@@ -12,4 +12,9 @@ FText UCardEffectFragment_Echo::GetLocalizableDescription_Implementation(const F
 	return FText::Format(LOCTEXT("EchoAttrDesc", "Card effect repeats {0} times every {1} seconds."), EchoCount, EchoDelay);
 }
 
+UCardEffectFragment_Echo::UCardEffectFragment_Echo()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Echo", "Echo");
+}
+
 #undef LOCTEXT_NAMESPACE

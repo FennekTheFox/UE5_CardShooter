@@ -23,4 +23,9 @@ FText UCardEffectFragment_Persistent::GetLocalizableDescription_Implementation(c
 		TrackedEffect.GetDefaultObject()->GetSimpleLocalizableName());
 }
 
+UCardEffectFragment_Persistent::UCardEffectFragment_Persistent()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Persistent", "Persistent");
+}
+
 #undef LOCTEXT_NAMESPACE

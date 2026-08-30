@@ -10,6 +10,8 @@ class UCardEffectFragment_Combo : public UCardEffectFragment_ExecutionAttribute
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Combo();
+
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	int32 ComboCount = 2;

@@ -12,5 +12,10 @@ FText UCardEffectFragment_Opener::GetLocalizableDescription_Implementation(const
 	return LOCTEXT("OpenerAttrDesc", "This card will always be shuffled to the front of the deck.");
 }
 
+UCardEffectFragment_Opener::UCardEffectFragment_Opener()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Opener", "Opener");
+}
+
 #undef LOCTEXT_NAMESPACE
 

@@ -9,6 +9,8 @@ class UCardEffectFragment_Stable : public UCardEffectFragment_ShuffleAttribute
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Stable();
+
 public:
 	 //~UCardEffectFragment
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity) override;

@@ -27,6 +27,11 @@ FText UCardEffectFragment_Base::GetRawLocalizableDescription(const FCardIdentity
 }
 
 
+UCardEffectFragment_Attribute::UCardEffectFragment_Attribute()
+{
+	AttributeName = NSLOCTEXT("CardAttributes", "CardAttributes_MissingName", "MISSING ATTRIBUTE NAME");
+}
+
 void UCardEffectFragment_Attribute::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const
 {
 	//create temporary proxy exec data

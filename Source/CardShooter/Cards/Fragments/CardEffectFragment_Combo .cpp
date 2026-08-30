@@ -3,6 +3,11 @@
 
 #define LOCTEXT_NAMESPACE "CardEffects"
 
+UCardEffectFragment_Combo::UCardEffectFragment_Combo()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Combo", "Combo");
+}
+
 FText UCardEffectFragment_Combo::GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 {
 	return FText::Format(LOCTEXT("ComboAttrDesc", "Combo({0}x|{1}s)"),

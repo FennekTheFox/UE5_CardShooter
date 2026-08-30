@@ -21,6 +21,8 @@ class UCardEffectFragment_Limited : public UCardEffectFragment_DeckLimitation
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Limited();
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 Limit = 3;

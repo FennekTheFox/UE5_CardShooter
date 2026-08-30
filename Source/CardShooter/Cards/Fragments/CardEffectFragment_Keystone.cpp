@@ -23,6 +23,11 @@ FText UCardEffectFragment_Keystone::GetLocalizableDescription_Implementation(con
 	return FText::Format(LOCTEXT("KeystoneAttrDesc", "A deck with this card can only contain {0} cards with the Keystone attribute."), FText::AsNumber(KeystoneLimit));
 }
 
+UCardEffectFragment_Keystone::UCardEffectFragment_Keystone()
+{
+	AttributeName = LOCTEXT("CardAttributes_Name_Keystone", "Keystone");
+}
+
 bool UCardEffectFragment_Keystone::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	int32 KeystoneCount = 0;

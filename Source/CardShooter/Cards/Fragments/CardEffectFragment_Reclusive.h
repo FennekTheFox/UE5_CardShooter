@@ -20,6 +20,8 @@ class UCardEffectFragment_Reclusive : public UCardEffectFragment_DeckLimitation
 {
 	GENERATED_BODY()
 
+	UCardEffectFragment_Reclusive();
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	int32 MaximumDeckSize = 10;
