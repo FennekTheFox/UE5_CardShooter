@@ -246,6 +246,7 @@ void GatherScalingGroupsFromExecution(UCardEffectFragment_Execution* Exec, TArra
 
 void UCardData::GetAllUsedParameterTags(TArray<FGameplayTag>& OutParameters) const
 {
+
 	if (ensure(PrimaryExecution))
 	{
 		GatherParameterTagsFromExecution(PrimaryExecution, OutParameters);
