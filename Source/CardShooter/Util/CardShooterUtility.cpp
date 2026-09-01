@@ -632,3 +632,28 @@ DEFINE_FUNCTION(UCardShooterUtilityLibrary::execWeightedRandomMapIndex)
 
 	*(int32*)RESULT_PARAM = Result;
 }
+
+bool UCardShooterUtilityLibrary::GetActiveEffectThatGrantedAbility(UGameplayAbility* AbilityInstance, FActiveGameplayEffectHandle& OutActiveEffectHandle)
+{
+	if (!AbilityInstance)
+	{
+		return false;
+	}
+
+	FGameplayAbilitySpec* AbilitySpec = AbilityInstance->GetCurrentAbilitySpec();
+
+	if (!AbilitySpec)
+	{
+		return false;
+	}
+
+	FActiveGameplayEffectHandle OriginEffectHandle = AbilitySpec->GameplayEffectHandle;
+
+	if (!OriginEffectHandle.IsValid())
+	{
+		return false;
+	}
+
+	OutActiveEffectHandle = OriginEffectHandle;
+	return true;
+}

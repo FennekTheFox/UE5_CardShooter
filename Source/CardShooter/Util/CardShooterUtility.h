@@ -90,4 +90,7 @@ public:
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "Random", meta = (MapParam = "Weights"))
 	static int32 WeightedRandomMapIndex(const TMap<int32, float>& Weights);
 	DECLARE_FUNCTION(execWeightedRandomMapIndex);
+
+	UFUNCTION(BlueprintPure)
+	static bool GetActiveEffectThatGrantedAbility(UGameplayAbility* AbilityInstance, FActiveGameplayEffectHandle& OutActiveEffectHandle);
 };
