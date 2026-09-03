@@ -7,12 +7,15 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCardPack, Log, Log)
 
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(Blueprintable, BlueprintType, Abstract)
 class UCardIdentityModifier : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
+	FText GetModifierDescription() const;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void ModifyCard(UPARAM(ref) FCardIdentity& CardToModify) const;
 };
