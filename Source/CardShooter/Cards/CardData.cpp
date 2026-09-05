@@ -9,6 +9,7 @@
 #include "Util/CardShooterUtility.h"
 #include "SaveGame/CardShooterSaveGameSubsystem.h"
 #include "SaveGame/CardShooterSaveData.h"
+#include "Fragments/CardEffectFragment_Stable.h"
 
 #define LOCTEXT_NAMESPACE "CardData"
 
@@ -29,9 +30,15 @@ void UCardData::GetIdentity(FCardIdentity& Identity)
 	Identity.CardDataPath = FSoftObjectPath(this);
 }
 
-TArray<UCardEffectFragment_Attribute*> UCardData::GetAllAttributesOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class)
+void UCardData::GetCardAttributes(const FCardIdentity& Identity, TArray<UCardEffectFragment_Attribute*>& OutAttributes) const
 {
-	TArray<UCardEffectFragment_Attribute*> OutArray = CardAttributes;
+	OutAttributes = CardAttributes;
+}
+
+TArray<UCardEffectFragment_Attribute*> UCardData::GetAllAttributesOfClass(const FCardIdentity& Identity, TSubclassOf<UCardEffectFragment_Attribute> Class)
+{
+	TArray<UCardEffectFragment_Attribute*> OutArray;
+	GetCardAttributes(Identity, OutArray);
 
 	OutArray = OutArray.FilterByPredicate([Class](UCardEffectFragment_Attribute* CardAttribute)
 		{
@@ -41,9 +48,12 @@ TArray<UCardEffectFragment_Attribute*> UCardData::GetAllAttributesOfClass(TSubcl
 	return OutArray;
 }
 
-UCardEffectFragment_Attribute* UCardData::GetAttributeOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class)
+UCardEffectFragment_Attribute* UCardData::GetAttributeOfClass(FCardIdentity& Identity, TSubclassOf<UCardEffectFragment_Attribute> Class)
 {
-	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
+	TArray<UCardEffectFragment_Attribute*> Attributes;
+	GetCardAttributes(Identity, Attributes);
+
+	for (UCardEffectFragment_Attribute* Attribute : Attributes)
 	{
 		if (Attribute->IsA(Class))
 		{
@@ -109,7 +119,10 @@ FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 	// Gather Attribute Descriptions
 	TArray<FText> AttributeDescs;
 
-	for (UCardEffectFragment_Attribute* Attr : CardAttributes)
+	TArray<UCardEffectFragment_Attribute*> Attributes;
+	GetCardAttributes(CardIdentity, Attributes);
+
+	for (UCardEffectFragment_Attribute* Attr : Attributes)
 	{
 		if (IsValid(Attr) && Attr->GetShouldShowInDescription())
 		{
@@ -313,6 +326,8 @@ void UCardData::GetAllUsedScalingGroups(TArray<FGameplayTag>& OutScalingGroups) 
 			OutScalingGroups.AddUnique(Param->MetaData.ScalingGroup);
 		}
 	}
+
+	OutScalingGroups.Remove(FGameplayTag());
 }
 
 void GatherParametersFromExecutionByPredicate(

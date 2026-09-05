@@ -5,7 +5,7 @@
 
 #include "CardAugment_ParameterModifier.generated.h"
 
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Card_Augment);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Card_Augment_ParameterModifier);
 
 
 USTRUCT(BlueprintType)

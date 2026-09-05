@@ -104,11 +104,19 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
 	TArray<UCardParameter*> Parameters;
 
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag AttributeTag;
+
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;
 
 	UFUNCTION(BlueprintPure)
 	bool GetParameterValue(FGameplayTag ParamTag, float& OutValue, const FCardIdentity& CardIdentity) const;
 
+	UFUNCTION(BlueprintPure)
+	bool GetCanBeExtracted() const {return bCanBeExtracted;}
+
+protected:
+	bool bCanBeExtracted = false;
 };
 
 //Parent class for attributes that can be applied to an execution

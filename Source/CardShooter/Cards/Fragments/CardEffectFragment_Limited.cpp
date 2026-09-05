@@ -20,7 +20,7 @@ UCardEffectFragment_Limited::UCardEffectFragment_Limited()
 	AttributeName = LOCTEXT("CardAttributes_Name_Limited", "Limited");
 }
 
-bool UCardEffectFragment_Limited::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Limited::Verify(const FCardIdentity& CardIdentity, const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	int32 Count = 0;
 

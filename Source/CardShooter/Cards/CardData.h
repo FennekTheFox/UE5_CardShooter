@@ -62,7 +62,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Appearance")
 	TArray<UDedicationData*> Dedications;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Functionality")
+	UPROPERTY(EditDefaultsOnly, Instanced, Category = "Functionality")
 	TArray<TObjectPtr<UCardEffectFragment_Attribute>> CardAttributes;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Functionality")
@@ -80,15 +80,21 @@ public:
 public:
 	UFUNCTION(BlueprintPure)
 	void GetIdentity(FCardIdentity& Identity);
+
 	UFUNCTION(BlueprintPure)
-	TArray<UCardEffectFragment_Attribute*> GetAllAttributesOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
+	void GetCardAttributes(const FCardIdentity& Identity, TArray<UCardEffectFragment_Attribute*>& OutAttributes) const;
+
 	UFUNCTION(BlueprintPure)
-	UCardEffectFragment_Attribute* GetAttributeOfClass(TSubclassOf<UCardEffectFragment_Attribute> Class);
+	TArray<UCardEffectFragment_Attribute*> GetAllAttributesOfClass(const FCardIdentity& Identity, TSubclassOf<UCardEffectFragment_Attribute> Class);
+
+	UFUNCTION(BlueprintPure)
+	UCardEffectFragment_Attribute* GetAttributeOfClass(FCardIdentity& Identity, TSubclassOf<UCardEffectFragment_Attribute> Class);
 
 	UFUNCTION(BlueprintPure)
 	FText GetDescription(const FCardIdentity& CardIdentity);
 	//Helper function mostly to separate out the parameter magnitudes for data validation
 	FText GetRawDescription(const FCardIdentity& CardIdentity);
+
 	UFUNCTION(BlueprintPure)
 	void GetDedications(FText& OutText) const;
 

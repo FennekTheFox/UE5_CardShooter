@@ -16,7 +16,7 @@ UCardEffectFragment_Gregarious::UCardEffectFragment_Gregarious()
 	AttributeName = LOCTEXT("CardAttributes_Name_Gregarious", "Gregarious");
 }
 
-bool UCardEffectFragment_Gregarious::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Gregarious::Verify(const FCardIdentity& CardIdentity, const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	bool bSuccess = Deck.CardList.Num() >= MinimumDeckSize;
 

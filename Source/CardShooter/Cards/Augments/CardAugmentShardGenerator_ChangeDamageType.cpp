@@ -17,7 +17,7 @@ void UCardAugmentShardGenerator_ChangeDamageType::Generate_Implementation(const 
 	TArray<UCardParameter*> Params;
 	CardData->GetParametersByPredicate(Params, [](const UCardParameter* Param)
 		{
-			if (!(Param->MetaData.DisplayType == ESetByCallerMagnitudeDisplayType::DamageType))
+			if ((Param->MetaData.DisplayType == ESetByCallerMagnitudeDisplayType::DamageType))
 			{
 				return true;
 			}

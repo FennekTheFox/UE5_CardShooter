@@ -28,14 +28,14 @@ UCardEffectFragment_Keystone::UCardEffectFragment_Keystone()
 	AttributeName = LOCTEXT("CardAttributes_Name_Keystone", "Keystone");
 }
 
-bool UCardEffectFragment_Keystone::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Keystone::Verify(const FCardIdentity& CardIdentity, const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	int32 KeystoneCount = 0;
 	bool bSuccess = true;
 
 	for (UCardData* Card : Deck.UtilityCards)
 	{
-		if (!Card->GetAllAttributesOfClass(UCardEffectFragment_Keystone::StaticClass()).IsEmpty())
+		if (!Card->GetAllAttributesOfClass(CardIdentity ,UCardEffectFragment_Keystone::StaticClass()).IsEmpty())
 		{
 			KeystoneCount += 1;
 		}
@@ -43,7 +43,7 @@ bool UCardEffectFragment_Keystone::Verify(const FCardDeck_DataOnly& Deck, TArray
 
 	for (UCardData* Card : Deck.CardList)
 	{
-		if (!Card->GetAllAttributesOfClass(UCardEffectFragment_Keystone::StaticClass()).IsEmpty())
+		if (!Card->GetAllAttributesOfClass(CardIdentity ,UCardEffectFragment_Keystone::StaticClass()).IsEmpty())
 		{
 			KeystoneCount += 1;
 		}

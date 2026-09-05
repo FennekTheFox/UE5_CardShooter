@@ -16,11 +16,11 @@ UCardEffectFragment_Archetype::UCardEffectFragment_Archetype()
 	AttributeName = LOCTEXT("CardAttributes_Name_Archetype", "Archetype");
 }
 
-bool UCardEffectFragment_Archetype::Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
+bool UCardEffectFragment_Archetype::Verify(const FCardIdentity& CardIdentity, const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons)
 {
 	for (UCardData* Card : Deck.UtilityCards)
 	{
-		TArray<UCardEffectFragment_Attribute*> Attributes = Card->GetAllAttributesOfClass(UCardEffectFragment_Archetype::StaticClass());
+		TArray<UCardEffectFragment_Attribute*> Attributes = Card->GetAllAttributesOfClass(CardIdentity,UCardEffectFragment_Archetype::StaticClass());
 
 		for (UCardEffectFragment_Attribute* Attribute : Attributes)
 		{
@@ -37,7 +37,7 @@ bool UCardEffectFragment_Archetype::Verify(const FCardDeck_DataOnly& Deck, TArra
 
 	for (UCardData* Card : Deck.CardList)
 	{
-		TArray<UCardEffectFragment_Attribute*> Attributes = Card->GetAllAttributesOfClass(UCardEffectFragment_Archetype::StaticClass());
+		TArray<UCardEffectFragment_Attribute*> Attributes = Card->GetAllAttributesOfClass(CardIdentity,UCardEffectFragment_Archetype::StaticClass());
 
 		for (UCardEffectFragment_Attribute* Attribute : Attributes)
 		{

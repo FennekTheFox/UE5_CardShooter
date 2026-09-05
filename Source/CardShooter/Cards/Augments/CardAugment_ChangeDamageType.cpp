@@ -142,13 +142,13 @@ FText UCardAugmentDescriptionGenerator_ChangeDamageType::GenerateText(const FCar
 
 FText UCardAugmentShardNameGenerator_ChangeDamageType::Generate(const FCardAugmentShard& ShardData)
 {
-	FText FormatingBase = LOCTEXT("Augment_ModParam_FormatingBase", "{0}-Morphing Augment Shard, Ver. {2}");
+	FText FormatingBase = LOCTEXT("Augment_ModParam_FormatingBase", "{0}-Morphing Augment Shard, Ver. {1}");
 
 	FText TypeText = FText::GetEmpty();
 
 	for (auto&& KVPair : DamageTypeAliases)
 	{
-		if (FMath::IsNearlyEqual(KVPair.Key, ShardData.ShardMagnitude, 0.05f))
+		if (FMath::IsNearlyEqual(KVPair.Key, ShardData.ShardOption, 0.05f))
 		{
 			TypeText = KVPair.Value;
 			break;
@@ -177,7 +177,7 @@ FText UCardAugmentShardDescGenerator_ChangeDamageType::Generate(const FCardAugme
 
 	for (auto&& KVPair : DamageTypeNames)
 	{
-		if (FMath::IsNearlyEqual(KVPair.Key, ShardData.ShardMagnitude, 0.05f))
+		if (FMath::IsNearlyEqual(KVPair.Key, ShardData.ShardOption, 0.05f))
 		{
 			TypeText = KVPair.Value;
 			break;

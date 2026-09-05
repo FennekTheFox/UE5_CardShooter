@@ -1,6 +1,6 @@
 #include "CardAugment_ParameterModifier.h"
 
-UE_DEFINE_GAMEPLAY_TAG(TAG_Card_Augment, "Gameplay.Core.Cards.Augments.ParameterModifier");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Card_Augment_ParameterModifier, "Gameplay.Core.Cards.Augments.ParameterModifier");
 
 #define LOCTEXT_NAMESPACE "CardAugments"
 
@@ -53,7 +53,7 @@ UCardAugment_ParameterModifier::UCardAugment_ParameterModifier()
 		MagnitudeCalculation = Cast<UMagnitudeCalculation_ParameterModifier>(MagCalcFinder.Class->GetDefaultObject());
 	}
 
-	AugmentTag = TAG_Card_Augment;
+	AugmentTag = TAG_Card_Augment_ParameterModifier;
 }
 
 void UCardAugment_ParameterModifier::ApplyAugment(FCardExecution_AdditionalData& DataToModify, const FCardAugmentData& AugmentData) const
@@ -235,6 +235,10 @@ FText UCardAugmentShardDescGenerator_ModifyParameter::Generate(const FCardAugmen
 	if (FText* SCTPtr = ScalingGroupNames.Find(ShardData.ShardProperty))
 	{
 		ScalingGroupText = *SCTPtr;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("There was a missing scaling group, or an invalid augment property"))
 	}
 
 	return FText::Format(FormatingBase,

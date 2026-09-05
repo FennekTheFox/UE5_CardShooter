@@ -44,5 +44,5 @@ class UCardEffectFragment_DeckLimitation : public UCardEffectFragment_Attribute
 	GENERATED_BODY()
 
 public:
-	virtual bool Verify(const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons) { return false; };
+	virtual bool Verify(const FCardIdentity& CardIdentity, const FCardDeck_DataOnly& Deck, TArray<UDeckLimitationViolation*>& FailureReasons) { return false; };
 };

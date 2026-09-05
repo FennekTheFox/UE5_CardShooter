@@ -66,9 +66,14 @@ static FAutoConsoleCommandWithWorldAndArgs GiveCurrencyCmd(
 void UCardShooterSaveData::ValidateAndFix(FCardIdentity& CardIdentity)
 {
 	//Also correct the asset tag in the card identity just to be sure
+	if (!CardIdentity.AssetTag.IsValid() && !CardIdentity.CardDataPath.IsValid())
+	{
+		return;
+	}
+
 
 	UCardData* Data = UCardShooterUtilityLibrary::GetCardDataFromIdentity(CardIdentity);
-	if (ensure(Data))
+	if (!ensure(Data))
 	{
 		CardIdentity.AssetTag = Data->AssetTag;
 	}
@@ -164,8 +169,19 @@ void UCardShooterSaveData::AddCardToCollection(UObject* WorldContext, const FCar
 	ValidateAndFix(FixedIdentity);
 	CallAnyCardChangedNextTick(WorldContext);
 
+	int32 EmptyIndex = Collection.Cards.Find(FCardIdentity());
+
+	if(Collection.Cards.IsValidIndex(EmptyIndex))
+	{
+		OutHandle.Index = EmptyIndex;
+		Collection.Cards[EmptyIndex] = CardIdentity;
+	}
+	else
+	{
+		OutHandle.Index = Collection.Cards.Add(FixedIdentity);
+	}
+
 	OutHandle.StorageLocation = ECardIdentityStorageLocation::Collection;
-	OutHandle.Index = Collection.Cards.Add(FixedIdentity);
 	OutHandle.StoragePath = FSoftObjectPath(this);
 }
 
@@ -200,7 +216,15 @@ bool UCardShooterSaveData::RemoveCardFromCollection(UObject* WorldContext, const
 	ValidateAndFix(FixedIdentity);
 	CallAnyCardChangedNextTick(WorldContext);
 
-	return Collection.Cards.RemoveSingle(CardIdentity) == 1;
+
+	int32 FoundIndex = Collection.Cards.Find(FixedIdentity);
+	if (FoundIndex != INDEX_NONE)
+	{
+		Collection.Cards[FoundIndex] = FCardIdentity();
+		return true;
+	}
+
+	return false;//Collection.Cards.RemoveSingle(CardIdentity) == 1;
 }
 
 void UCardShooterSaveData::GetSortedCardCollectionKeys(TArray<FCardIdentity>& OutCards) const
@@ -208,30 +232,46 @@ void UCardShooterSaveData::GetSortedCardCollectionKeys(TArray<FCardIdentity>& Ou
 	TSet<FCardIdentity> CardIDSet(Collection.Cards);
 	OutCards = CardIDSet.Array();
 
+	OutCards.RemoveAll([](const FCardIdentity& Card) {return Card == FCardIdentity();});
+
 	OutCards.Sort([](const FCardIdentity& A, const FCardIdentity& B) {
 		return A < B;
 		});
 }
 
+//Note: this function may take a long time on large collections. may be worth to make it async
 void UCardShooterSaveData::GetCardCollectionGroupIdentities(TArray<FCardIdentity>& OutCards) const
 {
 	TSet<FCardIdentity> CardIDSet(Collection.Cards);
 	OutCards = CardIDSet.Array();
 
-	OutCards.RemoveAll([OutCards](const FCardIdentity& Card) {
-		for (const FCardIdentity& OtherCard : OutCards)
+	OutCards.RemoveAll([](const FCardIdentity& Card) {return Card == FCardIdentity();});
+
+	for (int i = 0; i < OutCards.Num(); i++)
+	{
+		const FCardIdentity& CurrentCard = OutCards[i];
+
+		bool bBetterVersionExists = false;
+		for (int j = i + 1; j < OutCards.Num(); j++)
 		{
-			if (Card != OtherCard && Card.AssetTag == OtherCard.AssetTag)
+			const FCardIdentity& OtherCard = OutCards[j];
+
+			if (CurrentCard != OtherCard && CurrentCard.AssetTag == OtherCard.AssetTag)
 			{
-				if (Card < OtherCard)
+				if (CurrentCard < OtherCard)
 				{
-					return true;
+					OutCards.RemoveAt(i);
+					i--;
+					break;
+				}
+				else
+				{
+					j--;
+					OutCards.RemoveAt(j);
 				}
 			}
 		}
-
-		return false;
-		});
+	}
 
 	//Sort by dominant hue hehe
 	OutCards.Sort([](const FCardIdentity& A, const FCardIdentity& B) {

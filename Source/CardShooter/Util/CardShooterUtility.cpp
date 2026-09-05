@@ -10,6 +10,8 @@
 #include "SaveGame/CardShooterSaveData.h"
 #include "Internationalization/Regex.h"
 #include "Cards/CardData.h"
+#include "Util/CardShooterUtility.h"
+#include "../Cards/CardIdentity.h"
 
 UCardData* UCardShooterUtilityLibrary::GetCardDataFromIdentity(const FCardIdentity& Identity)
 {
@@ -105,34 +107,53 @@ bool UCardShooterUtilityLibrary::VerifyDeck(const FCardDeck& Deck, APlayerContro
 		DataOnlyDeck.CardList.Add(GetCardDataFromIdentity(Identity));
 	}
 
-	for (UCardData* Card : DataOnlyDeck.UtilityCards)
+	for (const FCardIdentityHandle& CardHandle : Deck.UtilityCards)
 	{
-		if (!Card)
+		//The utility card handle was invalid, we treat it as an empty slot and move on
+		if (!CardHandle.IsValid())
 		{
-			return false;
+			continue;
 		}
 
-		for (UCardEffectFragment_Attribute* DeckLimitation : Card->CardAttributes)
+		FCardIdentity CardIdentity = FCardIdentity();
+		if (!UCardIdentityHandleLibrary::GetCardIdentityFromHandle(CardHandle, CardIdentity))
+		{
+			continue;
+		}
+		UCardData* CardData = UCardShooterUtilityLibrary::GetCardDataFromIdentity(CardIdentity);
+		TArray<UCardEffectFragment_Attribute*> CardAttributes;
+		CardData->GetCardAttributes(CardIdentity, CardAttributes);
+
+		for (UCardEffectFragment_Attribute* DeckLimitation : CardAttributes)
 		{
 			if (UCardEffectFragment_DeckLimitation* AsDeckLimitation = Cast<UCardEffectFragment_DeckLimitation>(DeckLimitation))
 			{
-				bSuccess &= AsDeckLimitation->Verify(DataOnlyDeck, FailureReasons);
+				bSuccess &= AsDeckLimitation->Verify(CardIdentity, DataOnlyDeck, FailureReasons);
 			}
 		}
 	}
 
-	for (UCardData* Card : DataOnlyDeck.CardList)
+	for (const FCardIdentityHandle& CardHandle : Deck.CardHandles)
 	{
-		if (!Card)
+		//The utility card handle was invalid, we treat it as an empty slot and move on
+		if (!CardHandle.IsValid())
 		{
-			return false;
+			continue;
 		}
+		FCardIdentity CardIdentity = FCardIdentity();
+		if (!UCardIdentityHandleLibrary::GetCardIdentityFromHandle(CardHandle, CardIdentity))
+		{
+			continue;
+		}
+		UCardData* CardData = UCardShooterUtilityLibrary::GetCardDataFromIdentity(CardIdentity);
+		TArray<UCardEffectFragment_Attribute*> CardAttributes;
+		CardData->GetCardAttributes(CardIdentity, CardAttributes);
 
-		for (UCardEffectFragment_Attribute* DeckLimitation : Card->CardAttributes)
+		for (UCardEffectFragment_Attribute* DeckLimitation : CardAttributes)
 		{
 			if (UCardEffectFragment_DeckLimitation* AsDeckLimitation = Cast<UCardEffectFragment_DeckLimitation>(DeckLimitation))
 			{
-				bSuccess &= AsDeckLimitation->Verify(DataOnlyDeck, FailureReasons);
+				bSuccess &= AsDeckLimitation->Verify(CardIdentity, DataOnlyDeck, FailureReasons);
 			}
 		}
 	}

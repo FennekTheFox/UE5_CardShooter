@@ -33,7 +33,7 @@ bool FCardIdentity::operator<(const FCardIdentity& Other) const
 	//Deck assignment superceeds visual rarity
 	if (UsedInDecksWithIndices.Num() != Other.UsedInDecksWithIndices.Num())
 	{
-		return Augments.Num() < Other.Augments.Num();
+		return UsedInDecksWithIndices.Num() < Other.UsedInDecksWithIndices.Num();
 	}
 
 	for (int32 i = 0; i < UsedInDecksWithIndices.Num(); ++i)
