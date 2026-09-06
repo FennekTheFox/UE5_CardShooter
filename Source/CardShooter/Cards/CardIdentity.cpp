@@ -96,8 +96,11 @@ bool UCardIdentityHandleLibrary::GetCardIdentityFromHandle(
 {
 	switch (Handle.StorageLocation)
 	{
-	case ECardIdentityStorageLocation::Invalid: ensure(false); return false;
-	case ECardIdentityStorageLocation::Cache: return GetCachedCardIdentityFromIndex(Handle.Index, OutIdentity);
+	case ECardIdentityStorageLocation::Invalid: 
+		ensure(false); 
+		return false;
+	case ECardIdentityStorageLocation::Cache: 
+		return GetCachedCardIdentityFromIndex(Handle.Index, OutIdentity);
 	case ECardIdentityStorageLocation::Collection:
 	{
 		UCardShooterSaveData* SaveData = Cast<UCardShooterSaveData>(Handle.StoragePath.TryLoad());
