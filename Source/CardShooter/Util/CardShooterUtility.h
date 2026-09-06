@@ -93,4 +93,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static bool GetActiveEffectThatGrantedAbility(UGameplayAbility* AbilityInstance, FActiveGameplayEffectHandle& OutActiveEffectHandle);
+
+
+	UFUNCTION(BlueprintPure)
+	static bool GetSetByCallerValueFromSpec(const FGameplayEffectSpec& Spec, FGameplayTag Tag, float& Value);
 };

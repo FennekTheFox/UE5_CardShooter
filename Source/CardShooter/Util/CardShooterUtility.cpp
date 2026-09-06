@@ -678,3 +678,13 @@ bool UCardShooterUtilityLibrary::GetActiveEffectThatGrantedAbility(UGameplayAbil
 	OutActiveEffectHandle = OriginEffectHandle;
 	return true;
 }
+
+bool UCardShooterUtilityLibrary::GetSetByCallerValueFromSpec(const FGameplayEffectSpec& Spec, FGameplayTag Tag, float& Value)
+{
+	if (const float* ValuePtr = Spec.SetByCallerTagMagnitudes.Find(Tag))
+	{
+		Value = *ValuePtr;
+		return true;
+	}
+	return false;
+}
