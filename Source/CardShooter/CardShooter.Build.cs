@@ -33,7 +33,8 @@ public class CardShooter : ModuleRules
             "ModularGameplay",
             "ModularGameplayActors",
             "GameFeatures",
-            "LyraGame"
+            "LyraGame",
+            "NetCore"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]

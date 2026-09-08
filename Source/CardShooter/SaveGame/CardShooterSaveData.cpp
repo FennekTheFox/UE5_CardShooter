@@ -73,14 +73,14 @@ void UCardShooterSaveData::ValidateAndFix(FCardIdentity& CardIdentity)
 
 
 	UCardData* Data = UCardShooterUtilityLibrary::GetCardDataFromIdentity(CardIdentity);
-	if (!ensure(Data))
+	if (ensure(Data))
 	{
 		CardIdentity.AssetTag = Data->AssetTag;
-	}
 
-	if (FMath::IsNearlyEqual(CardIdentity.DominantHue, -1.f))
-	{
-		CardIdentity.DominantHue = Data->DominantHue;
+		if (FMath::IsNearlyEqual(CardIdentity.DominantHue, -1.f))
+		{
+			CardIdentity.DominantHue = Data->DominantHue;
+		}
 	}
 }
 
