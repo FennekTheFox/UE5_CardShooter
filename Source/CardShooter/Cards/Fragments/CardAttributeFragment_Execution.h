@@ -84,6 +84,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
 	TArray<UCardParameter*> Parameters;
 
+	//Replaces {Key} in the raw description with a hover tag block that references the object
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<FString, TSubclassOf<class UObject>> HoverContextObjects;
+
 	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution) override;
 
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;

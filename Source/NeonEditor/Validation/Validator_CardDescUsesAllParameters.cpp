@@ -239,9 +239,7 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 				}
 			}
 
-			if (AsCEF_GA) 
-			{
-				for (auto&& KVPair : AsCEF_GA->HoverContextObjects)
+				for (auto&& KVPair : WithParameters->HoverContextObjects)
 				{
 					if (!ensure(KVPair.Value))
 					{
@@ -258,7 +256,7 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 					}
 				}
 
-				for (auto&& KVPair : AsCEF_GA->HoverContextObjects)
+				for (auto&& KVPair : WithParameters->HoverContextObjects)
 				{
 					if (!ensure(KVPair.Value))
 					{
@@ -288,7 +286,6 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 						continue;
 					}
 				}
-			}
 		}
 	}
 }

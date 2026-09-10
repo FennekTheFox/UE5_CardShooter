@@ -51,7 +51,8 @@ public:
 				SNew(SRichTextBlock)
 					.Text(this, &SHoverObjectWidget::GetText)
 					.TextStyle(&TextStyle.Get())
-			];
+			]
+			.SetVerticalAlignment(EVerticalAlignment::VAlign_Bottom);
 	}
 
 	~SHoverObjectWidget()

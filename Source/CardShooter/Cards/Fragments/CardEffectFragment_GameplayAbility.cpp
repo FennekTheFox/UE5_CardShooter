@@ -132,39 +132,4 @@ FText UCardEffectFragment_GameplayAbility::GetRawLocalizableDescription(const FC
 	return FText::GetEmpty();
 }
 
-void UCardEffectFragment_GameplayAbility::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const
-{
-	Super::GetFormattingArgs(Args, CardIdentity);
-
-	for (auto&& KVPair : HoverContextObjects)
-	{
-		if (!ensure(KVPair.Value))
-		{
-			continue;
-		}
-
-		FText DisplayText = FText::GetEmpty();
-
-		if (UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject())) 
-		{
-			DisplayText = AsGE_CE->GetSimpleLocalizableName();
-		}else
-		if(KVPair.Value->GetDefaultObject()->Implements<UHoverableContext>())
-		{
-			IHoverableContext::Execute_GetHoverText(
-				KVPair.Value->GetDefaultObject(),
-				DisplayText
-			);
-		}
-
-		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
-			"<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"HoverContent\">{3}</>"),
-			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
-			FText::FromString(this->GetPathName()),
-			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
-			DisplayText
-		));
-	}
-}
-
 #undef LOCTEXT_NAMESPACE
