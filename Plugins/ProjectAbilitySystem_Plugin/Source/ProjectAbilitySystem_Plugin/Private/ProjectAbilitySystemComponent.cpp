@@ -108,6 +108,11 @@ void UProjectAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Ability
 
 	UProjectGameplayAbility* Ability = Cast<UProjectGameplayAbility>(AbilitySpec.Ability);
 
+	if (!ensure(Ability))
+	{
+		return;
+	}
+
 	for (UAbilityActivationTrigger* Trigger : Ability->ActivationTriggers)
 	{
 		if (Trigger->GetTriggerName() == FName("OnTagAdded"))
@@ -194,6 +199,11 @@ void UProjectAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& Abili
 	}
 
 	UProjectGameplayAbility* Ability = Cast<UProjectGameplayAbility>(AbilitySpec.Ability);
+
+	if (!ensure(Ability))
+	{
+		return;
+	}
 
 	for (UAbilityActivationTrigger* Trigger : Ability->ActivationTriggers)
 	{
@@ -581,9 +591,13 @@ void UProjectAbilitySystemComponent::TryActivateAbilitiesOnSpawn()
 {
 	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 	{
-		if (const UProjectGameplayAbility* AbilityCDO = CastChecked<UProjectGameplayAbility>(AbilitySpec.Ability))
+		if (const UProjectGameplayAbility* AbilityCDO = Cast<UProjectGameplayAbility>(AbilitySpec.Ability))
 		{
 			AbilityCDO->TryActivateAbilityOnSpawn(AbilityActorInfo.Get(), AbilitySpec);
+		}
+		else
+		{
+			ensure(false);
 		}
 	}
 }
