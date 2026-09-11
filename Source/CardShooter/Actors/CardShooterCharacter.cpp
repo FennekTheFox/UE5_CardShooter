@@ -79,12 +79,22 @@ void ACardShooterCharacter::MoveInput(const FInputActionValue& Value)
 
 void ACardShooterCharacter::LookInput(const FInputActionValue& Value)
 {
+
+
+	// Scale movement input by delta time and rotation rate
+	const float DeltaTime = GetWorld()->GetDeltaSeconds();
+	const float RotationRate = GetCharacterMovement()->RotationRate.Yaw;
+
+	const float MaxRotation = DeltaTime * RotationRate;
+
 	// get the Vector2D look axis
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	FVector2D LookAxisVector = Value.Get<FVector2D>().GetClampedToMaxSize(MaxRotation);
 
-	// pass the axis values to the aim input
-	DoAim(LookAxisVector.X, LookAxisVector.Y);
+	const float YawRotation = LookAxisVector.X;
+	const float PitchRotation = LookAxisVector.Y;
 
+	// Pass the scaled values to movement
+	DoAim(YawRotation, PitchRotation);
 }
 
 void ACardShooterCharacter::DoAim(float Yaw, float Pitch)

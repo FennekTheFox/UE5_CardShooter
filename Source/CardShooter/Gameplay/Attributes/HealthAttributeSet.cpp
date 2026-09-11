@@ -32,3 +32,8 @@ void UHealthAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UHealthAttributeSet, MaxHealth, OldValue);
 }
+
+void UHealthAttributeSet::OnRep_TotalCurrentShieldAmount(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UHealthAttributeSet, TotalCurrentShieldAmount, OldValue);
+}

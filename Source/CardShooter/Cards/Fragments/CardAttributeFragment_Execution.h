@@ -36,6 +36,16 @@ protected:
 };
 
 
+UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew)
+class UCardActivationCondition : public UObject
+{
+	GENERATED_BODY()
+
+
+public:
+	UFUNCTION(BlueprintNativeEvent)
+	bool CheckCondition(class ACharacter* Avatar, const FCardExecution_AdditionalData& ExecutionData);
+};
 
 
 UCLASS(BlueprintType, Blueprintable, Abstract)
@@ -44,6 +54,11 @@ class UCardEffectFragment_Execution : public UCardEffectFragment_Root
 	GENERATED_BODY()
 
 public:
+	//Activation conditions for the execution path. for simplicity this will only be evaluated on the root
+	//execution
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Instanced)
+	TArray<UCardActivationCondition*> ActivationConditions;
+
 	//Execution of cards always needs to happen on server side, and be replicated to the client
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ExecuteCardEffect(APawn* ExecutingPawn, const FCardExecution_AdditionalData AdditionalData = FCardExecution_AdditionalData());
@@ -56,6 +71,9 @@ public:
 
 	UPROPERTY(Transient)
 	TObjectPtr<UCardEffectFragment_Execution_Compound> ParentCompound;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool CanActivateExecution(class ACharacter* Avatar, const FCardIdentity& CardIdentity);
 
 	FText GetLocalizableName_Implementation(const FCardIdentity& CardIdentity)
 	{
@@ -73,8 +91,6 @@ private:
 	TObjectPtr<UCardEffectFragment_Execution> ParentExec = nullptr;
 };
 
-
-
 UCLASS(Abstract)
 class UCardEffectFragment_Execution_WithParameters : public UCardEffectFragment_Execution
 {
@@ -90,6 +106,7 @@ public:
 
 	UCardExecutionInstance* ExecuteCardEffect_Implementation(APawn* ExecutingPawn, const FCardExecution_AdditionalData& AdditionalData, UCardEffectFragment_Execution* ParentExecution) override;
 
+	bool CanActivateExecution(ACharacter* Avatar, const FCardIdentity& CardIdentity) override;
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;
 	virtual void GatherParameters(FCardExecution_AdditionalData& OutData) const;
 };

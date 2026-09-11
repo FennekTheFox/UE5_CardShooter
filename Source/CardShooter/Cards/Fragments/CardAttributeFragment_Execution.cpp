@@ -62,6 +62,13 @@ UCardExecutionInstance* UCardEffectFragment_Execution::ExecuteCardEffect_Impleme
 	return NewInstance;
 }
 
+bool UCardEffectFragment_Execution::CanActivateExecution(class ACharacter* Avatar, const FCardIdentity& CardIdentity)
+{
+	//This base class doesnt really get used anymore, and is especially useless for the conditions...
+	ensure(false);
+	return true;
+}
+
 void UCardEffectFragment_Execution_Compound::FindSubExecutionsOfClass(TSubclassOf<UCardEffectFragment_Execution> Class, TArray<UCardEffectFragment_Execution*>& OutArray)
 {
 	for (UCardEffectFragment_Execution* SubExec : Executions)
@@ -129,6 +136,50 @@ UCardExecutionInstance* UCardEffectFragment_Execution_WithParameters::ExecuteCar
 
 	NewInstance->StartExecutionInstance(ExecutingPawn, PostModificationData, this);
 	return NewInstance;
+}
+
+bool UCardEffectFragment_Execution_WithParameters::CanActivateExecution(ACharacter* Avatar, const FCardIdentity& CardIdentity)
+{
+	if (!ensure(Avatar))
+	{
+		return false;
+	}
+
+	FCardExecution_AdditionalData TmpData;
+	GatherParameters(TmpData);
+
+	TArray<UItem_CardAugment*> Augments;
+	UCardData::GetAugments(CardIdentity, Augments);
+	for (UItem_CardAugment* AugmentItem : Augments)
+	{
+		if (!AugmentItem)
+		{
+			continue;
+		}
+		FCardAugmentData AugmentData = AugmentItem->AugmentData;
+		UCardAugment* AugmentCDO = nullptr;
+
+		if (UClass* AugmentClass =
+			AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		{
+			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
+		}
+
+		if (AugmentCDO)
+		{
+			AugmentCDO->ApplyAugment(TmpData, AugmentData);
+		}
+	}
+
+	for (UCardActivationCondition* ActivationCondition : ActivationConditions)
+	{
+		if (!ActivationCondition->CheckCondition(Avatar, TmpData))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const
@@ -266,3 +317,8 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 
 
 
+bool UCardActivationCondition::CheckCondition_Implementation(ACharacter* Avatar, const FCardExecution_AdditionalData& ExecutionData)
+{
+	ensure(false);
+	return false;
+}

@@ -72,6 +72,9 @@ public:
 	TObjectPtr<UCardEffectFragment_Execution> SecondaryExecution;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Functionality")
+	bool bCheckActivationConditions = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Functionality")
 	bool bGloballyEnabled = true;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "HueSorting")
