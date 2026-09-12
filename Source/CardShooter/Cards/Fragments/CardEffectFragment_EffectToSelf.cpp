@@ -99,7 +99,7 @@ FText UCardEffectFragment_ApplyEffectToOwner::GetRawLocalizableDescription(const
 				Base,
 				FText::FromString(AsGE_CE->GetPathName()),
 				FText::FromString(this->GetPathName()),
-				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
+				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardCachedIdentityHandle(CardIdentity).Index),
 				AsGE_CE->GetSimpleLocalizableName())
 		);
 	}

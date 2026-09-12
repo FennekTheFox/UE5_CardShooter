@@ -20,6 +20,7 @@
 #include "InputCoreTypes.h"
 #include "Cards/Fragments/CardEffectFragment_GameplayAbility.h"
 #include "Util/CardShooterUtility.h"
+#include "Cards/Fragments/CardAttributeFragment_Execution.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RichTextHoverDecorator)
 
@@ -113,14 +114,22 @@ private:
 		{
 			IHoverableContext::Execute_GetHoverContent(HoverObject, Content);
 
-			if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP =
-				Cast<UCardEffectFragment_Execution_WithParameters>(relatedExecFrag))
+			FCardIdentity TheCardIdentity = CardIdentity.Get();
+
+			if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(relatedExecFrag))
 			{
 				IHoverableContext::Execute_GetHoverContent(HoverObject, Content);
 				FFormatNamedArguments Args;
-				AsCEF_E_WP->GetFormattingArgs(Args, CardIdentity.Get());
+				AsCEF_E_WP->GetFormattingArgs(Args, TheCardIdentity);
 				Content = UCardShooterUtilityLibrary::FormatTextForDisplay(Content);
 				Content = FText::Format(Content, Args);
+
+				if (IHoverableContext* HoverableContextObject = Cast<IHoverableContext>(HoverObject))
+				{
+					FFormatNamedArguments Args2;
+					HoverableContextObject->GetFormattingArgs(AsCEF_E_WP, Args2);
+					Content = FText::Format(Content, Args2);
+				}
 			}
 		}
 
@@ -514,4 +523,10 @@ TSharedPtr<ITextDecorator> URichTextBlockHoverObjectDecorator::CreateDecorator(
 			TooltipWidgetClass,
 			DefaultTextStyle,
 			TextStyleSet));
+}
+
+
+void UHoverContextObject_Base::GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const
+{
+	UCardEffectFragment_Execution_WithParameters::AppendFormattingArgsFromHoverContextObjects(RelatedExec, HoverContextObjects, FormattingArguments);
 }

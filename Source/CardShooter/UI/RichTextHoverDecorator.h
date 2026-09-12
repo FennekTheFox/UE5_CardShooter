@@ -14,6 +14,7 @@
 class ISlateStyle;
 class UInputAction;
 class URichTextBlock;
+class UCardEffectFragment_Execution_WithParameters;
 
 UINTERFACE(BlueprintType)
 class CARDSHOOTER_API UHoverableContext : public UInterface
@@ -33,8 +34,23 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
 	void GetHoverContentTitle(FText& OutText) const;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My Interface")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
 	void GetHoverContent(FText& OutText) const;
+
+	virtual void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const {};
+};
+
+UCLASS(Blueprintable, BlueprintType, Abstract)
+class UHoverContextObject_Base : public UObject,
+	public IHoverableContext
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FString, TSubclassOf<UObject>> HoverContextObjects;
+
+	void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const override;
 };
 
 /**

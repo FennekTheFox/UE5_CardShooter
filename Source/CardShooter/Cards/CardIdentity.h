@@ -145,7 +145,7 @@ class CARDSHOOTER_API UCardIdentityHandleLibrary : public UBlueprintFunctionLibr
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "CardShooter|Cards")
-	static FCardIdentityHandle GetOrAddCardIdentityHandle(const FCardIdentity& Identity);
+	static FCardIdentityHandle GetOrAddCardCachedIdentityHandle(const FCardIdentity& Identity);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "CardShooter|Cards")
 	static bool GetCardIdentityFromHandle(const FCardIdentityHandle& Handle, FCardIdentity& OutIdentity, APlayerController* PC = nullptr);

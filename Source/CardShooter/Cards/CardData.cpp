@@ -130,7 +130,7 @@ FText UCardData::GetAttributesDescription(const FCardIdentity& CardIdentity)
 			FText Wrapped = FText::Format(
 				FText::FromString(TEXT("<hover id=\"{0}\" cardidentityhandle=\"{1}\" style=\"HoverContent\">{2}</>")),
 				FText::FromString(Attr->GetPathName()),
-				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(CardIdentity).Index),
+				FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardCachedIdentityHandle(CardIdentity).Index),
 				AttrName
 			);
 			AttributeDescs.Add(Wrapped);

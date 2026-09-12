@@ -7,6 +7,7 @@
 #include "Abilities/GameplayAbilityTargetTypes.h"
 #include "Cards/Augments/CardAugmentData.h"
 #include "CardExecution_AdditionalData.h"
+#include "Cards/CardIdentity.h"
 
 #include "CardAttributeFragment_Execution.generated.h"
 
@@ -109,6 +110,8 @@ public:
 	bool CanActivateExecution(ACharacter* Avatar, const FCardIdentity& CardIdentity) override;
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;
 	virtual void GatherParameters(FCardExecution_AdditionalData& OutData) const;
+
+	static void AppendFormattingArgsFromHoverContextObjects(const UCardEffectFragment_Execution_WithParameters* RelatedExec, const TMap<FString, TSubclassOf<class UObject>>& HoverContextObjects, FFormatNamedArguments& Args, FCardIdentity CardIdentity = FCardIdentity());
 };
 
 UCLASS()

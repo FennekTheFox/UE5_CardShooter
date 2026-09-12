@@ -68,7 +68,7 @@ bool FCardIdentity::operator<(const FCardIdentity& Other) const
 
 TArray<FCardIdentity> UCardIdentityHandleLibrary::CachedIdentities;
 
-FCardIdentityHandle UCardIdentityHandleLibrary::GetOrAddCardIdentityHandle(
+FCardIdentityHandle UCardIdentityHandleLibrary::GetOrAddCardCachedIdentityHandle(
 	const FCardIdentity& Identity)
 {
 	for (int32 i = 0; i < CachedIdentities.Num(); ++i)
