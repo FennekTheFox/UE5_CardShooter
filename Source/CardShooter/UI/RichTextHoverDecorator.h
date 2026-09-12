@@ -37,7 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
 	void GetHoverContent(FText& OutText) const;
 
-	virtual void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const {};
+	virtual void GetHoverStyle(FText& OutText) const { OutText =  FText::FromString("HoverContent"); }
+	virtual void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const {}
 };
 
 UCLASS(Blueprintable, BlueprintType, Abstract)

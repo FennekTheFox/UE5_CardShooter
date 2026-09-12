@@ -140,11 +140,18 @@ void UCardEffectFragment_Execution_WithParameters::AppendFormattingArgsFromHover
 				);
 			}
 
+		FText Style = FText::FromString("HoverContent");
+		if (IHoverableContext* AsHoverableContext = Cast<IHoverableContext>(KVPair.Value->GetDefaultObject()))
+		{
+			AsHoverableContext->GetHoverStyle(Style);
+		}
+
 		Args.Add(KVPair.Key, FText::Format(LOCTEXT("AbilityReferencedEffectFormat",
-			"<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"HoverContent\">{3}</>"),
+			"<hover id=\"{0}\" relatedExec=\"{1}\" cardidentityhandle=\"{2}\" style=\"{3}\">{4}</>"),
 			FText::FromString(KVPair.Value->GetDefaultObject()->GetPathName()),
 			FText::FromString(RelatedExec->GetPathName()),
 			FText::AsNumber(UCardIdentityHandleLibrary::GetOrAddCardCachedIdentityHandle(CardIdentity).Index),
+			Style,
 			DisplayText
 		));
 	}

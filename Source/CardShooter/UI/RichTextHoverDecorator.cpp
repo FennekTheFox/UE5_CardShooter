@@ -530,3 +530,4 @@ void UHoverContextObject_Base::GetFormattingArgs(const UCardEffectFragment_Execu
 {
 	UCardEffectFragment_Execution_WithParameters::AppendFormattingArgsFromHoverContextObjects(RelatedExec, HoverContextObjects, FormattingArguments);
 }
+

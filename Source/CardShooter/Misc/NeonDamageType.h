@@ -24,4 +24,6 @@ public:
 	void GetHoverText_Implementation(FText& OutText) const override;
 	void GetHoverContentTitle_Implementation(FText& OutText) const override;
 	void GetHoverContent_Implementation(FText& OutText) const override;
+
+	virtual void GetHoverStyle(FText& OutText) const override { OutText = RichStyle; };
 };
