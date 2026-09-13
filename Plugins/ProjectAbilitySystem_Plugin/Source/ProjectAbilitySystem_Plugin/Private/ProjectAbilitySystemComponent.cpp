@@ -183,6 +183,29 @@ void UProjectAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& Ability
 
 			WhileTagPresentOngoingAbilityList.AddUnique(AbilitySpec.Handle);
 		}
+		else if (Trigger->GetTriggerName() == FName("Attribute Based"))
+		{
+			UAbilityActivationTrigger_AttributeBased* AsAttributeBased =
+				Cast<UAbilityActivationTrigger_AttributeBased>(Trigger);
+			if (!ensure(AsAttributeBased))
+			{
+				break;
+			}
+
+			//If theres no entry yet, we need to bind the callback
+			if(!AttributeChangedTriggerMapping.Find(AsAttributeBased->ReferenceAttribute))
+			{
+				auto& ReferenceAttributeChangedDelegate = RegisterGameplayAttributeEvent(AsAttributeBased->ReferenceAttribute);
+				auto Handle = ReferenceAttributeChangedDelegate.AddUObject(this, &UProjectAbilitySystemComponent::OnAttributeChanged);
+
+				auto& NewEntry = AttributeChangedTriggerMapping.FindOrAdd(AsAttributeBased->ReferenceAttribute); 
+				NewEntry.Key = Handle;
+			}
+
+
+			auto& NewEntry = AttributeChangedTriggerMapping.FindOrAdd(AsAttributeBased->ReferenceAttribute);
+			NewEntry.Value.Add(AsAttributeBased, AbilitySpec.Handle);
+		}
 	}
 }
 
@@ -296,6 +319,27 @@ void UProjectAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& Abili
 				}
 			}
 			AbilitiesToTriggerOnTick.Remove(AbilitySpec.Handle);
+		}
+		else if (Trigger->GetTriggerName() == FName("Attribute Based"))
+		{
+			UAbilityActivationTrigger_AttributeBased* AsAttributeBased =
+				Cast<UAbilityActivationTrigger_AttributeBased>(Trigger);
+			if (!ensure(AsAttributeBased))
+			{
+				break;
+			}
+
+			//If theres no entry yet, we need to bind the callback
+			if (TPair<FDelegateHandle, TMap<UAbilityActivationTrigger_AttributeBased*, FGameplayAbilitySpecHandle>>* AttributeBasedActivationsList = AttributeChangedTriggerMapping.Find(AsAttributeBased->ReferenceAttribute))
+			{
+				AttributeBasedActivationsList->Value.Remove(AsAttributeBased);
+
+				if (AttributeBasedActivationsList->Value.IsEmpty())
+				{
+					auto& ReferenceAttributeChangedDelegate = RegisterGameplayAttributeEvent(AsAttributeBased->ReferenceAttribute);
+					ReferenceAttributeChangedDelegate.Remove(AttributeBasedActivationsList->Key);
+				}
+			}
 		}
 	}
 }
@@ -627,6 +671,23 @@ void UProjectAbilitySystemComponent::CancelAbilitiesWithTag(const FGameplayTag& 
 		if (Spec.Ability->AbilityTags.HasTag(GameplayTag))
 		{
 			CancelAbilitySpec(Spec, nullptr);
+		}
+	}
+}
+
+void UProjectAbilitySystemComponent::OnAttributeChanged(float NewValue, const FGameplayEffectModCallbackData* CallbackData)
+{
+	const auto* Entry = AttributeChangedTriggerMapping.Find(CallbackData->EvaluatedData.Attribute);
+
+	if(ensure(Entry))
+	{
+		const auto& Map = Entry->Value;
+		for (const auto& KVPair : Map)
+		{
+			if (KVPair.Key->OnAttributeChanged(NewValue))
+			{
+				TryActivateAbility(KVPair.Value);
+			}
 		}
 	}
 }

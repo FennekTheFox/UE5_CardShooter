@@ -6,6 +6,7 @@
 #include "InputAction.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
+#include "GameplayEffectExtension.h"
 
 #include "ProjectAbilitySystemComponent.generated.h"
 
@@ -83,6 +84,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CancelAbilitiesWithTag(const FGameplayTag& GameplayTag);
 
+	void OnAttributeChanged(float NewValue, const FGameplayEffectModCallbackData* CallbackData);
+
 private:
 	UPROPERTY()
 	TMap<FGameplayTag, FAbilitySetApplicationData> ContextData;
@@ -110,6 +113,8 @@ private:
 	TMap<FGameplayTag, TArray<FGameplayAbilitySpecHandle>> AbilitiesToTriggerWhileTagPresentOngoing;
 
 	TArray<FGameplayAbilitySpecHandle> AbilitiesToTriggerOnTick;
+
+	TMap<FGameplayAttribute, TPair<FDelegateHandle, TMap<class UAbilityActivationTrigger_AttributeBased*, FGameplayAbilitySpecHandle>>> AttributeChangedTriggerMapping;
 	
 	TMap<FGameplayTag, FDelegateHandle> OnTagAddedDelegateHandles;
 	TMap<FGameplayTag, FDelegateHandle> WhileTagPresentDelegateHandles;

@@ -1,22 +1,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AttributeSet.h"
+#include "ProjectAttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "MovementAttributeSet.generated.h"
 
-#define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
-GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
-GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
-GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
-GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
-
 UCLASS()
-class UMovementAttributeSet : public UAttributeSet
+class UMovementAttributeSet : public UProjectAttributeSet
 {
 	GENERATED_BODY()
 
 public:
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, MoveSpeed)
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, RotationRate)
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, JumpHeight)
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, Acceleration)
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, BrakingDeceleration)
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, AirControl)
+	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, GravityScale)
 
 	UMovementAttributeSet();
 
@@ -30,80 +31,47 @@ public:
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-
-	/*
-	 * CharacterMovement->MaxWalkSpeed
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MoveSpeed, Category = "Movement")
-	FGameplayAttributeData MoveSpeed;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, MoveSpeed)
-
-		UFUNCTION()
+protected:
+	UFUNCTION()
 	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 
-
-	/*
-	 * CharacterMovement->RotationRate.Yaw
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_RotationRate, Category = "Movement")
-	FGameplayAttributeData RotationRate;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, RotationRate)
-
-		UFUNCTION()
+	UFUNCTION()
 	void OnRep_RotationRate(const FGameplayAttributeData& OldValue);
 
-
-	/*
-	 * CharacterMovement->JumpZVelocity
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_JumpHeight, Category = "Movement")
-	FGameplayAttributeData JumpHeight;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, JumpHeight)
-
-		UFUNCTION()
+	UFUNCTION()
 	void OnRep_JumpHeight(const FGameplayAttributeData& OldValue);
 
-
-	/*
-	 * CharacterMovement->MaxAcceleration
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Acceleration, Category = "Movement")
-	FGameplayAttributeData Acceleration;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, Acceleration)
-
-		UFUNCTION()
+	UFUNCTION()
 	void OnRep_Acceleration(const FGameplayAttributeData& OldValue);
 
-
-	/*
-	 * CharacterMovement->BrakingDecelerationWalking
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_BrakingDeceleration, Category = "Movement")
-	FGameplayAttributeData BrakingDeceleration;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, BrakingDeceleration)
-
-		UFUNCTION()
+	UFUNCTION()
 	void OnRep_BrakingDeceleration(const FGameplayAttributeData& OldValue);
 
-
-	/*
-	 * CharacterMovement->AirControl
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AirControl, Category = "Movement")
-	FGameplayAttributeData AirControl;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, AirControl)
-
-		UFUNCTION()
+	UFUNCTION()
 	void OnRep_AirControl(const FGameplayAttributeData& OldValue);
 
-
-	/*
-	 * CharacterMovement->GravityScale
-	 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_GravityScale, Category = "Movement")
-	FGameplayAttributeData GravityScale;
-	ATTRIBUTE_ACCESSORS(UMovementAttributeSet, GravityScale)
-
-		UFUNCTION()
+	UFUNCTION()
 	void OnRep_GravityScale(const FGameplayAttributeData& OldValue);
+
+private:
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MoveSpeed, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MoveSpeed;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_RotationRate, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData RotationRate;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_JumpHeight, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData JumpHeight;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Acceleration, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Acceleration;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_BrakingDeceleration, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData BrakingDeceleration;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AirControl, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData AirControl;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_GravityScale, Category = "Movement", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData GravityScale;
 };

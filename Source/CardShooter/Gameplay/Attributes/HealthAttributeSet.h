@@ -12,6 +12,7 @@ class UHealthAttributeSet : public UProjectAttributeSet
 
 public:
 	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	ATTRIBUTE_ACCESSORS(UHealthAttributeSet, Health)
 	ATTRIBUTE_ACCESSORS(UHealthAttributeSet, MaxHealth)
 	ATTRIBUTE_ACCESSORS(UHealthAttributeSet, IncomingDamage)

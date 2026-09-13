@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameplayEffectExtension.h"
+#include "ProjectAbilitySystemComponent.h"
 #include "AbilityTriggers.generated.h"
 
 UCLASS(BlueprintType, Abstract, EditInlineNew, DefaultToInstanced, CollapseCategories)
@@ -84,4 +86,54 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag GameplayTag;
+};
+
+UENUM()
+enum class EComparisonOperation : uint8
+{
+	LessThan,
+	LessThanEq,
+	Equals,
+	GreaterThanEq,
+	GreaterThan,
+	NotEquals
+};
+
+// Attempts to activate the ability each time a Gameplay Event with the specified Gameplay Tag happens.
+UCLASS(BlueprintType, DisplayName = "Attribute Based")
+class UAbilityActivationTrigger_AttributeBased : public UAbilityActivationTrigger
+{
+	friend class UProjectAbilitySystemComponent;
+
+	GENERATED_BODY()
+
+public:
+	FName GetTriggerName() override { return FName("Attribute Based"); };
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FGameplayAttribute ReferenceAttribute;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	EComparisonOperation ComparisonOperation = EComparisonOperation::Equals;
+
+	//The right hand side value of the comparison operation
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	float ComparisonValue = 100.f;
+
+	bool OnAttributeChanged(float NewValue) const
+	{
+		bool bSuccess = false;
+
+		switch (ComparisonOperation)
+		{
+		case EComparisonOperation::Equals: bSuccess = FMath::IsNearlyEqual(NewValue, ComparisonValue); break;
+		case EComparisonOperation::LessThan: bSuccess = NewValue < ComparisonValue; break;
+		case EComparisonOperation::LessThanEq: bSuccess = NewValue <= ComparisonValue; break;
+		case EComparisonOperation::GreaterThanEq: bSuccess = NewValue >= ComparisonValue; break;
+		case EComparisonOperation::GreaterThan: bSuccess = NewValue > ComparisonValue; break;
+		case EComparisonOperation::NotEquals: bSuccess = !FMath::IsNearlyEqual(NewValue, ComparisonValue); break;
+		}
+
+		return bSuccess;
+	}
 };

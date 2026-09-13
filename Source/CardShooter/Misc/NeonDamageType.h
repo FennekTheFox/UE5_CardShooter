@@ -21,9 +21,14 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FText DamageTypeDescription = FText::FromString("This damage type doesnt have a description yet.");
 
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FString, TSubclassOf<UObject>> HoverContextObjects;
+
 	void GetHoverText_Implementation(FText& OutText) const override;
 	void GetHoverContentTitle_Implementation(FText& OutText) const override;
 	void GetHoverContent_Implementation(FText& OutText) const override;
 
 	virtual void GetHoverStyle(FText& OutText) const override { OutText = RichStyle; };
+	void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const override;
+
 };
