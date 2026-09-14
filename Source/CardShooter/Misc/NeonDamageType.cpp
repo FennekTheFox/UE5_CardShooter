@@ -9,13 +9,13 @@ void UNeonDamageType::GetHoverText_Implementation(FText& OutText) const
 	OutText = DamageTypeName;
 }
 
-void UNeonDamageType::GetHoverContentTitle_Implementation(FText& OutText) const
+void UNeonDamageType::GetHoverContentTitle_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = FText::Format(LOCTEXT("DamageTypeTitleFormat", "Damage Type: {0}"),
 		DamageTypeName);
 }
 
-void UNeonDamageType::GetHoverContent_Implementation(FText& OutText) const
+void UNeonDamageType::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = DamageTypeDescription;
 }

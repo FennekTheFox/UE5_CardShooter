@@ -111,6 +111,7 @@ public:
 	virtual void GetFormattingArgs(FFormatNamedArguments& Args, const FCardIdentity& CardIdentity) const;
 	virtual void GatherParameters(FCardExecution_AdditionalData& OutData) const;
 
+	static void GetAdditionalExecData(const UCardEffectFragment_Execution_WithParameters* RelatedExec, const FCardIdentity& CardIdentity, FCardExecution_AdditionalData& OutData);
 	static void AppendFormattingArgsFromHoverContextObjects(const UCardEffectFragment_Execution_WithParameters* RelatedExec, const TMap<FString, TSubclassOf<class UObject>>& HoverContextObjects, FFormatNamedArguments& Args, FCardIdentity CardIdentity = FCardIdentity());
 };
 

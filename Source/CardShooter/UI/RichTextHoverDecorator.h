@@ -32,10 +32,10 @@ public:
 	void GetHoverText(FText& OutText) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
-	void GetHoverContentTitle(FText& OutText) const;
+	void GetHoverContentTitle(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "HoverableContext")
-	void GetHoverContent(FText& OutText) const;
+	void GetHoverContent(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const;
 
 	virtual void GetHoverStyle(FText& OutText) const { OutText =  FText::FromString("HoverContent"); }
 	virtual void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const {}

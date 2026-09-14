@@ -677,6 +677,11 @@ void UProjectAbilitySystemComponent::CancelAbilitiesWithTag(const FGameplayTag& 
 
 void UProjectAbilitySystemComponent::OnAttributeChanged(float NewValue, const FGameplayEffectModCallbackData* CallbackData)
 {
+	if (!CallbackData)
+	{
+		return;
+	}
+
 	const auto* Entry = AttributeChangedTriggerMapping.Find(CallbackData->EvaluatedData.Attribute);
 
 	if(ensure(Entry))

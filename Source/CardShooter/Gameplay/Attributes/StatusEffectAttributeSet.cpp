@@ -1,60 +1,65 @@
 #include "StatusEffectAttributeSet.h"
 
 #include "Net/UnrealNetwork.h"
+#include "GameplayEffectExtension.h"
 
 void UStatusEffectAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, ShockBuildUp, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, ImmolationBuildUp, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, FreezeBuildUp, COND_None, REPNOTIFY_Always);
 }
 
 void UStatusEffectAttributeSet::OnRep_ShockBuildUp(const FGameplayAttributeData& OldValue)
 {
-    UE_LOG(LogTemp, Log,
-        TEXT("BEFORE REPNOTIFY: Property=%f"),
-        ShockBuildUp.GetCurrentValue());
-
-    if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
-    {
-        UE_LOG(LogTemp, Log,
-            TEXT("BEFORE REPNOTIFY: ASC Current=%f Base=%f"),
-            ASC->GetNumericAttribute(GetShockBuildUpAttribute()),
-            ASC->GetNumericAttributeBase(GetShockBuildUpAttribute()));
-    }
-
-    GAMEPLAYATTRIBUTE_REPNOTIFY(UStatusEffectAttributeSet, ShockBuildUp, OldValue);
-
-    if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
-    {
-        UE_LOG(LogTemp, Log,
-            TEXT("AFTER REPNOTIFY: Property=%f ASC Current=%f Base=%f"),
-            ShockBuildUp.GetCurrentValue(),
-            ASC->GetNumericAttribute(GetShockBuildUpAttribute()),
-            ASC->GetNumericAttributeBase(GetShockBuildUpAttribute()));
-    }	
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UStatusEffectAttributeSet, ShockBuildUp, OldValue);
 }
 
-void UStatusEffectAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+void UStatusEffectAttributeSet::OnRep_ImmolationBuildUp(const FGameplayAttributeData& OldValue)
 {
-	Super::PreAttributeChange(Attribute, NewValue);
-    if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
-    {
-        UE_LOG(LogTemp, Log,
-            TEXT("PreAttributeChanged: Current=%f Base=%f"),
-            ASC->GetNumericAttribute(GetShockBuildUpAttribute()),
-            ASC->GetNumericAttributeBase(GetShockBuildUpAttribute()));
-    }
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UStatusEffectAttributeSet, ImmolationBuildUp, OldValue);
+}
+
+void UStatusEffectAttributeSet::OnRep_FreezeBuildUp(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UStatusEffectAttributeSet, FreezeBuildUp, OldValue);
 }
 
 void UStatusEffectAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
-    if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
-    {
-        UE_LOG(LogTemp, Log,
-            TEXT("PostAttributeChanged: Current=%f Base=%f"),
-            ASC->GetNumericAttribute(GetShockBuildUpAttribute()),
-            ASC->GetNumericAttributeBase(GetShockBuildUpAttribute()));
-    }
+}
+
+void UStatusEffectAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetShockBuildUpAttribute() ||
+		Attribute == GetImmolationBuildUpAttribute() ||
+		Attribute == GetFreezeBuildUpAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+}
+
+void UStatusEffectAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	const FGameplayAttribute& ModifiedAttribute = Data.EvaluatedData.Attribute;
+
+	if (ModifiedAttribute == GetShockBuildUpAttribute())
+	{
+		SetShockBuildUp(FMath::Clamp(GetShockBuildUp(), 0.0f, 100.0f));
+	}
+	else if (ModifiedAttribute == GetFreezeBuildUpAttribute())
+	{
+		SetFreezeBuildUp(FMath::Clamp(GetFreezeBuildUp(), 0.0f, 100.0f));
+	}
+	else if (ModifiedAttribute == GetImmolationBuildUpAttribute())
+	{
+		SetImmolationBuildUp(FMath::Clamp(GetImmolationBuildUp(), 0.0f, 100.0f));
+	}
 }

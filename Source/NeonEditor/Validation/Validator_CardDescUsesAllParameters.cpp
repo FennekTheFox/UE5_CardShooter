@@ -96,7 +96,7 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 
 	}
 
-	for(const FGameplayTag& MissingParameter : UsedParameters)
+	for (const FGameplayTag& MissingParameter : UsedParameters)
 	{
 		FString Unused;
 		FString ParameterKey;
@@ -239,53 +239,53 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 				}
 			}
 
-				for (auto&& KVPair : WithParameters->HoverContextObjects)
+			for (auto&& KVPair : WithParameters->HoverContextObjects)
+			{
+				if (!ensure(KVPair.Value))
 				{
-					if (!ensure(KVPair.Value))
-					{
-						continue;
-					}
-
-					UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
-
-					if (AsGE_CE&& AsGE_CE->EffectDesc.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
-					{
-						UsedParameters.Remove(ParameterTag);
-						i--;
-						continue;
-					}
+					continue;
 				}
 
-				for (auto&& KVPair : WithParameters->HoverContextObjects)
+				UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
+
+				if (AsGE_CE && AsGE_CE->EffectDesc.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
 				{
-					if (!ensure(KVPair.Value))
-					{
-						continue;
-					}
-
-					if (!KVPair.Value->ImplementsInterface(UHoverableContext::StaticClass()))
-					{
-						continue;
-					}
-
-					UObject* CDO = KVPair.Value->GetDefaultObject();
-
-					if (!ensure(CDO))
-					{
-						continue;
-					}
-
-					FText RawHoverContent;
-
-					IHoverableContext::Execute_GetHoverContent(CDO, RawHoverContent);
-
-					if (RawHoverContent.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
-					{
-						UsedParameters.Remove(ParameterTag);
-						i--;
-						continue;
-					}
+					UsedParameters.Remove(ParameterTag);
+					i--;
+					continue;
 				}
+			}
+
+			for (auto&& KVPair : WithParameters->HoverContextObjects)
+			{
+				if (!ensure(KVPair.Value))
+				{
+					continue;
+				}
+
+				if (!KVPair.Value->ImplementsInterface(UHoverableContext::StaticClass()))
+				{
+					continue;
+				}
+
+				UObject* CDO = KVPair.Value->GetDefaultObject();
+
+				if (!ensure(CDO))
+				{
+					continue;
+				}
+
+				FText RawHoverContent;
+
+				IHoverableContext::Execute_GetHoverContent(CDO, FSetByCallerMetaData(), RawHoverContent, WithParameters);
+
+				if (RawHoverContent.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
+				{
+					UsedParameters.Remove(ParameterTag);
+					i--;
+					continue;
+				}
+			}
 		}
 	}
 }

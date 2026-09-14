@@ -112,13 +112,29 @@ private:
 
 		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
 		{
-			IHoverableContext::Execute_GetHoverContent(HoverObject, Content);
-
 			FCardIdentity TheCardIdentity = CardIdentity.Get();
 
 			if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(relatedExecFrag))
 			{
-				IHoverableContext::Execute_GetHoverContent(HoverObject, Content);
+				FCardExecution_AdditionalData tempAddData;
+				UCardEffectFragment_Execution_WithParameters::GetAdditionalExecData(AsCEF_E_WP, TheCardIdentity, tempAddData);
+
+				if (auto* AsCardParam = Cast<UCardParameter>(HoverObject))
+				{
+					if (int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag))
+					{
+						IHoverableContext::Execute_GetHoverContent(HoverObject, tempAddData.SetByCallerMetaDataValues[Index], Content, AsCEF_E_WP);
+					}
+					else
+					{
+						IHoverableContext::Execute_GetHoverContent(HoverObject, FSetByCallerMetaData(), Content, AsCEF_E_WP);
+					}
+				}
+				else
+				{
+					IHoverableContext::Execute_GetHoverContent(HoverObject, FSetByCallerMetaData(), Content, AsCEF_E_WP);
+				}
+
 				FFormatNamedArguments Args;
 				AsCEF_E_WP->GetFormattingArgs(Args, TheCardIdentity);
 				Content = UCardShooterUtilityLibrary::FormatTextForDisplay(Content);
@@ -147,7 +163,28 @@ private:
 
 		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
 		{
-			IHoverableContext::Execute_GetHoverContentTitle(HoverObject, Title);
+			if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(relatedExecFrag))
+			{
+				FCardIdentity TheCardIdentity = CardIdentity.Get();
+				FCardExecution_AdditionalData tempAddData;
+				UCardEffectFragment_Execution_WithParameters::GetAdditionalExecData(AsCEF_E_WP, TheCardIdentity, tempAddData);
+
+				if (auto* AsCardParam = Cast<UCardParameter>(HoverObject))
+				{
+					if (int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag))
+					{
+						IHoverableContext::Execute_GetHoverContentTitle(HoverObject, tempAddData.SetByCallerMetaDataValues[Index], Title, AsCEF_E_WP);
+					}
+					else
+					{
+						IHoverableContext::Execute_GetHoverContentTitle(HoverObject, FSetByCallerMetaData(), Title, AsCEF_E_WP);
+					}
+				}
+				else
+				{
+					IHoverableContext::Execute_GetHoverContentTitle(HoverObject, FSetByCallerMetaData(), Title, AsCEF_E_WP);
+				}
+			}
 		}
 
 		if (UCardEffectFragment_Base* AsCEF_B = Cast<UCardEffectFragment_Base>(HoverObject))

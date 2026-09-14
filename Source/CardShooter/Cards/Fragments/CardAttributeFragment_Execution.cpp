@@ -111,6 +111,43 @@ void UCardEffectFragment_Execution_WithParameters::GatherParameters(FCardExecuti
 	}
 }
 
+void UCardEffectFragment_Execution_WithParameters::GetAdditionalExecData(const UCardEffectFragment_Execution_WithParameters* RelatedExec, const FCardIdentity& CardIdentity, FCardExecution_AdditionalData& OutData)
+{
+	for (const UCardParameter* Param : RelatedExec->Parameters)
+	{
+		if (!Param)
+		{
+			continue;
+		}
+
+		OutData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
+		OutData.SetByCallerMetaDataValues.Add(Param->MetaData);
+	}
+
+	//apply the card augments
+	TArray<UItem_CardAugment*> Augments;
+	UCardData::GetAugments(CardIdentity, Augments);
+	for (UItem_CardAugment* AugmentItem : Augments)
+	{
+		if (!AugmentItem)
+		{
+			continue;
+		}
+		FCardAugmentData AugmentData = AugmentItem->AugmentData;
+		UCardAugment* AugmentCDO = nullptr;
+
+		if (UClass* AugmentClass = AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
+		{
+			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
+		}
+
+		if (AugmentCDO)
+		{
+			AugmentCDO->ApplyAugment(OutData, AugmentData);
+		}
+	}
+}
+
 void UCardEffectFragment_Execution_WithParameters::AppendFormattingArgsFromHoverContextObjects(const UCardEffectFragment_Execution_WithParameters* RelatedExec, const TMap<FString, TSubclassOf<class UObject>>& HoverContextObjects, FFormatNamedArguments& Args, FCardIdentity CardIdentity)
 {
 	if (!ensure(RelatedExec))
@@ -237,39 +274,7 @@ void UCardEffectFragment_Execution_WithParameters::GetFormattingArgs(FFormatName
 
 	//create temporary proxy exec data
 	FCardExecution_AdditionalData tempAddData;
-	for (const UCardParameter* Param : Parameters)
-	{
-		if (!Param)
-		{
-			continue;
-		}
-
-		tempAddData.SetByCallerMetaDataTags.Add(Param->ParameterTag);
-		tempAddData.SetByCallerMetaDataValues.Add(Param->MetaData);
-	}
-
-	//apply the card augments
-	TArray<UItem_CardAugment*> Augments;
-	UCardData::GetAugments(CardIdentity, Augments);
-	for (UItem_CardAugment* AugmentItem : Augments)
-	{
-		if (!AugmentItem)
-		{
-			continue;
-		}
-		FCardAugmentData AugmentData = AugmentItem->AugmentData;
-		UCardAugment* AugmentCDO = nullptr;
-
-		if (UClass* AugmentClass =AugmentData.AugmentClass.TryLoadClass<UCardAugment>())
-		{
-			AugmentCDO = AugmentClass->GetDefaultObject<UCardAugment>();
-		}
-
-		if (AugmentCDO)
-		{
-			AugmentCDO->ApplyAugment(tempAddData, AugmentData);
-		}
-	}
+	UCardEffectFragment_Execution_WithParameters::GetAdditionalExecData(this, CardIdentity, tempAddData);
 
 	//Iterate over all SetByCaller magnitudes
 	for (int32 i = 0; i < tempAddData.SetByCallerMetaDataTags.Num(); i++)

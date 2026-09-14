@@ -14,12 +14,12 @@
 #define LOCTEXT_NAMESPACE "CardData"
 
 
-void UDedicationData::GetHoverContentTitle_Implementation(FText& OutText) const
+void UDedicationData::GetHoverContentTitle_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = DedicationTitle;
 }
 
-void UDedicationData::GetHoverContent_Implementation(FText& OutText) const
+void UDedicationData::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = DedicationText;
 }
