@@ -23,6 +23,9 @@ public:
 	ATTRIBUTE_ACCESSORS(UStatusEffectAttributeSet, FreezeBuildUp);
 	ATTRIBUTE_ACCESSORS(UStatusEffectAttributeSet, FreezeResistanceMultiplier);
 	ATTRIBUTE_ACCESSORS(UStatusEffectAttributeSet, FreezeAmplification);
+	ATTRIBUTE_ACCESSORS(UStatusEffectAttributeSet, ToxinBuildUp);
+	ATTRIBUTE_ACCESSORS(UStatusEffectAttributeSet, ToxinResistanceMultiplier);
+	ATTRIBUTE_ACCESSORS(UStatusEffectAttributeSet, ToxinAmplification);
 
 	UFUNCTION()
 	void OnRep_ShockBuildUp(const FGameplayAttributeData& OldValue);
@@ -32,6 +35,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_FreezeBuildUp(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_ToxinBuildUp(const FGameplayAttributeData& OldValue);
 
 
 	void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
@@ -73,4 +79,13 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData FreezeAmplification;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ToxinBuildUp, meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ToxinBuildUp;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ToxinResistanceMultiplier;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ToxinAmplification;
 };

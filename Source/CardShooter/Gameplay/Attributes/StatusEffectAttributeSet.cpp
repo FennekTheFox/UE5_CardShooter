@@ -10,6 +10,7 @@ void UStatusEffectAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetim
 	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, ShockBuildUp, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, ImmolationBuildUp, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, FreezeBuildUp, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UStatusEffectAttributeSet, ToxinBuildUp, COND_None, REPNOTIFY_Always);
 }
 
 void UStatusEffectAttributeSet::OnRep_ShockBuildUp(const FGameplayAttributeData& OldValue)
@@ -27,6 +28,11 @@ void UStatusEffectAttributeSet::OnRep_FreezeBuildUp(const FGameplayAttributeData
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UStatusEffectAttributeSet, FreezeBuildUp, OldValue);
 }
 
+void UStatusEffectAttributeSet::OnRep_ToxinBuildUp(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UStatusEffectAttributeSet, ToxinBuildUp, OldValue);
+}
+
 void UStatusEffectAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
@@ -38,7 +44,8 @@ void UStatusEffectAttributeSet::PreAttributeChange(const FGameplayAttribute& Att
 
 	if (Attribute == GetShockBuildUpAttribute() ||
 		Attribute == GetImmolationBuildUpAttribute() ||
-		Attribute == GetFreezeBuildUpAttribute())
+		Attribute == GetFreezeBuildUpAttribute() ||
+		Attribute == GetToxinBuildUpAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
 	}
@@ -61,5 +68,9 @@ void UStatusEffectAttributeSet::PostGameplayEffectExecute(const struct FGameplay
 	else if (ModifiedAttribute == GetImmolationBuildUpAttribute())
 	{
 		SetImmolationBuildUp(FMath::Clamp(GetImmolationBuildUp(), 0.0f, 100.0f));
+	}
+	else if (ModifiedAttribute == GetToxinBuildUpAttribute())
+	{
+		SetToxinBuildUp(FMath::Clamp(GetToxinBuildUp(), 0.0f, 100.0f));
 	}
 }
