@@ -67,7 +67,7 @@ public:
 
 	//BEGIN IHoverableContext
 	void GetHoverContentTitle_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
-	void GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
+	void GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
 	//END IHoverableContext
 
 	FText GetStyle(const FSetByCallerMetaData& InMetaData) override;
@@ -84,7 +84,7 @@ public:
 
 	//BEGIN IHoverableContext
 	void GetHoverContentTitle_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
-	void GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
+	void GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
 	//END IHoverableContext
 
 	FText GetStyle(const FSetByCallerMetaData& InMetaData) override;

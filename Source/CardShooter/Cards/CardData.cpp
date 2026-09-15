@@ -19,7 +19,7 @@ void UDedicationData::GetHoverContentTitle_Implementation(const FSetByCallerMeta
 	OutText = DedicationTitle;
 }
 
-void UDedicationData::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
+void UDedicationData::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = DedicationText;
 }

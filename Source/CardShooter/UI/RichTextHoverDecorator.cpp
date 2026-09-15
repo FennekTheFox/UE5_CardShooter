@@ -96,19 +96,19 @@ private:
 			return AsCEF_A->GetLocalizableDescription(CardIdentity.Get());
 		}
 
-		if (UGameplayEffect_CardExecution* AsGA_CE = Cast<UGameplayEffect_CardExecution>(HoverObject))
-		{
-			if (UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(relatedExecFrag))
-			{
-				return AsGA_CE->GetDescription(CardIdentity.Get(), AsCEF_AETO);
-			}
-			else if (UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(relatedExecFrag))
-			{
-				return AsGA_CE->GetDescription(CardIdentity.Get(), AsCEF_GA);
-			}
+		//if (UGameplayEffect_CardExecution* AsGA_CE = Cast<UGameplayEffect_CardExecution>(HoverObject))
+		//{
+		//	if (UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(relatedExecFrag))
+		//	{
+		//		return AsGA_CE->GetDescription(CardIdentity.Get(), AsCEF_AETO);
+		//	}
+		//	else if (UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(relatedExecFrag))
+		//	{
+		//		return AsGA_CE->GetDescription(CardIdentity.Get(), AsCEF_GA);
+		//	}
 
-			return AsGA_CE->GetDescription(CardIdentity.Get());
-		}
+		//	return AsGA_CE->GetDescription(CardIdentity.Get());
+		//}
 
 		if (HoverObject->GetClass()->ImplementsInterface(UHoverableContext::StaticClass()))
 		{
@@ -123,16 +123,16 @@ private:
 				{
 					if (int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag))
 					{
-						IHoverableContext::Execute_GetHoverContent(HoverObject, tempAddData.SetByCallerMetaDataValues[Index], Content, AsCEF_E_WP);
+						IHoverableContext::Execute_GetHoverContent(HoverObject, tempAddData.SetByCallerMetaDataValues[Index], Content, TheCardIdentity, AsCEF_E_WP);
 					}
 					else
 					{
-						IHoverableContext::Execute_GetHoverContent(HoverObject, FSetByCallerMetaData(), Content, AsCEF_E_WP);
+						IHoverableContext::Execute_GetHoverContent(HoverObject, FSetByCallerMetaData(), Content, TheCardIdentity, AsCEF_E_WP);
 					}
 				}
 				else
 				{
-					IHoverableContext::Execute_GetHoverContent(HoverObject, FSetByCallerMetaData(), Content, AsCEF_E_WP);
+					IHoverableContext::Execute_GetHoverContent(HoverObject, FSetByCallerMetaData(), Content, TheCardIdentity, AsCEF_E_WP);
 				}
 
 				FFormatNamedArguments Args;

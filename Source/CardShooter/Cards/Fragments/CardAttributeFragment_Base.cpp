@@ -168,7 +168,7 @@ void UCardParameter_ScalingGroupParameter::GetHoverContentTitle_Implementation(c
 	OutText = FText::Format(LOCTEXT("CardParam_SGParam_Title", "Card Parameter: {0}"), MetaData.ParameterName);
 }
 
-void UCardParameter_ScalingGroupParameter::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
+void UCardParameter_ScalingGroupParameter::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = FText::GetEmpty();
 
@@ -206,7 +206,7 @@ void UCardParameter_DamageType::GetHoverContentTitle_Implementation(const FSetBy
 	OutText = FText::Format(LOCTEXT("CardParam_DamageType_Title", "Damage Type: {0}"), InMetaData.GetDisplayText());
 }
 
-void UCardParameter_DamageType::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
+void UCardParameter_DamageType::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	const TSubclassOf<UNeonDamageType>* DamageTypeContext = DamageTypeMap.Find((int)InMetaData.Magnitude);
 
@@ -216,7 +216,7 @@ void UCardParameter_DamageType::GetHoverContent_Implementation(const FSetByCalle
 	}
 
 	FText DamageTypeDesc;
-	IHoverableContext::Execute_GetHoverContent(DamageTypeContext->GetDefaultObject(), FSetByCallerMetaData(), DamageTypeDesc, RelatedExec);
+	IHoverableContext::Execute_GetHoverContent(DamageTypeContext->GetDefaultObject(), FSetByCallerMetaData(), DamageTypeDesc, CardIdentity, RelatedExec);
 
 	OutText = FText::Format(LOCTEXT("CardParam_DamageType_Desc", "Default Type: {0}\n\n{1}"), 
 		MetaData.GetDisplayText(),

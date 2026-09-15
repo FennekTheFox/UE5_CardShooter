@@ -122,7 +122,10 @@ FText UCardEffectFragment_GameplayAbility::GetRawLocalizableDescription(const FC
 
 	if (UGameplayAbility_CardExecution* AsGA_CE = Cast<UGameplayAbility_CardExecution>(AbilityToExecute.Ability->GetDefaultObject()))
 	{
-
+		if (AsGA_CE->GetName().IsEmpty())
+		{
+			return AsGA_CE->GetDescription(CardIdentity);
+		}
 		return FText::Format(FText::FromString("{0}: {1}"),
 			AsGA_CE->GetName(),
 			AsGA_CE->GetDescription(CardIdentity));

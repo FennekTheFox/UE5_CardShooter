@@ -21,6 +21,9 @@ public:
 	FText DetailedEffectName;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<FString, TSubclassOf<UObject>> HoverContextObjects;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FText EffectDesc;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
@@ -40,9 +43,9 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure)
-	FText GetDescription(const FCardIdentity& CardIdentity);
+	FText GetDescription(const FCardIdentity& CardIdentity) const;
 
-	FText GetDescription(const FCardIdentity& CardIdentity, class UCardEffectFragment_Execution_WithParameters* OwningCEF_E_WP);
+	FText GetDescription(const FCardIdentity& CardIdentity, const class UCardEffectFragment_Execution_WithParameters* OwningCEF_E_WP) const;
 
 	UFUNCTION(BlueprintPure)
 	class UTexture2D* GetIcon() 
@@ -52,5 +55,9 @@ public:
 
 
 	void GetHoverContentTitle_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
+	void GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec = nullptr) const override;
+
+
+	void GetFormattingArgs(const UCardEffectFragment_Execution_WithParameters* RelatedExec, FFormatNamedArguments& FormattingArguments) const override;
 
 };

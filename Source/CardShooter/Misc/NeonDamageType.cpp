@@ -15,7 +15,7 @@ void UNeonDamageType::GetHoverContentTitle_Implementation(const FSetByCallerMeta
 		DamageTypeName);
 }
 
-void UNeonDamageType::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
+void UNeonDamageType::GetHoverContent_Implementation(const FSetByCallerMetaData& InMetaData, FText& OutText, const FCardIdentity& CardIdentity, const UCardEffectFragment_Execution_WithParameters* RelatedExec) const
 {
 	OutText = DamageTypeDescription;
 }

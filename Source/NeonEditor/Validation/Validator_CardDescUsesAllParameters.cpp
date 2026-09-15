@@ -277,7 +277,7 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 
 				FText RawHoverContent;
 
-				IHoverableContext::Execute_GetHoverContent(CDO, FSetByCallerMetaData(), RawHoverContent, WithParameters);
+				IHoverableContext::Execute_GetHoverContent(CDO, FSetByCallerMetaData(), RawHoverContent, Identity, WithParameters);
 
 				if (RawHoverContent.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
 				{
