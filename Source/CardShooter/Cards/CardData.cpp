@@ -208,6 +208,30 @@ void GatherParameterTagsFromExecution(UCardEffectFragment_Execution* Exec, TArra
 	}
 }
 
+void GatherLocalizedParameterTagsFromExecution(UCardEffectFragment_Execution* Exec, TArray<FGameplayTag>& OutParameters)
+{
+	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
+	{
+		for (const UCardParameter* Param : AsCEF_E_WP->Parameters)
+		{
+			if (!Param || !Param->bNeedsLocalization)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param->ParameterTag);
+		}
+	}
+
+	if (UCardEffectFragment_Execution_Compound* AsCEF_E_C = Cast<UCardEffectFragment_Execution_Compound>(Exec))
+	{
+		for (UCardEffectFragment_Execution* CompExec : AsCEF_E_C->Executions)
+		{
+			GatherParameterTagsFromExecution(CompExec, OutParameters);
+		}
+	}
+}
+
 void GatherParametersFromExecution(UCardEffectFragment_Execution* Exec, TArray<UCardParameter*>& OutParameters)
 {
 	if (UCardEffectFragment_Execution_WithParameters* AsCEF_E_WP = Cast<UCardEffectFragment_Execution_WithParameters>(Exec))
@@ -274,6 +298,32 @@ void UCardData::GetAllUsedParameterTags(TArray<FGameplayTag>& OutParameters) con
 		for (UCardParameter* Param : Attribute->Parameters)
 		{
 			if (!Param)
+			{
+				continue;
+			}
+
+			OutParameters.AddUnique(Param->ParameterTag);
+		}
+	}
+}
+
+void UCardData::GetAllLocalizedParameterTags(TArray<FGameplayTag>& OutParameters) const
+{
+
+	if (ensure(PrimaryExecution))
+	{
+		GatherLocalizedParameterTagsFromExecution(PrimaryExecution, OutParameters);
+	}
+	if (SecondaryExecution)
+	{
+		GatherLocalizedParameterTagsFromExecution(SecondaryExecution, OutParameters);
+	}
+
+	for (UCardEffectFragment_Attribute* Attribute : CardAttributes)
+	{
+		for (UCardParameter* Param : Attribute->Parameters)
+		{
+			if (!Param || !Param->bNeedsLocalization)
 			{
 				continue;
 			}

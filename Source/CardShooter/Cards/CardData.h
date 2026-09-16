@@ -111,6 +111,9 @@ public:
 	void GetAllUsedParameterTags(TArray<FGameplayTag>& OutParameters) const;
 
 	UFUNCTION(BlueprintCallable)
+	void GetAllLocalizedParameterTags(TArray<FGameplayTag>& OutParameters) const;
+
+	UFUNCTION(BlueprintCallable)
 	void GetAllUsedParameters(TArray<UCardParameter*>& OutParameters) const;
 
 	UFUNCTION(BlueprintCallable)

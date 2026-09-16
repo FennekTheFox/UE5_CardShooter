@@ -121,7 +121,8 @@ private:
 
 				if (auto* AsCardParam = Cast<UCardParameter>(HoverObject))
 				{
-					if (int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag))
+					int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag);
+					if (Index != INDEX_NONE)
 					{
 						IHoverableContext::Execute_GetHoverContent(HoverObject, tempAddData.SetByCallerMetaDataValues[Index], Content, TheCardIdentity, AsCEF_E_WP);
 					}
@@ -171,7 +172,8 @@ private:
 
 				if (auto* AsCardParam = Cast<UCardParameter>(HoverObject))
 				{
-					if (int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag))
+					int32 Index = tempAddData.SetByCallerMetaDataTags.Find(AsCardParam->ParameterTag);
+					if(Index != INDEX_NONE)
 					{
 						IHoverableContext::Execute_GetHoverContentTitle(HoverObject, tempAddData.SetByCallerMetaDataValues[Index], Title, AsCEF_E_WP);
 					}

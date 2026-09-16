@@ -50,6 +50,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FSetByCallerMetaData MetaData;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bNeedsLocalization = true;
+
 	//BEGIN IHoverableContext
 	void GetHoverText_Implementation(FText& OutText) const override;
 	//END IHoverableContext

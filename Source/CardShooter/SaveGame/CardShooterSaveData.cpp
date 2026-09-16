@@ -247,7 +247,7 @@ void UCardShooterSaveData::GetCardCollectionGroupIdentities(TArray<FCardIdentity
 
 	OutCards.RemoveAll([](const FCardIdentity& Card) {return Card == FCardIdentity();});
 
-	for (int i = 0; i < OutCards.Num(); i++)
+	for (int i = 0; i < OutCards.Num() -1; i++)
 	{
 		const FCardIdentity& CurrentCard = OutCards[i];
 
@@ -256,7 +256,7 @@ void UCardShooterSaveData::GetCardCollectionGroupIdentities(TArray<FCardIdentity
 		{
 			const FCardIdentity& OtherCard = OutCards[j];
 
-			if (CurrentCard != OtherCard && CurrentCard.AssetTag == OtherCard.AssetTag)
+			if (/*CurrentCard != OtherCard &&*/ CurrentCard.AssetTag == OtherCard.AssetTag)
 			{
 				if (CurrentCard < OtherCard)
 				{
@@ -266,8 +266,8 @@ void UCardShooterSaveData::GetCardCollectionGroupIdentities(TArray<FCardIdentity
 				}
 				else
 				{
-					j--;
 					OutCards.RemoveAt(j);
+					j--;
 				}
 			}
 		}
