@@ -139,6 +139,59 @@ EDataValidationResult UValidator_CardDescUsesAllParameters::ValidateLoadedAsset_
 }
 
 
+
+static bool RecursivelyIterateOverHoverContext(
+	const TSubclassOf<UObject> HoverContextClass,
+	const FGameplayTag ParameterTag,
+	const FCardIdentity& Identity,
+	const FString& RequiredToken,
+	TArray<FGameplayTag>& UsedParameters,
+	const UCardEffectFragment_Execution_WithParameters* WithParameters,
+	UObject* Asset,
+	int& i)
+{
+	if (!ensure(HoverContextClass))
+	{
+		return false;
+	}
+
+	if (!HoverContextClass->ImplementsInterface(UHoverableContext::StaticClass()))
+	{
+		return false;
+	}
+
+	UObject* CDO = HoverContextClass->GetDefaultObject();
+
+	if (!ensure(CDO))
+	{
+		return false;
+	}
+
+	FText RawHoverContent;
+
+	IHoverableContext::Execute_GetHoverContent(CDO, FSetByCallerMetaData(), RawHoverContent, Identity, WithParameters);
+
+	if (RawHoverContent.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
+	{
+		UsedParameters.Remove(ParameterTag);
+		i--;
+		return true;
+	}
+
+	if (const UHoverContextObject_Base* AsHoverBase = Cast<UHoverContextObject_Base>(CDO))
+	{
+		for (auto&& KVPair : AsHoverBase->HoverContextObjects)
+		{
+			if (RecursivelyIterateOverHoverContext(KVPair.Value, ParameterTag, Identity, RequiredToken, UsedParameters, WithParameters, Asset, i))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 UValidator_CardDescUsesAllParameters::UValidator_CardDescUsesAllParameters()
 {
 	Exceptions.Add(FGameplayTag::RequestGameplayTag("Gameplay.Effect.Parameters.SecondaryUtilityCooldown"));
@@ -166,14 +219,14 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 		return;
 	}
 
-	if (UCardEffectFragment_Execution_WithParameters* WithParameters =
+	if (const UCardEffectFragment_Execution_WithParameters* WithParameters =
 		Cast<UCardEffectFragment_Execution_WithParameters>(Execution))
 	{
 		const FString ExecDesc =
 			WithParameters->GetRawLocalizableDescription(Identity).ToString();
 
 
-		UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(WithParameters);
+		const UCardEffectFragment_ApplyEffectToOwner* AsCEF_AETO = Cast<UCardEffectFragment_ApplyEffectToOwner>(WithParameters);
 		FString EffectDesc = "";
 		if (AsCEF_AETO)
 		{
@@ -185,7 +238,7 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 				}
 			}
 		}
-		UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(WithParameters);
+		const UCardEffectFragment_GameplayAbility* AsCEF_GA = Cast<UCardEffectFragment_GameplayAbility>(WithParameters);
 
 		for (int32 i = 0; i < UsedParameters.Num(); i++)
 		{
@@ -246,7 +299,7 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 					continue;
 				}
 
-				UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
+				const UGameplayEffect_CardExecution* AsGE_CE = Cast<UGameplayEffect_CardExecution>(KVPair.Value->GetDefaultObject());
 
 				if (AsGE_CE && AsGE_CE->EffectDesc.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
 				{
@@ -258,33 +311,10 @@ void UValidator_CardDescUsesAllParameters::ValidateExecutionRecursive(
 
 			for (auto&& KVPair : WithParameters->HoverContextObjects)
 			{
-				if (!ensure(KVPair.Value))
+				if (RecursivelyIterateOverHoverContext(KVPair.Value, ParameterTag, Identity, RequiredToken, UsedParameters, WithParameters, Asset, i))
 				{
 					continue;
-				}
-
-				if (!KVPair.Value->ImplementsInterface(UHoverableContext::StaticClass()))
-				{
-					continue;
-				}
-
-				UObject* CDO = KVPair.Value->GetDefaultObject();
-
-				if (!ensure(CDO))
-				{
-					continue;
-				}
-
-				FText RawHoverContent;
-
-				IHoverableContext::Execute_GetHoverContent(CDO, FSetByCallerMetaData(), RawHoverContent, Identity, WithParameters);
-
-				if (RawHoverContent.ToString().Contains(RequiredToken, ESearchCase::CaseSensitive))
-				{
-					UsedParameters.Remove(ParameterTag);
-					i--;
-					continue;
-				}
+				}					
 			}
 		}
 	}
